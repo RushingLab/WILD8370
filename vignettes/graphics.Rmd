@@ -1,0 +1,126 @@
+---
+title: "Checklist and tips for publication-quality graphics in R"
+subtitle: "WILD8370: Bayesian Models for Conservation Science"
+date: "updated on `r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    keep_md: yes
+vignette: >
+  %\VignetteIndexEntry{Graphics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,warning = FALSE, message = FALSE,
+  comment = "#>"
+)
+library(emo)
+```
+
+# Attributes of good figures
+
+Effective data visualizations should:
+
+1) **Tell a story**. Each figure in a manuscript or report should communicate one of the main findings you want readers to know. A casual reader should be able to understand the primary findings by looking at the figures.
+
+2) **Be intuitive**. Strive for figures that readers can understand without having to read the caption or text. Readers should at least grasp the main gist of the figure just by looking at it.
+
+3) **Err towards simplicity**. Avoid clutter. Avoid gratuitous use of visual attributes (color, size, shape) that do not show attributes of the data. Avoid background colors. Use grid lines sparingly and only when they make interpretation of the data easier.
+
+4) **Be readable**. The default sizes for axis labels and text are rarely big enough. You will almost always need to make them bigger.
+
+5) **Maximize data-ink ratio, within reason**. Related to point 3, most of the "ink" in your figure should show data rather than non-data (axis ticks/labels, titles, legends, grid lines, etc.). Maximize ink that shows data relative to non-data, [within reason](https://clauswilke.com/dataviz/balance-data-context.html).
+
+6) **Have a visual hierarchy**. The most important information in the plot should be the most visible. Use layering, color, brightness, size, transparency, etc. to make important attributes (generally data, sometimes even specific portions of the data) jump out and less important attributes (axis ticks/lines, grid lines, less important data points) fade into the background.
+
+# What type of figure should I use?
+
+**Trends or time series** - line chart
+
+**Amounts/comparisons of discrete groups**  - bar chart, dot plot with error bars
+
+**Frequencies/distributions** - histogram
+
+**Associations of 2 or more continuous variables** - scatterplot
+
+**Comparing distributions of discrete groups** - box-and-whisker plot, violin plt
+
+**Spatial relationships** - map
+
+# Visualization checklist
+
+Below is a list of considerations for making high-quality figures for publications. This is not a complete list and these should be considered suggestions. 
+
+- Does your figure include a caption that clearly explains all elements needed to interpret the visualization? Remember that the caption and figure should be understandable without referencing the main text.
+
+- Does your figure accurately show variability in the data or uncertainty in estimates? 
+
+- Do your axes start and stop at reasonable values?
+
+- Do your axis titles clearly indicate what variables are being shown? Do they include units? 
+
+- Are your axis labels, axis titles, and text annotations appropriately sized? 
+
+- If your figure includes different colors, shapes, or sizes, do these attributes communicate properties of the data? 
+
+- If your figure includes different colors, shapes, or sizes, do you have a legend to show what values are represented by these attributes? 
+
+- Are color palettes colorblind-friendly? 
+
+- If you have overlapping elements (points, bars, etc.), can they be clearly distinguished? 
+
+- If your figure includes multiple panels, are the axis limits consistent? 
+
+- If your figure includes multiple panels, is each panel labeled? 
+
+- Do you have grid lines? If so, do they show relevant information needed to interpret the figure? 
+
+- Do you have grid lines? If so, are they appropriately sized and colored to not distract from the data? 
+
+- Did you use a 3D pie chart? `r emo::ji("angry")`
+
+# Saving high-resolution figures for publication
+
+In many cases, you will need to save your figures rather than render them directly in your .rmd file. The `ggsave()` function is (in my opinion) the easiest way to save high-resolution figures. By default, `ggsave()` will save the last plot that you created in `R` using the ssame size as your graphics device. All you have to tell the function is where to save the figure and what to name the file. So, for example, the following code would save 
+
+```{r eval = FALSE}
+libary(ggplot2)
+
+df <- data.frame(x = seq(1:10), 
+                 y = seq(1:10))
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_point()
+
+ggsave("figs/scatterplot.png")
+```
+
+`ggsave()` also uses whatever file type you name the figure file to guess what format to save the figure as (in this case, png). Options include: "eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", and "svg".
+
+You can also change the defaults to, for example, save a specific figure object, change the figure size, and change the figure resolution. For example,
+
+```{r eval = FALSE}
+libary(ggplot2)
+
+df <- data.frame(x = seq(1:10), 
+                 y = seq(1:10))
+
+p <- ggplot(df, aes(x = x, y = y)) +
+      geom_point()
+
+ggsave(filename = "figs/scatterplot.png",
+       plot = p,
+       width = 5, 
+       height = 8,
+       units = "in",
+       dpi = 600)
+```
+
+Easy!
+
+# Additional resources
+
+[Fundamentals of Data Visualization](https://clauswilke.com/dataviz/), by Claus Wilke. A comprehensive book on data visualization, with lots of `R` code.
+

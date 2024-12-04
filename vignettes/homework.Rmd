@@ -1,0 +1,49 @@
+---
+title: "Homework instructions"
+subtitle: "WILD8370: Bayesian Models for Conservation Science"
+date: "updated on `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Homework instructions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+All homework assignments for this course will be completed R Markdown files. To make the distribution, completion, and grading easier, each homework will follow the same workflow. 
+
+# Homework steps
+
+## Step 1: Create a new directory to store your homework files
+
+1) Create a new directory (or ideally a subdirectoy of your `WILD8370\homework` directory) and call it `LastNameFirstName-Homework#`, replacing `LastNameFirstName` with your last and first names and `#` with the appropriate homework number
+
+## Step 2: Create a new R Markdown file
+
+2a) Click on `File -> New File -> R Markdown...`
+
+2b) In the `Title:` window type `Lab # assignment`, substituting the correct lab number. 
+
+2c) In the `Author` window, type your name  
+
+2d) Click `Ok`
+
+2e) Save the R Markdown file as `LastnameFirstname-homework#` in the directory you created in step 1, replacing `LastNameFirstName` with your last and first names and `#` with the appropriate homework number  
+
+## Step 3: Complete the assignment
+
+3) Complete the assignment, following the instructions in the lab document as you go
+
+## Step 4: Submit your assignment
+
+4a) Before submitting your assignment, always click the "Knit" button to be sure your .Rmd file can be rendered as a HTML page. **If you have any problems rendering the file, please contact your TA prior to the submission deadline.**
+
+4b) Once you know your file can be rendered, upload **both** the `LastnameFirstname-homework#.Rmd` *and* the `LastnameFirstname-homework#.html` files to eLC under the correct assignment folder
+
+**Assignments that fail to follow this instructions will not be graded**

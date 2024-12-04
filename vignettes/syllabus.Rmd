@@ -1,0 +1,186 @@
+---
+title: "Syllabus"
+subtitle: "WILD8370: Bayesian Models for Conservation Science"
+author: "Spring 2025"
+output: 
+  rmarkdown::html_vignette:
+    keep_md: yes
+vignette: >
+  %\VignetteIndexEntry{Syllabus}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,warning = FALSE, message = FALSE,
+  comment = "#>"
+)
+```
+
+*Disclaimer*: The course syllabus is a general plan for the course; deviations announced to the class by the instructor may be necessary.
+
+# LOGISTICS
+
+**Lecture**: Monday, Wednesday 9:10-10:00  
+**Location**: 1-307  
+
+**Lab**: Wednesday 1:50 – 3:50  
+**Location**: 1-307  
+
+# INSTRUCTORS
+Dr. Clark Rushing  
+clark.rushing@uga.edu  
+**Office**: Warnell 3-409   
+**Office hours**: TBD
+
+Dr. Heather Gaya  
+heather.gaya@uga.edu  
+**Office**: Warnell 3-410   
+**Office hours**: TBD  
+
+# COURSE DESCRIPTION
+
+Quantitative models play a central role in linking data to inferences about ecological processes. Although quantitative ecological modeling involves a diverse array of questions and techniques, many of the most common modeling frameworks are based on a set of general underlying principles. This course aims to provide students with a firm understanding of these principles and their application, with a particular focus on modeling the dynamics of plant and animal populations using Bayesian methods. By building from common principles to more specific procedures, students will be better equipped to tailor analyses to their specific data and questions, ultimately leading to deeper and more robust understanding of the ecological systems they study. Concepts discussed during lectures will be reinforced through lab exercises focused on implementing statistical models using modern software tools (e.g. R, Nimble, and git). 
+
+# COURSE OBJECTIVES
+
+The primary objective of this course is to give you the tools to tackle your research questions using rigorous statistical models appropriate for your data. In particular, you will leave this course with:   
+
+* A firm understanding of the foundational principles underlying common ecological models  
+* The ability to express mathematical and theoretical models as they apply to common ecological datasets  
+* The ability to convert those models into working code for Bayesian data analysis  
+* The confidence needed to design, analyze, and report original ecological research using sound quantitative approaches
+
+A secondary objective of this course is to provide you with tools and best practices for storing, manipulating, and analyzing ecological data and developing reproducible code for analyses. In my experience, most graduate students are well trained in methods for data collection and, to a degree, data analysis. However, most students do not receive formal training on the steps between data collection and reporting results from statistical models (e.g., proofing, storing, and formatting data; developing well-documented, reproducible analyses; preparing reports). Advancing the field of ecology also requires a scientific community capable of judging the quality of the code, interpretation, reporting of quantitative models. Graduate students often get few opportunities to critically review the work of their peers or to get constructive feedback on their reviews. The lab portion of this course is specifically designed to provide you with hands on experience with:  
+
+* Best practices for cleaning, formatting, and storing data using R
+* Generating reproducible analyses and reports using R and R Markdown
+* Providing critical peer review of scientific code and reports
+
+# LEARNING OUTCOMES
+
+1)	Understand common deterministic and stochastic models used to analyze ecological data
+2)	Understand key principles of linear models, including design matrices, linear predictors, and model interpretations
+3)	Understand key principles of Bayesian statistics, including Bayes theorem, Markov Chain Monte Carlo methods, prior distributions, and posterior sampling
+4)	Understand the concepts underlying Bayesian hierarchical models, including fixed vs. random effects, hyperparameters, and shrinkage 
+5)	Develop custom Bayesian models using MCMC software (e.g., Nimble) to estimate parameter values and derived quantities of interest for common ecological processes
+6)	Be able to evaluate model convergence/fit of Bayesian models
+7)	Be able to prepare reproducible reports using R and R Markdown
+
+# PREREQUISITES
+
+Students should have at least one semester of both basic ecology and introductory statistics. Although we will thoroughly cover the foundational principles of common statistical models, a basic understanding of ecological theory and statistical inference will be very helpful.  
+ 
+All lab activities for this course will rely heavily on the statistical programming language R (and associated software, including RStudio, Nimble, and git). During the first few weeks, each lab session will begin with a tutorial on these tools so students are not expected to be experts prior to the course. However, we will quickly move into activities that require some degree of R proficiency so we highly recommend that you have a basic understanding of programming in R (e.g., importing/exporting & manipulating data objects, visualizing data) prior to this course. If you find yourself struggling with any aspects of using R, please seek individual help during office hours. The earlier we can get you up to speed, the more painless the remainder of the semester will be.  
+
+
+# COURSE FORMAT
+
+This course will be taught using both lectures and labs. Lectures will focus on the conceptual basis of ecological modeling and Bayesian methods. Labs are designed to reinforce and clarify lecture topics, allowing students to get hands-on experience manipulating, analyzing, and visualizing data. All class materials, including lecture slides, computer code, lab documents, and data, will be posted on the course website prior to class. 
+
+# COURSE RESOURCES
+
+## Textbooks
+
+Although there are many excellent texts covering various aspects of ecological modeling, the lectures for this course will closely follow two: 
+
+> Hobbs, N.T. and M.B. Hooten, 2015. *Bayesian Models: A Statistical Primer for Ecologists* (available [here](https://www.amazon.com/Bayesian-Models-Statistical-Primer-Ecologists/dp/0691159289/ref=sr_1_1?s=books&ie=UTF8&qid=1459363878&sr=1-1&keywords=bayesian+models+a+statistical+primer+for+ecologists))
+
+> Kéry, M. and M. Schaub, 2011. *Bayesian population analysis using WinBUGS: A hierarchical perspective* (available [here](https://www.amazon.com/Bayesian-Population-Analysis-using-WinBUGS/dp/0123870208)). 
+
+Weekly readings will be assigned from these books so we highly recommend all students purchase them prior to the start of the semester. The Kéry & Schaub book also contains a wealth of useful code that, although optional, students are encouraged to implement as they read the text. Chapters from these books may occasionally be supplemented with primary journal articles. When applicable PDF’s of these articles will be posted on the course website. 
+
+Although the two text books and lab materials are sufficient for mastering the material presented in this course, a number of other excellent books are available and students may find some/all of these books helpful. The following books are 100% optional for this course but we have found helpful for learning this material:
+
+> Kéry, M. & Royle, J.A. 2016. *Applied Hierarchical Modeling in Ecology: Analysis of distribution, abundance, and species richness in R and BUGS*. Academic Press.
+
+> Kéry, M., 2010. *Introduction to WinBUGS for ecologists: Bayesian approach to regression, ANOVA, mixed models and related analyses*. Academic Press.
+
+> Williams, B.K., Nichols, J.D., Conroy, M.J., 2001. *Analysis and management of animal populations*. Academic Press.
+
+> Bolker, B.M., 2008. *Ecological models and data in R*. Princeton University Press.
+
+## Lab materials
+
+Materials for labs will be provided as HTML and R Markdown files on the course webpage. These materials will include step-by-step tutorials for all lab exercises as well as links to additional online resources, problem sets, and homework assignments. 
+
+## Software
+
+All lab computers will have R and RStudio installed on them so students are not required to install software on their own computers. However, students are free to use their own laptops during lab and having R and RStudio installed will make it easier to complete lab assignments outside of class. Any students wishing to use their own computers **should have R, RStudio, and JAGS installed and running prior to the first lab**. Detailed instructions for installing R and RStudio can be found [here](http://stat545.com/block000_r-rstudio-install.html). JAGS can be downloaded [here](https://sourceforge.net/projects/mcmc-jags/files/). 
+
+If you plan to use your own computer, **be sure you have the most recent versions of all three software programs installed**. This will greatly decrease the chances of running to issue running the code I will provide in lab. Prior to the start of the semester, test that you have R and RStudio installed correctly by doing the following: 
+
+1) Launch RStudio
+
+2) Put the cursor in the window labelled `Console`. Type the following code followed by enter or return: `x <- 2 * 4`. Next type `x` followed by enter or return. You should see the value 8 print to screen. If yes, you’ve succeeded in installing R and RStudio.
+
+If you encounter any problems with the previous steps, please contact the instructors prior to the first class. 
+
+# ATTENDANCE
+
+As graduate students who willingly signed up for this course, we presume that you are eager to learn the material and are self-motivated enough to put in the required effort. For this reason, we do not set a formal attendance policy. However, we will cover a lot of material over the course of the semester and each topic will build on concepts from previous weeks. As a result, missing even a few lectures or labs will make it difficult for you to fully master the learning outcomes described above. If you know you will be missing any lectures or labs, please contact us in advance so we can make sure you do not get too far behind on the material. 
+
+### A note on fieldwork
+
+We realize that many students have field work obligations during the spring semester. If you need to take this course but know in advance that you will be in the field for a portion of the semester, please let us know ASAP so we can discuss whether field work will be a barrier to taking the course or merely an inconvenience. This distinction will mainly be a function of how long and when you will miss class. If these absences are relatively few, taking the course may still be an option. Students will still be expected to complete and turn in any assignments they miss. If you are going to miss too many classes or will be unable to complete the assignments while you're in the field, it may be better to take the class at a time when your field commitments are smaller. 
+
+# GRADING
+
+Your grade in the course will be based on a total of 200 possible points. Thirty five percent of your grade (70 points) will come from 7 homework assignments. Twenty five percent of your grade (50 points) will come from a midterm exam covering the topics we discuss in lecture during the first half of the semester. The final 40% (80 points) will be based on an individual project due at the end of the semesters.
+ 
+The 7 homework assignments will build on concepts and skills that we cover in lecture and lab. Specific objectives and tasks for each assignment, along with any necessary data, will be posted on the course website. In general, students will be provided with ‘raw’ data and will need to clean/prepare (and document!) data prior to analysis. Each assignment will be due before class the week after the assignment is posted. All assignments must be prepared as R Markdown files that include all text, code, model output, and figures necessary to fully document your work and conclusions (we will spend the first several labs going over preparation of reports using R Markdown so, again, no previous experience is necessary). See [here](https://rushinglab.github.io/WILD8370/articles/homework.html) for instructions on submitting assignment
+
+Individual projects may address an ecological question of your choosing, but must be approved by me during the first half of the semester. You are free to use any data you have access to, including data from your own projects, published datasets, or even simulated data. Once the project topic and data are approved, you are expected to develop statistical models using the tools and skill gained during the semester to gain insights into the ecological processes that generated your data. Once completed, a final report should be prepared as if you were submitting the results to a short-format scientific journal. Additionally, you will give a short oral presentation of your results during the final week of class as if you were presenting at a professional conference. Later in the semester, I will provide a rubric for how the written and oral reports will be assessed. 
+
+
+# GRADING SCALE
+
+```{r grading, echo=FALSE}
+library(kableExtra)
+grades <- data.frame(Grade = c("A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"),
+                       Percent = c("93-100%", "90-92.9%", 
+                                   "87-89.9%", "83-86.9%", "80-82.9%", 
+                                   "77-79.9%", "73-76.9%", "70-72.9%",
+                                   "67-69.9%", "60-66.9%", "59.9% and below"),
+                       Points = c("186-200", "180-185", 
+                                   "174-179", "166-173", "160-165", 
+                                   "154-159", "146-153", "140-145",
+                                   "134-139", "126-133", "0-125"))
+
+grades %>%
+  kable("html", col.names = c("GRADE", "% RANGE", "POINT RANGE"), align = 'c') %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = TRUE)
+
+```
+
+# UNIVERSITY HONOR CODE & ACADEMIC HONESTY
+
+As a University of Georgia student, you have agreed to abide by the UGA academic honesty policy. UGA Student Honor code: 
+
+> I will be academically honest in all of my academic work and will not tolerate academic dishonesty of others  
+
+A Culture of Honesty, the University's policy and procedures for handling cases of suspected dishonesty, can be found at [https://honesty.uga.edu/](https://honesty.uga.edu/)  
+
+You are responsible for informing yourself about the university’s standards before performing any academic work. Lack of knowledge of the academic honesty policy is not a reasonable explanation for a violation. Please ask if you have questions related to course assignments and the academic honesty policy. Any form of possible academic dishonesty will be reported to the UGA Office of the Vice President for Instruction.
+
+# ACCOMMODATIONS FOR DISABILITIES
+
+If you require a disability-required accommodation, it is essential that you register with the Disability Resource Center (Clark Howell Hall; https://drc.uga.edu; 706-542-8719 [voice]; 706-542-8778 [TTY]) and notify me of your eligibility for reasonable accommodations. We can then plan how best to coordinate your accommodations. Please note that accommodations cannot be provided retroactively. 
+
+# WELLNESS STATEMENT 
+
+Mental Health and Wellness Resources:
+
+- If you or someone you know needs assistance, you are encouraged to contact Student Care and Outreach in the Division of Student Affairs at 706-542-7774 or visit [https://sco.uga.edu/](https://sco.uga.edu/). They will help you navigate any difficult circumstances you may be facing by connecting you with the appropriate resources or services.
+
+- UGA has several resources for a student seeking mental health services ([https://www.uhs.uga.edu/bewelluga/bewelluga](https://www.uhs.uga.edu/bewelluga/bewelluga)) or crisis support ([https://www.uhs.uga.edu/info/emergencies](https://www.uhs.uga.edu/info/emergencies)).
+
+- If you need help managing stress anxiety, relationships, etc., please visit BeWellUGA ([https://www.uhs.uga.edu/bewelluga/bewelluga](https://www.uhs.uga.edu/bewelluga/bewelluga)) for a list of FREE workshops, classes, mentoring, and health coaching led by licensed clinicians and health educators in the University Health Center.
+
+- Additional resources can be accessed through the UGA App.
+
+
+# FERPA NOTICE
+
+The Federal Family Educational Rights and Privacy Act (FERPA) grants students certain information privacy rights. To comply with FERPA, all communication that refers to individual students must be through a secure medium (UGAMail or eLC) or in person. Instructors are not allowed to respond to messages that refer to individual students or student progress in the course through non-UGA accounts, phone calls, or other types of electronic media. For details, please visit [https://apps.reg.uga.edu/FERPA](https://apps.reg.uga.edu/FERPA).
