@@ -1,33 +1,33 @@
 title: WILD8370
-#url: http://rushinglab.github.io/WILD8370
+url: http://rushinglab.github.io/WILD8370
 template:
-  params:
-    bootswatch: spacelab
+  bootstrap: 5
+  bootswatch: spacelab
 
 reference:
 
 navbar:
   left:
-    - icon: fa-home
+    - icon: fas fa-house-chimney
       href: index.html
   right:
     - text: "Syllabus"
-      icon: fas fa-book
+      icon: fab fa-readme
       href: articles/syllabus.html
     - text: "Schedule"
-      icon: fas fa-calendar
+      icon: far fa-calendar
       href: articles/schedule.html
     - text: "Lectures"
-      icon: fas fa-file-pdf-o
+      icon: far fa-file-powerpoint
       menu:
         - text: "Lecture 0: Course introduction"
           href: articles/lectures/00_course_intro/00_course_intro.html
     - text: "Labs"
-      icon: fas fa-desktop
+      icon: fas fa-laptop-code
       menu:
         - text: "Lab 1: Introduction to R"
           href: articles/lab01_intro_to_R.html
-    - icon: fas fa-pencil-square-o
+    - icon: far fa-bookmark
       text: "References"
       menu:
         - text: "Assignment instructions"

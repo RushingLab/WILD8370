@@ -4,136 +4,78 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to R Markdown • WILD8370</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/spacelab/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to R Markdown">
-<meta property="og:description" content="WILD8370">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to R Markdown">
 </head>
-<body data-spy="scroll" data-target="#toc">
-    
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">WILD8370</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2025.1.0</span>
-      </span>
-    </div>
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fa fa-home"></span>
-     
-  </a>
-</li>
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
+    <a class="navbar-brand me-2" href="../index.html">WILD8370</a>
+
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2025.1.0</small>
+
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fas fa-house-chimney"></span></a></li>
       </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="../articles/syllabus.html">
-    <span class="fas fa-book"></span>
-     
-    Syllabus
-  </a>
-</li>
-<li>
-  <a href="../articles/schedule.html">
-    <span class="fas fa-calendar"></span>
-     
-    Schedule
-  </a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="fas fa-file-pdf-o"></span>
-     
-    Lectures
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/lectures/00_course_intro/00_course_intro.html">Lecture 0: Course introduction</a>
-    </li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="nav-link" href="../articles/syllabus.html"><span class="fa fab fa-readme"></span> Syllabus</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/schedule.html"><span class="fa far fa-calendar"></span> Schedule</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lectures" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa far fa-file-powerpoint"></span> Lectures</button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lectures">
+<li><a class="dropdown-item" href="../articles/lectures/00_course_intro/00_course_intro.html">Lecture 0: Course introduction</a></li>
   </ul>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="fas fa-desktop"></span>
-     
-    Labs
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/lab01_intro_to_R.html">Lab 1: Introduction to R</a>
-    </li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-labs" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-laptop-code"></span> Labs</button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-labs">
+<li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 1: Introduction to R</a></li>
   </ul>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="fas fa-pencil-square-o"></span>
-     
-    References
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/homework.html">Assignment instructions</a>
-    </li>
-    <li>
-      <a href="../articles/projects_and_directories.html">Projects and directories</a>
-    </li>
-    <li>
-      <a href="../articles/RMarkdown.html">R Markdown reference</a>
-    </li>
-    <li>
-      <a href="../articles/graphics.html">Creating publication-quality graphics</a>
-    </li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-references" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa far fa-bookmark"></span> References</button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-references">
+<li><a class="dropdown-item" href="../articles/homework.html">Assignment instructions</a></li>
+    <li><a class="dropdown-item" href="../articles/projects_and_directories.html">Projects and directories</a></li>
+    <li><a class="dropdown-item" href="../articles/RMarkdown.html">R Markdown reference</a></li>
+    <li><a class="dropdown-item" href="../articles/graphics.html">Creating publication-quality graphics</a></li>
   </ul>
 </li>
       </ul>
 </div>
-<!--/.nav-collapse -->
+
+
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
+</nav><div class="container template-article">
 
-      
 
-      </header><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Introduction to R Markdown</h1>
+
+
+<div class="row">
+  <main id="main" class="col-md-9"><div class="page-header">
+
+      <h1>Introduction to R Markdown</h1>
             <h3 data-toc-skip class="subtitle">WILD8370: Bayesian Models
 for Conservation Science</h3>
             
             <h4 data-toc-skip class="date">updated on 2024-12-17</h4>
       
-      
-      <div class="hidden name"><code>RMarkdown.Rmd</code></div>
 
+      <div class="d-none name"><code>RMarkdown.Rmd</code></div>
     </div>
 
     
@@ -461,8 +403,10 @@ or if you are feeling particularly ambitious <a href="https://mirror2.sandyriver
 <div class="section level4">
 <h4 id="inline-vs--block-equations">Inline vs. block equations<a class="anchor" aria-label="anchor" href="#inline-vs--block-equations"></a>
 </h4>
-<p>You can include equations either inline (<span class="math inline">\(e = mc^2\)</span>) or as a stand-alone block:</p>
-<p><span class="math display">\[e=mc^2\]</span></p>
+<p>You can include equations either inline
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">e = mc^2</annotation></semantics></math>)
+or as a stand-alone block:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">e=mc^2</annotation></semantics></math></p>
 <p>Inline equations are added by putting a single dollar sign
 <code>$</code> on either side of the equation (<code>$e=mc^2$</code>).
 Equation blocks are create by starting and ending a new line with double
@@ -473,38 +417,53 @@ dollar signs</p>
 <div class="section level3">
 <h3 id="greek-letters">Greek letters<a class="anchor" aria-label="anchor" href="#greek-letters"></a>
 </h3>
-<p>Statistical models include a lot of Greek letters (<span class="math inline">\(\alpha, \beta, \gamma\)</span>, etc.). You can add
-Greek letters to an equation by typing a backslash <code>\</code>
-followed by the name of the letter <code>\alpha</code>. Uppercase and
-lower case letters are possible by capitalizing the name (<span class="math inline">\(\Delta\)</span> = <code>$\Delta$</code>) or not
-(<span class="math inline">\(\delta\)</span> =
-<code>$\delta$</code>).</p>
+<p>Statistical models include a lot of Greek letters
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>γ</mi></mrow><annotation encoding="application/x-tex">\alpha, \beta, \gamma</annotation></semantics></math>,
+etc.). You can add Greek letters to an equation by typing a backslash
+<code>\</code> followed by the name of the letter <code>\alpha</code>.
+Uppercase and lower case letters are possible by capitalizing the name
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Δ</mi><annotation encoding="application/x-tex">\Delta</annotation></semantics></math>
+= <code>$\Delta$</code>) or not
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+= <code>$\delta$</code>).</p>
 </div>
 <div class="section level3">
 <h3 id="subscripts-and-superscripts">Subscripts and superscripts<a class="anchor" aria-label="anchor" href="#subscripts-and-superscripts"></a>
 </h3>
-<p>You can add superscripts using the <code>^</code> (<span class="math inline">\(\pi r^2\)</span>=<code>$\pi r^2$</code>) symbol
-and subscripts using an underscore <code>_</code> (<span class="math inline">\(N_t\)</span> = <code>$N_t$</code>).</p>
+<p>You can add superscripts using the <code>^</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\pi r^2</annotation></semantics></math>=<code>$\pi r^2$</code>)
+symbol and subscripts using an underscore <code>_</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>t</mi></msub><annotation encoding="application/x-tex">N_t</annotation></semantics></math>
+= <code>$N_t$</code>).</p>
 <p>If the superscript or subscript includes more than one character, put
-the entire script within curly brackets <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code>: <span class="math inline">\(N_t-1 \neq N_{t-1}\)</span> is
-<code>$N_t-1 \neq N_{t-1}$</code></p>
+the entire script within curly brackets <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code>:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>t</mi></msub><mo>−</mo><mn>1</mn><mo>≠</mo><msub><mi>N</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">N_t-1 \neq N_{t-1}</annotation></semantics></math>
+is <code>$N_t-1 \neq N_{t-1}$</code></p>
 </div>
 <div class="section level3">
 <h3 id="brackets-and-parentheses">Brackets and parentheses<a class="anchor" aria-label="anchor" href="#brackets-and-parentheses"></a>
 </h3>
 <p>You can add normal sized brackets and parenthesis just by typing them
-into the equation: <span class="math inline">\((x + y)\)</span> =
-<code>(x + y)</code></p>
+into the equation:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(x + y)</annotation></semantics></math>
+= <code>(x + y)</code></p>
 <p>If you need bigger sizes, using <code>$\big($</code>,
-<code>$\bigg($</code>, and <code>$\Bigg($</code> produces <span class="math inline">\(\big(\)</span>, <span class="math inline">\(\bigg(\)</span>, and <span class="math inline">\(\Bigg(\)</span> (switch the opening parenthesis
-for a closing parenthesis or square bracket as needed)</p>
+<code>$\bigg($</code>, and <code>$\Bigg($</code> produces
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><annotation encoding="application/x-tex">\big(</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo minsize="2.4" maxsize="2.4" stretchy="false" form="prefix">(</mo><annotation encoding="application/x-tex">\bigg(</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo minsize="3.0" maxsize="3.0" stretchy="false" form="prefix">(</mo><annotation encoding="application/x-tex">\Bigg(</annotation></semantics></math>
+(switch the opening parenthesis for a closing parenthesis or square
+bracket as needed)</p>
 </div>
 <div class="section level3">
 <h3 id="fractions">Fractions<a class="anchor" aria-label="anchor" href="#fractions"></a>
 </h3>
-<p>Fractions can either be inline (<span class="math inline">\(1/n\)</span> = <code>$1/n$</code>) or stacked
-(<span class="math inline">\(\frac{1}{n}\)</span> =
-<code>$\frac{1}{n}$</code>). For stacked equations, the terms in the
+<p>Fractions can either be inline
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1/n</annotation></semantics></math>
+= <code>$1/n$</code>) or stacked
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mn>1</mn><mi>n</mi></mfrac><annotation encoding="application/x-tex">\frac{1}{n}</annotation></semantics></math>
+= <code>$\frac{1}{n}$</code>). For stacked equations, the terms in the
 first curly brackets are the numerator and the terms in the second curly
 brackets are the denominator.</p>
 </div>
@@ -512,16 +471,27 @@ brackets are the denominator.</p>
 <h3 id="operators">Operators<a class="anchor" aria-label="anchor" href="#operators"></a>
 </h3>
 <p>Pretty much every operator you could need can be written in latex.
-Some common ones include <span class="math inline">\(\times\)</span>
-(<code>$\times$</code>), <span class="math inline">\(\lt\)</span>
-(<code>$\lt$</code>), <span class="math inline">\(\gt\)</span>
-(<code>$\gt$</code>), <span class="math inline">\(\leq\)</span>
-(<code>$\leq$</code>), <span class="math inline">\(\geq\)</span>
-(<code>$\geq$</code>), <span class="math inline">\(\neq\)</span>
-(<code>$\neq$</code>), <span class="math inline">\(\sum\)</span>
-(<code>$\sum$</code>), <span class="math inline">\(\prod\)</span>
-(<code>$\prod$</code>), <span class="math inline">\(\infty\)</span>
-(<code>$\infty$</code>), and <span class="math inline">\(\propto\)</span> (<code>$\propto$</code>).</p>
+Some common ones include
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>×</mo><annotation encoding="application/x-tex">\times</annotation></semantics></math>
+(<code>$\times$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>&lt;</mo><annotation encoding="application/x-tex">\lt</annotation></semantics></math>
+(<code>$\lt$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>&gt;</mo><annotation encoding="application/x-tex">\gt</annotation></semantics></math>
+(<code>$\gt$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\leq</annotation></semantics></math>
+(<code>$\leq$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math>
+(<code>$\geq$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≠</mo><annotation encoding="application/x-tex">\neq</annotation></semantics></math>
+(<code>$\neq$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>∑</mo><annotation encoding="application/x-tex">\sum</annotation></semantics></math>
+(<code>$\sum$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>∏</mo><annotation encoding="application/x-tex">\prod</annotation></semantics></math>
+(<code>$\prod$</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>∞</mi><annotation encoding="application/x-tex">\infty</annotation></semantics></math>
+(<code>$\infty$</code>), and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>∝</mo><annotation encoding="application/x-tex">\propto</annotation></semantics></math>
+(<code>$\propto$</code>).</p>
 <p>See documents above in Equations section for a list of other
 operators.</p>
 </div>
@@ -768,35 +738,26 @@ Started with R Markdown</a></p>
 <p>Cosma Shalizi’s <a href="http://www.stat.cmu.edu/~cshalizi/rmarkdown" class="external-link">Using R Markdown for
 Class Reports</a></p>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
-  <p></p>
-<p>Developed by Clark Rushing.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p>Developed by Clark Rushing.</p>
 </div>
 
-<div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<div class="pkgdown-footer-right">
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
-  
 
 
-  
+
 
   </body>
 </html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>LECTURE 0: course overview</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# LECTURE 0: course overview
+]
+.subtitle[
+## FANR 8370
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# logistics
+
+**Lecture**: Monday, Wednesday 9:10-10:00  
+**Location**: 1-307  
+
+**Lab**: Wednesday 1:50 – 3:50  
+**Location**: 1-307  
+
+---
+# instructors
+
+.pull-left[
+#### Dr. Clark Rushing  
+[clark.rushing@usu.edu](clark.rushing@usu.edu)  
+**Office**: Warnell 3-409   
+]
+
+.pull-right[
+#### Dr. Heather Gaya  
+[heather.gaya@uga.edu](heather.gaya@uga.edu)  
+**Office**: Warnell 3-410   
+]
+
+---
+# course format
+
+Refer to [syllabus](https://rushinglab.github.io/WILD8370/articles/syllabus.html)
+
+---
+class: inverse, center, middle
+
+# why bayesian? 
+
+---
+# why bayesian?
+
+**Philosophical advantages**  
+&lt;br/&gt;
+--
+1) Probabilistic treatment of all unknown quantities  
+&lt;br/&gt;
+
+--
+2) Coherent framework for incorporating prior knowledge into analysis  
+&lt;br/&gt;
+
+--
+3) Proper accounting of uncertainty  
+&lt;br/&gt;
+
+--
+4) Ease of estimating latent variables (and uncertainty)
+
+---
+# why bayesian?
+
+**Practical advantages**  
+&lt;br/&gt;
+--
+1) Ability to develop custom/complex models to suite your needs  
+&lt;br/&gt;
+
+--
+2) Many statistical concepts (e.g., random effects) make more sense (no blackbox)  
+&lt;br/&gt;
+
+--
+3) Expanded "toolkit" for quantitative analysis  
+&lt;br/&gt;
+
+--
+4) Ability to keep up with the literature  
+&lt;br/&gt;
+
+--
+5) Ability to review manuscripts/proposals that use Bayesian methods
+
+
+---
+# why bayesian
+
+**Disadvantages**   
+&lt;br/&gt;
+--
+1) Computationally intensive  
+&lt;br/&gt;
+
+--
+2) Few "canned" software
+
+---
+# bayesian methods in ecology
+
+The use of Bayesian methods is growing rapidly in ecology, largely due to:  
+
+--
+- powerful computers and the development of accessible software   
+
+--
+- large amount of code online and in books that be used as the starting point for analyses  
+
+--
+
+These developments have led to many people adopting Bayesian methods even if they don't fully understand what they're doing. They also led to some ecologists becoming full-on Bayesians and then a predictable backlash from those that view these methods as needlessly complex and overly trendy (i.e., statistical machismo)    
+
+The methods you'll learn about in this class, just like all statistical methods, are *tools* to help you answer questions  
+
+Your job as a researcher is to choose the tools that best suite your question and your data. The goal of this course is to **expand your toolbox**  
+
+---
+class: inverse, center, middle
+
+# why are you interested in learning bayesian methods?
+
+
+---
+class: inverse, center, middle
+
+# reproducible research 
+
+---
+# reproducible research
+
+**What makes research "reproducible"?**  
+
+Many definitions (Goodman et al. 2016) but for the purposes of this class, we will define it as:  
+
+&gt; The ability of independent researchers to reproduce scientific results using the original data and methods (adapted from Markwick et al. 2018)  
+
+&lt;br/&gt;
+
+--
+- Reproducibility is a gradient from unreproducible (no data, no methods, etc.) to completely reproducible (the ability to start with raw data and reproduce all results, figures, tables, etc) `\(^1\)`.  
+&lt;br/&gt;
+
+--
+- At a minimum, reproducibility means someone could re-run your analyses and come up with exactly the same answer  
+
+
+???
+
+Goodman, S. N., Fanelli, D., and Ioannidis, J. P. A. (2016) *What Does Research Reproducibility Mean?* Science Translational Medicine, 8, 341ps12–341ps12.
+
+Marwick, B., Boettiger, C. &amp; Mullen, L. (2018) *Packaging Data Analytical Work Reproducibly Using R (and Friends)*, The American Statistician, 72:1, 80-88, DOI: 10.1080/00031305.2017.1375986 
+
+`\(^1\)` Stricly speaking, reproducing results could also include the ability to recreate figures, tables, and even text as it appears in the original report or paper.  Fully reproducible research is hard but that does not mean we shouldn't strive for moving our work closer to to that end of the spectrum. 
+
+---
+# why make your research reproducible?
+
+Making your work reproducible involves extra work. Why bother?  
+&lt;br/&gt;
+--
+1) To help advance science - if your work can't be reproduced, it's not science  
+&lt;br/&gt;
+
+--
+2) To meet requirements of journals/granting orgs  
+&lt;br/&gt;
+
+--
+3) To make it easier to share your work with collaborators  
+&lt;br/&gt;
+
+--
+4) To make it easier to revise your analysis later
+
+---
+class: inverse, center, middle
+&gt; You always have at least one collaborator on every project - you future self. And your past self doesn't respond to email
+
+---
+# course philosophy
+
+- Stats courses are the primary source of experience for learning to work with data   
+&lt;br/&gt;
+
+--
+- But in-class examples often ignore the fact that **most** time will be spent wrangling raw data to get it ready for analysis   
+&lt;br/&gt;
+
+--
+- Because data wrangling skills aren't taught, students (often) develop bad habits  
+&lt;br/&gt;
+
+--
+- In the "lab" activities in this course, we will emphasize the tasks of cleaning and processing raw data to prepare it for analysis  
+
+
+--
+### Additional resources
+
+* Cooper, N. &amp; Hsing, P. (2017) [*A guide to reproducible code*](https://www.britishecologicalsociety.org/wp-content/uploads/2017/12/guide-to-reproducible-code.pdf) British Ecological Society
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

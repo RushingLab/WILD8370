@@ -7,6 +7,7 @@ Maintainer: Clark Rushing <clark.rushing@uga.edu>
 Description: WILD8370: Bayesian Models for Conservation Science at the University of Georgia. This package primarily exists to distribute data, code, and other materials in an efficient manner.
 License: CC0
 Encoding: UTF-8
+URL: http://rushinglab.github.io/WILD8370
 LazyData: true
 Suggests: 
     gganimate
