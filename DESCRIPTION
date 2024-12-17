@@ -24,7 +24,6 @@ Imports:
     knitr,
     nimble,
     jagsUI,
-    maptools,
     maps,
     mapproj,
     abind,

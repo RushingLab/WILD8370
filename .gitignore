@@ -2,6 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-docs
 *.Rproj
 .DS_Store
+*.icloud

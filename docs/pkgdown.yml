@@ -1,0 +1,14 @@
+pandoc: 3.1.4
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  RMarkdown: RMarkdown.html
+  graphics: graphics.html
+  homework: homework.html
+  lab01_intro_to_R: lab01_intro_to_R.html
+  lab02: lab02.html
+  projects_and_directories: projects_and_directories.html
+  schedule: schedule.html
+  syllabus: syllabus.html
+last_built: 2024-12-17T12:36Z
+

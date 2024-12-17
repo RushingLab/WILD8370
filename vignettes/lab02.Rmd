@@ -1,0 +1,14 @@
+---
+title: "lab02"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(WILD8370)
+```
