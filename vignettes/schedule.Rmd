@@ -61,7 +61,7 @@ schedule <- data.frame(WK = c("1", "", "",
       "", "", "", #15
       "", "", "", #16
       ""), 
-                       Lab = c("", "Lab 1", "",
+                       Lab = c("", "Mathematical Notation", "",
                                "", "Lab 2", "", 
                                "", "Lab 3", "",
                                "", "Lab 4", "", 
