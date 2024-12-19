@@ -25,7 +25,7 @@ navbar:
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:
-        - text: "Lab 1: Introduction to R"
+        - text: "Lab 0: Introduction to R"
           href: articles/lab01_intro_to_R.html
     - icon: far fa-bookmark
       text: "References"
