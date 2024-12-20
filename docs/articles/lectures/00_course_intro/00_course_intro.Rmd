@@ -15,6 +15,7 @@ output:
 ```{r setup, echo = FALSE, include=FALSE}
 options(htmltools.dir.version = FALSE)
 source(here::here("R/zzz.R"))
+library(WILD8370)
 # library(gganimate)
 ```
 

@@ -22,6 +22,10 @@ navbar:
       menu:
         - text: "Lecture 0: Course introduction"
           href: articles/lectures/00_course_intro/00_course_intro.html
+        - text: "Lecture 1: Introduction to Statistics"
+          href: articles/lectures/01_intro_to_statistics/01_intro_to_statistics.html
+        - text: "Lecture 2: Principles of Bayesian inference"
+          href: articles/lectures/02_bayesian_inference/02_bayesian_inference.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:

@@ -1,5 +1,5 @@
 ---
-title: "lab01b"
+title: "Lab1: Mathematical Notation"
 output: 
   rmarkdown::html_vignette:
     keep_md: yes
@@ -135,5 +135,5 @@ Note that here $y_i$ is going to be binary (0 = didn't make it, 1 = survived).
 
 $$ E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2*percentforest_{it}^2 + \beta_3 * sex_i $$
 
-3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into our previous turtle model? 
+3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into the previous turtle model? 
 

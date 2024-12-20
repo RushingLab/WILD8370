@@ -45,13 +45,13 @@ schedule <- data.frame(WK = c("1", "", "",
                        Day = c(rep(c("M", "W", ""), 16), "M"),
                        Week = MW(first.day = "2025/01/06", last.day = "2025/04/28"),
                        Lecture = c("Course introduction", "Introduction to statistics", "", #1
-      "Probability models and stochasticity", "", "", #2
-      "Principles of Bayesian inference", "", "", #3
-      "Introduction to Linear Models", "", "", #4
-      "Implementing Bayesian models: MCMC samplers and JAGS", "", "", #5
-      "Random/fixed effects in linear models", "", "", #6
-      "Observation error, intro to hierarchical models", "", "", #7
-      "Estimating occupancy from presence/absence data", "", "", #8 
+      "Principles of Bayesian inference", "Principles of Bayesian inference", "", #2
+      "Introduction to Linear Models and Nimble", "Introduction to Linear Models and Nimble", "", #3
+      "Random/fixed effects in linear models", "Informative Priors", "", #4
+      "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #5
+      "Estimating occupancy from presence/absence data", "Estimating occupancy from presence/absence data", "", #6
+      "", "", "", #7
+      "", "", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
       "", "", "", #10
       "", "", "", #11
@@ -62,13 +62,13 @@ schedule <- data.frame(WK = c("1", "", "",
       "", "", "", #16
       ""), 
                        Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
-                               "", "Manipulating data in R/Common distributions", "", 
-                               "", "Data simulation techniques/Informative priors", "",
-                               "", "Introduction to Nimble/Regression analysis using Nimble", "", 
-                               "", "Building simple samplers in R	", "", 
+                               "", "Data simulation techniques/Common distributions", "", 
+                               "", "Regression analysis using Nimble", "",
+                               "", "Building a simple MCMC", "", 
+                               "", "Lab 5", "", 
                                "", "Lab 6", "", 
                                "", "Solving Nimble errors", "", 
-                               "", "Occupancy models", "",
+                               "", "Lab 8", "",
                                "", "", "", # Spring break
                                "", "Lab 9", "",
                                "", "Lab 10", "", 
