@@ -27,6 +27,8 @@ navbar:
       menu:
         - text: "Lab 0: Introduction to R"
           href: articles/lab01_intro_to_R.html
+        - text: "Lab 1: Mathematical Notation"
+          href: articles/Lab01b_Mathematical_Notation.html  
     - icon: far fa-bookmark
       text: "References"
       menu:

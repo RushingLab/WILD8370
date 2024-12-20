@@ -1,0 +1,44 @@
+---
+title: "lab01b"
+output: 
+  rmarkdown::html_vignette:
+    keep_md: yes
+vignette: >
+  %\VignetteIndexEntry{Lab01b_Mathematical_Notation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+   warning = FALSE, message = FALSE,
+   fig.align = 'center', fig.retina = 2,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dplyr)
+library(knitr)
+source(here::here("R/zzz.R"))
+```
+
+```{r setup, echo=FALSE}
+library(WILD8370)
+```
+
+## Analysis Flowchart
+
+One of the hardest part of Bayesian analysis is converting your idea of an ecological system from English to math or math to English.
+
+Unlike in a lot of maximum likelihood packages, we get to decide exact how each variable in the model is defined, what distributions we think parameters come from, and what assumptions we are making about the underlying system we are trying to understand.
+
+This process is made more confusing by the fact that we aren't directly doing the math ourselves! We can think of the process as a fun little flow chart:
+
+![](Bayes_Flow.png)
+
+Steps 1 -3 are not specific to Bayesian analysis – you need to do the same thing for maximum likelihood analysis as well. Notice that steps 4 and 5 are simply how we will do Bayesian analysis *in this class*. You do not need MCMC software or R to perform a Bayesian analysis, it just happens to be the easiest way to do it.
+
+For today, we'll focus on going from steps 2a to 3.
+
+## Example 1: Salamander Abundance
+
+Let's say someone sets out cover boards in forests and pastures and counts the number of salamanders under the cover boards.

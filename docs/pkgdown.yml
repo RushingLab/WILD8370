@@ -5,12 +5,12 @@ articles:
   graphics: graphics.html
   homework: homework.html
   lab01_intro_to_R: lab01_intro_to_R.html
-  lab02: lab02.html
+  Lab01b_Mathematical_Notation: Lab01b_Mathematical_Notation.html
   projects_and_directories: projects_and_directories.html
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2024-12-19T16:31Z
+last_built: 2024-12-20T16:51Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles
