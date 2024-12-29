@@ -4,7 +4,7 @@ output:
   rmarkdown::html_vignette:
     keep_md: yes
 vignette: >
-  %\VignetteIndexEntry{Lab01b_Mathematical_Notation}
+  %\VignetteIndexEntry{Lab2_simulation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
