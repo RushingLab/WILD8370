@@ -22,6 +22,8 @@ navbar:
       menu:
         - text: "Lecture 0: Course introduction"
           href: articles/lectures/00_course_intro/00_course_intro.html
+        - text: "Lecture 1: Statistical inference in ecology"
+          href: articles/lectures/01_inference/01_inference.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:

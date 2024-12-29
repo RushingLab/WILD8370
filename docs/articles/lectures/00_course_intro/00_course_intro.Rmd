@@ -1,5 +1,5 @@
 ---
-title: "LECTURE 0: course overview"
+title: "lecture 0: course overview"
 subtitle: "FANR 8370"
 author: "<br/><br/><br/>Spring 2025"
 output:
@@ -10,6 +10,8 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
 ---
 
 ```{r setup, echo = FALSE, include=FALSE}
