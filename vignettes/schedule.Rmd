@@ -45,12 +45,12 @@ schedule <- data.frame(WK = c("1", "", "",
                        Day = c(rep(c("M", "W", ""), 16), "M"),
                        Week = MW(first.day = "2025/01/06", last.day = "2025/04/28"),
                        Lecture = c("Course introduction", "Introduction to statistics", "", #1
-      "", "", "", #2
-      "", "", "", #3
-      "", "", "", #4
-      "", "", "", #5
-      "", "", "", #6
-      "", "", "", #7
+      "Probability refresher", "Probability refresher", "", #2
+      "Principles of Bayesian inference", "Principles of Bayesian inference", "", #3
+      "Introduction to Linear Models and Nimble", "Introduction to Linear Models and Nimble", "", #4
+      "Random/fixed effects in linear models", "Informative Priors", "", #5
+      "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #6
+      "Estimating occupancy from presence/absence data", "Estimating occupancy from presence/absence data", "", #7
       "", "", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
       "", "", "", #10
@@ -61,13 +61,13 @@ schedule <- data.frame(WK = c("1", "", "",
       "", "", "", #15
       "", "", "", #16
       ""), 
-                       Lab = c("", "Lab 1", "",
-                               "", "Lab 2", "", 
-                               "", "Lab 3", "",
-                               "", "Lab 4", "", 
+                       Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
+                               "", "Data simulation techniques/Common distributions", "", 
+                               "", "Regression analysis using Nimble", "",
+                               "", "Building a simple MCMC", "", 
                                "", "Lab 5", "", 
                                "", "Lab 6", "", 
-                               "", "Lab 7", "", 
+                               "", "Solving Nimble errors", "", 
                                "", "Lab 8", "",
                                "", "", "", # Spring break
                                "", "Lab 9", "",

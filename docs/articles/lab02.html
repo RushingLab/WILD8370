@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>lab02 • WILD8370</title>
+<title>lab01b • WILD8370</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="lab02">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="lab01b">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -46,7 +46,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-labs" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-laptop-code"></span> Labs</button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-labs">
-<li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 1: Introduction to R</a></li>
+<li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 0: Introduction to R</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -71,7 +71,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>lab02</h1>
+      <h1>lab01b</h1>
             
       
 
@@ -82,7 +82,32 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://rushinglab.github.io/WILD8370">WILD8370</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+<div class="section level2">
+<h2 id="analysis-flowchart">Analysis Flowchart<a class="anchor" aria-label="anchor" href="#analysis-flowchart"></a>
+</h2>
+<p>One of the hardest part of Bayesian analysis is converting your idea
+of an ecological system from English to math or math to English.</p>
+<p>Unlike in a lot of maximum likelihood packages, we get to decide
+exact how each variable in the model is defined, what distributions we
+think parameters come from, and what assumptions we are making about the
+underlying system we are trying to understand.</p>
+<p>This process is made more confusing by the fact that we aren’t
+directly doing the math ourselves! We can think of the process as a fun
+little flow chart:</p>
+<p><img src="Bayes_Flow.png"></p>
+<p>Steps 1 -3 are not specific to Bayesian analysis – you need to do the
+same thing for maximum likelihood analysis as well. Notice that steps 4
+and 5 are simply how we will do Bayesian analysis <em>in this
+class</em>. You do not need MCMC software or R to perform a Bayesian
+analysis, it just happens to be the easiest way to do it.</p>
+<p>For today, we’ll focus on going from steps 2a to 3.</p>
+</div>
+<div class="section level2">
+<h2 id="some-common-mathematical-notation">Some Common Mathematical Notation<a class="anchor" aria-label="anchor" href="#some-common-mathematical-notation"></a>
+</h2>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

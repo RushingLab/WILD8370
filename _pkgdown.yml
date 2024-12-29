@@ -28,11 +28,15 @@ navbar:
           href: articles/lectures/02_probability/02_probability.html
         - text: "Lecture 3: Principles of Bayesian inference"
           href: articles/lectures/03_bayes/03_bayes.html
+        - text: "Lecture 6: More about priorss"
+          href: articles/lectures/06_priors/06_priors.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:
-        - text: "Lab 1: Introduction to R"
+        - text: "Lab 0: Introduction to R"
           href: articles/lab01_intro_to_R.html
+        - text: "Lab 1: Mathematical Notation"
+          href: articles/Lab01b_Mathematical_Notation.html
     - icon: far fa-bookmark
       text: "References"
       menu:

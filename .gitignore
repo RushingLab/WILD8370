@@ -5,4 +5,7 @@
 *.Rproj
 .DS_Store
 *.icloud
-inst/doc
+docs
+~$ForFigures.pptx
+ForFigures.pptx
+
