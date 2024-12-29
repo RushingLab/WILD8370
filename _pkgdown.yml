@@ -37,6 +37,10 @@ navbar:
           href: articles/lab01_intro_to_R.html
         - text: "Lab 1: Mathematical Notation"
           href: articles/Lab01b_Mathematical_Notation.html
+        - text: "Lab 2: Data Simulation"
+          href: articles/Lab2_simulation.html
+        - text: "Lab 5: Priors"
+          href: articles/priors.html
     - icon: far fa-bookmark
       text: "References"
       menu:

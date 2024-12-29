@@ -1,4 +1,4 @@
-pandoc: 3.1.4
+pandoc: '3.3'
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
@@ -6,12 +6,14 @@ articles:
   homework: homework.html
   lab01_intro_to_R: lab01_intro_to_R.html
   Lab01b_Mathematical_Notation: Lab01b_Mathematical_Notation.html
+  Lab2_simulation: Lab2_simulation.html
   moment_matching: moment_matching.html
+  priors: priors.html
   projects_and_directories: projects_and_directories.html
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2024-12-29T15:47Z
+last_built: 2024-12-29T21:55Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles

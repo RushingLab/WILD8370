@@ -137,3 +137,4 @@ $$ E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2*percentforest
 
 3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into the previous turtle model? 
 
+4. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
