@@ -24,6 +24,10 @@ navbar:
           href: articles/lectures/00_course_intro/00_course_intro.html
         - text: "Lecture 1: Statistical inference in ecology"
           href: articles/lectures/01_inference/01_inference.html
+        - text: "Lecture 2: Probability refresher"
+          href: articles/lectures/02_probability/02_probability.html
+        - text: "Lecture 3: Principles of Bayesian inference"
+          href: articles/lectures/03_bayes/03_bayes.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:

@@ -1,0 +1,55 @@
+---
+title: "Probability distribution cheatsheet"
+subtitle: "WILD8370: Bayesian Models for Conservation Science"
+date: "updated on `r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{moment_matching}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(WILD8370)
+```
+
+
+# 
+
+## Normal distribution
+
+## Poisson distribution
+
+## Beta distribution
+
+### Moments
+
+$$\Large \mu = \frac{\alpha}{\alpha + \beta}$$
+
+$$\Large \sigma^2 = \frac{\alpha\beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}$$
+
+### Moment matching
+
+$$\Large \alpha = \bigg(\frac{1-\mu}{\sigma^2}- \frac{1}{\mu} \bigg)\mu^2$$
+
+$$\Large \beta = \alpha \bigg(\frac{1}{\mu}-1\bigg)$$
+## Gamma distribution
+
+### Moments
+
+$$\Large \mu = \frac{\alpha}{\beta}$$
+
+$$\Large \sigma^2 = \frac{\alpha}{\beta^2}$$
+
+### Moment matching
+
+$$\Large \alpha = \frac{\mu^2}{\sigma^2}$$
+
+$$\Large \beta =  \frac{\mu}{\sigma^2}$$
+

@@ -1,5 +1,5 @@
 ---
-title: "lecture 2: principles of bayesian inference"
+title: "lecture 3: principles of bayesian inference"
 subtitle: "FANR 8370"
 author: "<br/><br/><br/>Spring 2025"
 output:

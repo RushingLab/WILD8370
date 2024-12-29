@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Homework instructions • WILD8370</title>
+<title>Probability distribution cheatsheet • WILD8370</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Homework instructions">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Probability distribution cheatsheet">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -49,7 +49,7 @@
 <li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 1: Introduction to R</a></li>
   </ul>
 </li>
-<li class="active nav-item dropdown">
+<li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-references" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa far fa-bookmark"></span> References</button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-references">
 <li><a class="dropdown-item" href="../articles/homework.html">Assignment instructions</a></li>
@@ -71,69 +71,65 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Homework instructions</h1>
+      <h1>Probability distribution cheatsheet</h1>
             <h3 data-toc-skip class="subtitle">WILD8370: Bayesian Models
 for Conservation Science</h3>
             
             <h4 data-toc-skip class="date">updated on 2024-12-29</h4>
       
 
-      <div class="d-none name"><code>homework.Rmd</code></div>
+      <div class="d-none name"><code>moment_matching.Rmd</code></div>
     </div>
 
     
     
-<p>All homework assignments for this course will be completed R Markdown
-files. To make the distribution, completion, and grading easier, each
-homework will follow the same workflow.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://rushinglab.github.io/WILD8370">WILD8370</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="homework-steps">Homework steps<a class="anchor" aria-label="anchor" href="#homework-steps"></a>
-</h2>
+<h2 id="section"></h2>
 <div class="section level3">
-<h3 id="step-1-create-a-new-directory-to-store-your-homework-files">Step 1: Create a new directory to store your homework files<a class="anchor" aria-label="anchor" href="#step-1-create-a-new-directory-to-store-your-homework-files"></a>
+<h3 id="normal-distribution">Normal distribution<a class="anchor" aria-label="anchor" href="#normal-distribution"></a>
 </h3>
-<ol style="list-style-type: decimal">
-<li>Create a new directory (or ideally a subdirectoy of your
-<code>WILD8370\homework</code> directory) and call it
-<code>LastNameFirstName-Homework#</code>, replacing
-<code>LastNameFirstName</code> with your last and first names and
-<code>#</code> with the appropriate homework number</li>
-</ol>
 </div>
 <div class="section level3">
-<h3 id="step-2-create-a-new-r-markdown-file">Step 2: Create a new R Markdown file<a class="anchor" aria-label="anchor" href="#step-2-create-a-new-r-markdown-file"></a>
+<h3 id="poisson-distribution">Poisson distribution<a class="anchor" aria-label="anchor" href="#poisson-distribution"></a>
 </h3>
-<p>2a) Click on <code>File -&gt; New File -&gt; R Markdown...</code></p>
-<p>2b) In the <code>Title:</code> window type
-<code>Lab # assignment</code>, substituting the correct lab number.</p>
-<p>2c) In the <code>Author</code> window, type your name</p>
-<p>2d) Click <code>Ok</code></p>
-<p>2e) Save the R Markdown file as
-<code>LastnameFirstname-homework#</code> in the directory you created in
-step 1, replacing <code>LastNameFirstName</code> with your last and
-first names and <code>#</code> with the appropriate homework number</p>
 </div>
 <div class="section level3">
-<h3 id="step-3-complete-the-assignment">Step 3: Complete the assignment<a class="anchor" aria-label="anchor" href="#step-3-complete-the-assignment"></a>
+<h3 id="beta-distribution">Beta distribution<a class="anchor" aria-label="anchor" href="#beta-distribution"></a>
 </h3>
-<ol start="3" style="list-style-type: decimal">
-<li>Complete the assignment, following the instructions in the lab
-document as you go</li>
-</ol>
+<div class="section level4">
+<h4 id="moments">Moments<a class="anchor" aria-label="anchor" href="#moments"></a>
+</h4>
+<p><span class="math display">$$\Large \mu = \frac{\alpha}{\alpha +
+\beta}$$</span></p>
+<p><span class="math display">$$\Large \sigma^2 =
+\frac{\alpha\beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}$$</span></p>
 </div>
-<div class="section level3">
-<h3 id="step-4-submit-your-assignment">Step 4: Submit your assignment<a class="anchor" aria-label="anchor" href="#step-4-submit-your-assignment"></a>
-</h3>
-<p>4a) Before submitting your assignment, always click the “Knit” button
-to be sure your .Rmd file can be rendered as a HTML page. <strong>If you
-have any problems rendering the file, please contact your TA prior to
-the submission deadline.</strong></p>
-<p>4b) Once you know your file can be rendered, upload
-<strong>both</strong> the <code>LastnameFirstname-homework#.Rmd</code>
-<em>and</em> the <code>LastnameFirstname-homework#.html</code> files to
-eLC under the correct assignment folder</p>
-<p><strong>Assignments that fail to follow this instructions will not be
-graded</strong></p>
+<div class="section level4">
+<h4 id="moment-matching">Moment matching<a class="anchor" aria-label="anchor" href="#moment-matching"></a>
+</h4>
+<p><span class="math display">$$\Large \alpha =
+\bigg(\frac{1-\mu}{\sigma^2}- \frac{1}{\mu} \bigg)\mu^2$$</span></p>
+<p><span class="math display">$$\Large \beta = \alpha
+\bigg(\frac{1}{\mu}-1\bigg)$$</span> ## Gamma distribution</p>
+</div>
+<div class="section level4">
+<h4 id="moments-1">Moments<a class="anchor" aria-label="anchor" href="#moments-1"></a>
+</h4>
+<p><span class="math display">$$\Large \mu =
+\frac{\alpha}{\beta}$$</span></p>
+<p><span class="math display">$$\Large \sigma^2 =
+\frac{\alpha}{\beta^2}$$</span></p>
+</div>
+<div class="section level4">
+<h4 id="moment-matching-1">Moment matching<a class="anchor" aria-label="anchor" href="#moment-matching-1"></a>
+</h4>
+<p><span class="math display">$$\Large \alpha =
+\frac{\mu^2}{\sigma^2}$$</span></p>
+<p><span class="math display">$$\Large \beta
+=  \frac{\mu}{\sigma^2}$$</span></p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
