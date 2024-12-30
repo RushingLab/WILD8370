@@ -297,7 +297,7 @@ Now that we have a simulated data set, let's save it so it's available for futur
 saveRDS(object = sim_df, file = "data/sim_seed_counts.rds")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, eval = FALSE}
 saveRDS(object = sim_df, file = here::here("data/sim_seed_counts.rds"))
 ```
 
