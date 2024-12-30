@@ -1,6 +1,6 @@
 ---
 title: 'Lab 3: Basic MCMC'
-author: "Heather Gaya"
+author: "Clark Rushing and Heather Gaya"
 output: 
   rmarkdown::html_vignette:
     keep_md: yes
@@ -405,7 +405,8 @@ Next, read in the simulated data and set the initial values for the MCMC:
 ```
 
 ```{r echo = FALSE}
-sim_dat <- data(sim_seed_counts)
+data("sim_seed_counts")
+sim_dat <- sim_seed_counts
 
 ## Length of chains
   nIter <- 10000
