@@ -1,0 +1,52 @@
+---
+title: "Lab 2 Answer Key"
+author: "Heather Gaya"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+We are performing a study on deer with CWD and want to simulate 20 years of abundance data on a declining population. We have a general sense that the population is declining by an average of 5% each year (e.g. $E(N_{t+1}) = N_t\lambda_t$), but the realized population has some stochasticity ($N_{t+1} \sim Pois(E(N_{t+1}))$). The population in year 1 is 475 deer. Write out a simulation for this data and use ggplot to visualize the realized population values across 20 years.
+
+```{r Q1, echo = T, eval = T}
+set.seed(4) #reproducible
+nocc <- 20
+EN <- N <- array(NA, nocc) #create empty arrays with space for 20 years
+N[1] <- 475
+lambda <- .95
+
+#simulate:
+for(t in 2:nocc){
+  EN[t] <- N[t-1]*lambda
+  N[t] <- rpois(1, EN[t])
+}
+```
+
+```{r Q1 plot, echo = T, eval = T}
+library(ggplot2)
+gg_df <- data.frame(N = N, year = 1:nocc)
+ggplot(gg_df, aes(x = year, y = N))+
+  geom_point()+
+  geom_line(lty = 2)+
+  theme_bw()+
+  ylim(0, 500)+
+  ggtitle("Deer Population")+
+  xlab("Year")+
+  ylab("Abundance of Deer")
+```
+
+## Question 2: 
+
+We decide to add more complexity to our simulation and have $\lambda_t$ vary by time. We think lambda might have a positive connection to the degree days (daily average number of degrees above 4 C) in December of each year (e.g. $\lambda_t = exp(l_0 + l_1*degreedays)$. Using the 'Weather_data' provided in the WILD8370 package (accessed via: data(Weather_data) ), simulate 20 years of population abundance. Be sure to choose reasonable values for $l_0$ and $l_1$ so that $\lambda_t$ stays between \## and ##. Don't forget to scale the covariate! Use ggplot to visualize the realized population values across 20 years.
+
+```{r, Q2, echo = T, eval = T}
+set.seed(4) #reproducible
+nocc <- 20
+EN <- N <- array(NA, nocc) #create empty arrays with space for 20 years
+N[1] <- 475
+data(Weather_data)
