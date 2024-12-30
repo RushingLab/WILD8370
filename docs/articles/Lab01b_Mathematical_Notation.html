@@ -50,6 +50,7 @@
 <li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 0: Introduction to R</a></li>
     <li><a class="dropdown-item" href="../articles/Lab01b_Mathematical_Notation.html">Lab 1: Mathematical Notation</a></li>
     <li><a class="dropdown-item" href="../articles/Lab2_simulation.html">Lab 2: Data Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab3_BasicMCMC.html">Lab 3: Basic MCMC</a></li>
     <li><a class="dropdown-item" href="../articles/priors.html">Lab 5: Priors</a></li>
   </ul>
 </li>
@@ -286,14 +287,19 @@ centered around with the expected weight with a standard deviation of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
 </blockquote>
 <ol start="2" style="list-style-type: decimal">
-<li>What does the following equation mean in English?</li>
+<li>Looking at the following bear equation, how would you interpret (in
+english) if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\beta_1</annotation></semantics></math>
+were negative? How about if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\beta_2</annotation></semantics></math>
+were negative?</li>
 </ol>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msubsup><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex"> E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2*percentforest_{it}^2 + \beta_3 * sex_i </annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>c</mi><mi>o</mi><mi>v</mi><mi>e</mi><msub><mi>r</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i </annotation></semantics></math></p>
 <ol start="3" style="list-style-type: decimal">
 <li><p>Looking at my data again, I notice that we also recorded each
 turtle’s sex before release. Sex was recorded as either juvenile, male
 or female. How would I add this information into the previous turtle
-model?</p></li>
+model of survival probability?</p></li>
 <li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
 the best, how would you rate this week’s content? What lingering
 questions/confusion about the lecture or lab do you still have?</p></li>

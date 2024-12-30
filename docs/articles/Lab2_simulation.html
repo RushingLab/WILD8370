@@ -50,6 +50,7 @@
 <li><a class="dropdown-item" href="../articles/lab01_intro_to_R.html">Lab 0: Introduction to R</a></li>
     <li><a class="dropdown-item" href="../articles/Lab01b_Mathematical_Notation.html">Lab 1: Mathematical Notation</a></li>
     <li><a class="dropdown-item" href="../articles/Lab2_simulation.html">Lab 2: Data Simulation</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab3_BasicMCMC.html">Lab 3: Basic MCMC</a></li>
     <li><a class="dropdown-item" href="../articles/priors.html">Lab 5: Priors</a></li>
   </ul>
 </li>
@@ -569,9 +570,10 @@ data and use ggplot to visualize the realized population values across
 20 years. Use the set.seed() command to make it reproducible.</p></li>
 <li><p>We decide to add more complexity to our simulation and have
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
-vary by time. We think lambda might have a positive connection to the
-degree days (daily average number of degrees above 4 C) in December of
-each year
+vary by time. Our real data were collected between 1994 and 2016, so
+we’ll use environmental data from that time period. We think lambda
+might have a positive relationship with the degree days (daily average
+number of degrees above 4 C) in December of each year
 (e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>t</mi></msub><mo>=</mo><mi>e</mi><mi>x</mi><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>l</mi><mn>0</mn></msub><mo>+</mo><msub><mi>l</mi><mn>1</mn></msub><mo>*</mo><mi>d</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>e</mi><mi>d</mi><mi>a</mi><mi>y</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda_t = exp(l_0 + l_1*degreedays)</annotation></semantics></math>.
 Using the ‘Weather_data’ provided in the WILD8370 package (accessed via:
 data(Weather_data) ), simulate 20 years of population abundance. Be sure
@@ -581,8 +583,9 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>l</mi><mn>1</mn></msub><annotation encoding="application/x-tex">l_1</annotation></semantics></math>
 so that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
-stays between ## and ##. Don’t forget to scale the covariate! Use ggplot
-to visualize the realized population values across 20 years.</p></li>
+stays below 1.1 for all values of degree days. Don’t forget to scale the
+covariate! Use ggplot to visualize the realized population values across
+20 years.</p></li>
 <li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
 the best, how would you rate this week’s content? What lingering
 questions/confusion about the lecture or lab do you still have?</p></li>
