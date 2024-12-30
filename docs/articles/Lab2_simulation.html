@@ -338,8 +338,8 @@ results of a linear regression or a Poisson GLM.<br>
 <h2 id="step-0-set-up-your-workspace-and-directories">Step 0: Set up your workspace and directories<a class="anchor" aria-label="anchor" href="#step-0-set-up-your-workspace-and-directories"></a>
 </h2>
 <p>Hopefully you have already created a main directory for this course
-when you started the homework assignment on choosing priors. If you have
-not already done so, create a sub-directory of that folder called
+when you started the homework assignment for last week. If you have not
+already done so, create a sub-directory of that folder called
 <code>data</code>.</p>
 <p>For this exercise, create a new script and add it to whatever
 sub-directory you will use to store analysis scripts (alternatively, you
@@ -557,11 +557,35 @@ when you read it in next time.&lt;/p&gt;'><sup>3</sup></a>:</p>
 <div class="section level2">
 <h2 id="homework-questions">Homework Questions<a class="anchor" aria-label="anchor" href="#homework-questions"></a>
 </h2>
-<p>TBD, but I’m bound to come up with something :)</p>
-<ol start="4" style="list-style-type: decimal">
-<li>On a 1-10 scale, with 1 being the worst week ever and 10 being the
-best, how would you rate this week’s content? What lingering
-questions/confusion about the lecture or lab do you still have?</li>
+<ol style="list-style-type: decimal">
+<li><p>We are performing a study on deer with CWD and want to simulate
+20 years of abundance data on a declining population. We have a general
+sense that the population is declining by an average of 5% each year
+(e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>N</mi><mi>t</mi></msub><msub><mi>λ</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">E(N_{t+1}) = N_t\lambda_t</annotation></semantics></math>),
+but the realized population has some stochasticity
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>P</mi><mi>o</mi><mi>i</mi><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N_{t+1} \sim Pois(E(N_{t+1}))</annotation></semantics></math>).
+The population in year 1 is 475 deer. Write out a simulation for this
+data and use ggplot to visualize the realized population values across
+20 years. Use the set.seed() command to make it reproducible.</p></li>
+<li><p>We decide to add more complexity to our simulation and have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
+vary by time. We think lambda might have a positive connection to the
+degree days (daily average number of degrees above 4 C) in December of
+each year
+(e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>t</mi></msub><mo>=</mo><mi>e</mi><mi>x</mi><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>l</mi><mn>0</mn></msub><mo>+</mo><msub><mi>l</mi><mn>1</mn></msub><mo>*</mo><mi>d</mi><mi>e</mi><mi>g</mi><mi>r</mi><mi>e</mi><mi>e</mi><mi>d</mi><mi>a</mi><mi>y</mi><mi>s</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda_t = exp(l_0 + l_1*degreedays)</annotation></semantics></math>.
+Using the ‘Weather_data’ provided in the WILD8370 package (accessed via:
+data(Weather_data) ), simulate 20 years of population abundance. Be sure
+to choose reasonable values for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>l</mi><mn>0</mn></msub><annotation encoding="application/x-tex">l_0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>l</mi><mn>1</mn></msub><annotation encoding="application/x-tex">l_1</annotation></semantics></math>
+so that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
+stays between ## and ##. Don’t forget to scale the covariate! Use ggplot
+to visualize the realized population values across 20 years.</p></li>
+<li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
+the best, how would you rate this week’s content? What lingering
+questions/confusion about the lecture or lab do you still have?</p></li>
 </ol>
 </div>
 
