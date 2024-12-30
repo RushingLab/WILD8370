@@ -131,10 +131,10 @@ Note that here $y_i$ is going to be binary (0 = didn't make it, 1 = survived).
 
 > The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the sex of the bear, and the time since fire. The relationship for time since fire is different for males and females. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
-2. What does the following equation mean in English? 
+2. Looking at the following bear equation, how would you interpret (in english) if $\beta_1$ were negative? How about if $\beta_2$ were negative? 
 
-$$ E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2*percentforest_{it}^2 + \beta_3 * sex_i $$
+$$E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into the previous turtle model? 
+3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into the previous turtle model of survival probability? 
 
 4. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
