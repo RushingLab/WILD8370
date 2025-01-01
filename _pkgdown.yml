@@ -39,6 +39,8 @@ navbar:
           href: articles/Lab01b_Mathematical_Notation.html
         - text: "Lab 2: Data Simulation"
           href: articles/Lab2_simulation.html
+        - text: "Lab 3: Basic MCMC"
+          href: articles/Lab3_BasicMCMC.html
         - text: "Lab 5: Priors"
           href: articles/priors.html
     - icon: far fa-bookmark

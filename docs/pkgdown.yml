@@ -7,13 +7,14 @@ articles:
   lab01_intro_to_R: lab01_intro_to_R.html
   Lab01b_Mathematical_Notation: Lab01b_Mathematical_Notation.html
   Lab2_simulation: Lab2_simulation.html
+  Lab3_BasicMCMC: Lab3_BasicMCMC.html
   moment_matching: moment_matching.html
   priors: priors.html
   projects_and_directories: projects_and_directories.html
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2024-12-29T22:43Z
+last_built: 2024-12-30T21:13Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles

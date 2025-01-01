@@ -1,11 +1,9 @@
 .Rproj.user
 .Rhistory
-.RData
 .Ruserdata
 *.Rproj
 .DS_Store
 *.icloud
-docs
 ~$ForFigures.pptx
 ForFigures.pptx
-
+Homework_Answers
