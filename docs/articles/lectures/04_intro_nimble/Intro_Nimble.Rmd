@@ -1,0 +1,327 @@
+---
+title: "Week 4"
+subtitle: "Introduction of Bayesian analysis using Nimble"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+source(here::here("R/zzz.R"))
+# library(gganimate)
+```
+
+## Readings
+
+> Kéry & Schaub 38-40; 58-64
+
+
+---
+class: inverse, middle, center
+
+# From custom MCMC to BUGS
+
+---
+## The BUGS language
+
+#### **B**ayesian **A**nalysis **U**sing **G**ibbs **S**ampling  
+
+--
+#### Language/program invented in the 1990's by epidemiologists in Cambridge  
+
+--
+#### Later became WinBUGS  
+
+- First customizable MCMC software  
+</br>
+
+--
+- Revolutionized the use of Bayesian methods in applied statistics
+
+---
+## The BUGS language
+
+#### Since the development of WinBUGS, other Bayesian software programs have been developed:
+
+- OpenBugs
+
+- [JAGS](https://sourceforge.net/projects/mcmc-jags/files/)
+
+- [Nimble](https://r-nimble.org/)
+
+- [Stan](https://mc-stan.org/)
+
+
+--
+#### For the remainder of the course, we will fit models using Nimble  
+
+- Uses BUGS language and R (easy to learn, lots of online documentation)  
+
+- Out-performs WinBUGS  
+
+- Available for all operating systems
+
+- Highly customizable
+
+---
+## The BUGS language
+
+#### Last week, we learned how to:  
+
+--
+- Define a likelihood and priors
+</br>
+
+- Write a custom MCMC sampler to produce samples from the joint posterior distribution  
+
+
+--
+### Given a statistical model and user-specified prior distributions, Nimble does these steps for you! 
+
+--
+- Possible to fit arbitrarily complex models $^1$  
+</br>
+
+--
+- "Frees the modeler in you"  
+
+
+???
+
+$^1$ remember, just because you *can* fit it doesn't mean it will return robust inferences. As we have already discussed, complex models often suffer from lack of identifiability and poor sampling of the joint posterior distribution. But, if you can write out a valid statistical model, Nimble can create a sampler and draw samples from the joint posterior distribution
+
+---
+## Running Nimble from R
+
+### Uses the `nimble` package
+
+--
+- Write model in `R` script using the `nimbleCode()` function
+</br>
+
+- Send the model to nimble along with initial values and data using `nimbleModel()`
+</br>
+
+- Build the MCMC automatically, compile the model and run it
+</br>
+
+- Model output brought back in to `R` for diagnostics/analysis/visualization  
+
+---
+## The BUGS language
+
+### Very similar to `R` (but slight differences)  
+
+- Limited ability to vectorize operations  
+</br>
+
+- Order of code less important (doesn't read top to bottom like `R`)
+
+### If you can write your model on the whiteboard, you can write it in Nimble
+
+- Stochastic relationships represented by `~`
+
+- Deterministic relationships represented by `<-`
+
+- Since this is likelihood, uses the `d` part of distributions (e.g. dnorm, dpois, dgamma, etc.)
+
+---
+## The BUGS language
+
+### Linear regression model
+<br/>
+<br/>
+
+$$\LARGE y_i = \alpha + \beta \times x_i + \epsilon_i$$
+</br>
+
+$$\LARGE \epsilon_i \sim Normal(0, \tau)$$
+
+---
+## The BUGS language
+
+### Linear regression model
+
+<br/>
+<br/>
+
+$$\LARGE y_i = \underbrace{\alpha + \beta \times x_i}_{Deterministic} + \underbrace{\epsilon_i}_{Stochastic}$$
+
+
+???
+
+Remember that $\tau = \frac{1}{\sigma^2}$
+
+---
+## The BUGS language
+
+### Linear regression model
+<br/>
+<br/>
+
+$$\underbrace{\LARGE \mu_i = \alpha + \beta \times x_i}_{Deterministic}$$
+</br>
+
+$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \tau)}_{Stochastic}$$
+</br>
+
+--
+
+Remember that these equations define the *likelihood* of our data given values of $\alpha$, $\beta$, and $\tau$
+
+
+---
+## The BUGS language
+
+### Linear regression model
+
+To specify a fully Bayesian model, we also need to define the priors:
+<br/>
+<br/>
+<br/>
+
+--
+
+
+$$\LARGE [\alpha] \sim Normal(\alpha|0, 0.001)$$
+</br>
+
+$$\LARGE [\beta] \sim Normal(\alpha|0, 0.001)$$
+</br>
+
+$$\LARGE [\tau] \sim Gamma(\tau|0.01, 0.01)$$
+</br>
+
+---
+## The BUGS language
+
+### Linear regression model 
+
+```{r, echo=TRUE}
+library(nimble)
+
+seedmod <- nimbleCode({
+  ## Priors
+    alpha ~ dnorm(0, 0.001) #mean, precision
+    beta ~ dnorm(0, 0.001)
+    tau ~ dgamma(.001,.001) # Precision
+    sigma <- 1/sqrt(tau)      # Calculate sd from precision
+    
+  ## Likelihood
+    for(i in 1:N){
+      mu[i] <- alpha + beta * x[i]
+      y[i] ~ dnorm(mu[i], tau)
+    }
+}) 
+```
+
+---
+## Preparing the data
+
+```{r eval = FALSE, echo = TRUE}
+## Read simulated data frame
+dat <- readRDS("data/sim_seed_counts.rds")
+
+## Store data for as a named list. 
+#Only 'data' if stochastic
+nimdat <- list(y = dat$y)
+
+#constants are for KNOWN values not from distributions
+nimconsts <- list(x = dat$visits.c, N = nrow(dat))
+
+## Create function that returns random initial values
+niminits <- function(){list(alpha = runif(1, 200, 300), 
+                              beta = runif(1, 25, 75), 
+                              tau = runif(1))}
+
+## Store which parameters we want to monitor
+params <- c("alpha", "beta", "tau", "sigma")
+```
+
+---
+## Run the model (One step method)
+
+```{r eval = FALSE, echo = TRUE}
+ ## Run the model
+nimfit <- nimbleMCMC(code = seedmod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 10000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+
+```{r echo = FALSE, include = FALSE}
+library(nimble)
+dat <- readRDS(here::here("data/sim_seed_counts.rds"))
+nimdat <- list(y = dat$y)
+nimconsts <- list(x = dat$visits.c, N = nrow(dat))
+niminits <- function(){list(alpha = runif(1, 200, 300), 
+                              beta = runif(1, 25, 75), 
+                              tau = runif(1))}
+params <- c("alpha", "beta", "tau", "sigma")
+nimfit <- nimbleMCMC(code = seedmod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 10000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+---
+## Diagnostics
+ 
+```{r echo = TRUE}
+str(nimfit)
+```
+ 
+---
+## Diagnostics
+ 
+```{r echo = TRUE, fig.height = 6.5}
+library(coda)
+plot(nimfit)
+```
+
+---
+## Structure of the output
+ 
+```{r echo=TRUE}
+class(nimfit)
+
+names(nimfit)
+```
+---
+## Structure of the output
+```{r echo=TRUE}
+summary(nimfit)
+
+```
+---
+## Saving model output
+
+```{r, eval = FALSE, echo=TRUE}
+saveRDS(nimfit, "output/regression_out.rds")
+```
+
