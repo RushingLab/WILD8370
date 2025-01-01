@@ -28,7 +28,7 @@ navbar:
           href: articles/lectures/02_probability/02_probability.html
         - text: "Lecture 3: Principles of Bayesian inference"
           href: articles/lectures/03_bayes/03_bayes.html
-        - text: "Lecture 6: More about priorss"
+        - text: "Lecture 6: More about priors"
           href: articles/lectures/06_priors/06_priors.html
     - text: "Labs"
       icon: fas fa-laptop-code

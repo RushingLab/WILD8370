@@ -48,7 +48,7 @@ Even if we have no previous estimates of polar bear survival, we are not complet
 
 Polar bears are a large, long-lived carnivore with a life expectancy of about 20-25 years (Ramsay & Stirling 1988). This simple fact suggests that adult survival must be pretty high - even with an annual survival probability of $95\%$, an individual would only have a `r round((0.95^20),2)*100`% probability of surviving 20 years. So survival probabilities much less than $\sim 90\%$ would be pretty surprising and we would be pretty suspicious of estimates less than $\sim 80\%$ (which would imply $1\%$ of female polar bears make it to 20 years of age). 
 
-Of course, polar bear populations in many areas are declining pretty quickly, suggesting that maybe adult survival rates could be lower than historical levels. So although we can be pretty that survival is  high (e.g., $>80\%$), we're not super confident about the actual survival rate. With regards to our prior, this suggests we want a prior that puts most of the weight $>80\%$ but is wide enough to reflect our uncertainty about the actual survival rates.
+Of course, polar bear populations in many areas are declining pretty quickly, suggesting that maybe adult survival rates could be lower than historical levels. So although we can be pretty that survival is high (e.g., $>80\%$), we're not super confident about the actual survival rate. With regards to our prior, this suggests we want a prior that puts most of the weight $>80\%$ but is wide enough to reflect our uncertainty about the actual survival rates.
 
 ### Turning our expertise into a prior
 
@@ -109,7 +109,7 @@ This seems reasonable given our understanding of the species biology. However, b
 
 ## Example 2: Published studies
 
-Polar bears are relatively well-studied so we would not be surprised to find at least a few published estimates of adult female survival. As it turns out, there are. Estimates from a few of these studies are included as a small data frame in the WILD6900 package:
+Polar bears are relatively well-studied so we would not be surprised to find at least a few published estimates of adult female survival. As it turns out, there are. Estimates from a few of these studies are included as a small data frame in the WILD8370 package:
 
 ```{r}
 data("SurvPriorData")
