@@ -1,0 +1,366 @@
+---
+title: "Lecture 5"
+subtitle: "Generalized linear model review"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+source(here::here("R/zzz.R"))
+library(nimble)
+# library(gganimate)
+```
+
+## Readings
+
+> ### Kéry & Schaub 48-55
+
+---
+class: inverse, center, middle
+
+# From linear models to GLMs
+
+---
+# Linear models
+<br/>
+<br/>
+$$\Large response = deterministic\; part+stochastic\; part$$ 
+<br/>
+<br/>
+
+--
+$$\underbrace{\LARGE \mu_i = \beta_0 + \beta_1 \times x_i}_{Deterministic}$$
+<br/>
+<br/>
+
+--
+$$\underbrace{\LARGE y_i \sim normal(\mu_i, \tau)}_{Stochastic}$$  
+
+???
+
+Note that the deterministic portion of the model has the same form as the equation for a line: $y = a + b \times x$, which is why we call these linear models
+
+---
+class: inverse, middle, center
+
+# Linear models under the hood
+## Variations on the stochastic model
+
+---
+## Stochasticity in the linear model
+
+$$\underbrace{\LARGE \mu_i = -2 + 0.5 \times x_i}_{Deterministic}$$
+--
+```{r fig.height=4, fig.width=4}
+x <- rbinom(100, size = 1, prob = 0.5)
+y <- -2 + 0.5 * x + rnorm(100, 0, 0.25)
+
+df <- data.frame(x = x, y = y)
+
+ggplot(df, aes(x, y)) + geom_boxplot(color = "white") +
+  geom_segment(aes(x = -0.1, xend = 0.1, y = -2, yend = -2), color = WILD6900_colors$value[WILD6900_colors$name == "primary"], size = 1.5) +
+  geom_segment(aes(x = 0.9, xend = 1.1, y = -1.5, yend = -1.5), color = WILD6900_colors$value[WILD6900_colors$name == "primary"], size = 1.5) +
+  scale_y_continuous(expression(mu))
+```
+
+---
+## Stochasticity in the linear model
+
+$$\LARGE \mu_i = -2 + 0.5 \times x_i$$
+
+$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \tau)}_{Stochastic}$$  
+
+--
+```{r fig.height=4, fig.width=4}
+ggplot(df, aes(x, y, group = x)) + 
+  geom_boxplot(width = 0.25) + 
+    geom_segment(aes(x = -0.1, xend = 0.1, y = -2, yend = -2), color = WILD6900_colors$value[WILD6900_colors$name == "primary"], size = 1.5) +
+  geom_segment(aes(x = 0.9, xend = 1.1, y = -1.5, yend = -1.5), color = WILD6900_colors$value[WILD6900_colors$name == "primary"], size = 1.5) +
+  geom_point(color = WILD6900_colors$value[WILD6900_colors$name == "warning"], alpha = 0.25)
+```
+
+---
+## Stochasticity in the linear model
+
+$$\LARGE \mu_i = -2 + 0.5 \times x_i$$
+
+
+```{r fig.height=4, fig.width=4}
+x <- rnorm(100)
+y <- -2 + 0.5 * x + rnorm(100, 0, 0.25)
+
+df <- data.frame(x = x, y = y)
+
+ggplot(df, aes(x, y)) + geom_point(color = "white") +
+  geom_abline(slope = 0.5, intercept = -2) +
+  scale_y_continuous(expression(mu))
+```
+
+---
+## Stochasticity in the linear model
+
+$$\LARGE \mu_i = -2 + 0.5 \times x_i$$
+
+$$\LARGE y_i \sim Normal(\mu_i, \tau)$$  
+
+```{r fig.height=4, fig.width=4}
+ggplot(df, aes(x, y)) +
+  geom_abline(slope = 0.5, intercept = -2) +
+  geom_point(color = WILD6900_colors$value[WILD6900_colors$name == "warning"], alpha = 0.25)
+```
+
+---
+class: inverse, center, middle
+
+# Components of the linear model
+
+---
+## Components of the linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim normal(\mu_i, \tau)$$
+
+--
+### 2) Link function
+
+$$\LARGE \mu_i = E(y_i) = linear\;\;predictor$$
+
+--
+### 3) Linear predictor
+
+$$\LARGE \beta_0 + \beta_1 \times x_i$$
+
+
+---
+## Stochasticity in the linear model
+
+### What happens if $\Large 0 \leq y_i$?
+<br/>
+<br/>
+
+--
+```{r fig.height=4, fig.width=4}
+ggplot(df, aes(x, y)) +
+  geom_point(color = "white") +
+  geom_abline(slope = 0.5, intercept = -2) +
+  scale_y_continuous(expression(mu))
+
+```
+
+---
+##  Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim normal(\mu_i, \tau)$$
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Poisson(\lambda_i)$$
+
+
+--
+### 2) Link function
+
+$$\LARGE \lambda_i = E(y_i) = linear\;\;predictor$$
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Poisson(\lambda_i)$$
+
+
+### 2) Link function
+
+$$\LARGE log(\lambda_i) = log(E(y_i)) = linear\;\;predictor$$
+
+--
+```{r fig.height = 2.5, fig.width=3.5}
+lambda <- runif(100, 0, 20)
+l.lambda <- log(lambda)
+
+df <- data.frame(lambda = lambda, log.lambda = l.lambda)
+
+ggplot(df, aes(x = log.lambda, y = lambda)) + geom_line(size = 2, color = WILD6900_colors$value[WILD6900_colors$name=="warning"]) +
+  scale_y_continuous(name = expression(lambda)) +
+  scale_x_continuous(name = expression(paste("log(", lambda, ")")))
+```
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Poisson(\lambda_i)$$
+
+
+### 2) Link function
+
+$$\LARGE log(\lambda_i) = log(E(y_i)) = linear\;\;predictor$$
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Poisson(\lambda_i)$$
+
+
+### 2) Link function
+
+$$\LARGE log(\lambda_i) = log(E(y_i)) = linear\;\;predictor$$
+
+### 3) Linear predictor
+
+$$\LARGE \beta_0 + \beta_1 \times x_i$$ 
+
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Bernoulli(p_i)$$
+
+--
+### 2) Link function
+
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+
+--
+```{r fig.height = 2.5, fig.width=3.5}
+p <- runif(100)
+l.p <- log(p/(1-p))
+
+df <- data.frame(p = p, logit.p = l.p)
+
+ggplot(df, aes(x = logit.p, y = p)) + geom_line(size = 2, color = WILD6900_colors$value[WILD6900_colors$name=="warning"]) +
+  scale_x_continuous(name = "logit(p)")
+```
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim Bernoulli(p_i)$$
+
+### 2) Link function
+
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+
+### 3) Linear predictor
+
+$$\LARGE \beta_0 + \beta_1 \times x_i$$ 
+
+---
+## Components of the generalized linear model
+
+### 1) Distribution
+
+$$\LARGE y_i \sim binomial(N, p_i)$$
+
+### 2) Link function
+
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+
+### 3) Linear predictor
+
+$$\LARGE \beta_0 + \beta_1 \times x_i$$ 
+
+---
+## GLMs in Nimble - Normal Link
+
+$$\mu_i = \beta_0 + \beta_1 \times x_i$$
+$$y_i \sim Normal(\mu_i, \tau)$$  
+```{r, eval=F, echo = T}
+nimbleCode({
+  ## Priors
+    beta0 ~ dnorm(0, 0.001) #mean, precision
+    beta1 ~ dnorm(0, 0.001)
+    tau ~ dgamma(.001,.001) # Precision
+    sigma <- 1/sqrt(tau)      # Calculate sd from precision
+    
+  ## Likelihood
+    for(i in 1:N){
+      mu[i] <- beta0 + beta1 * x[i]
+      y[i] ~ dnorm(mu[i], tau)
+    }
+}) 
+```
+---
+## GLMs in Nimble - Poisson Link
+$$y_i \sim Poisson(\lambda_i)$$
+$$log(\lambda_i) = log(E(y_i)) = \beta_0 + \beta_1 \times x_i$$
+```{r, eval=F, echo = T}
+nimbleCode({
+  ## Priors
+    beta0 ~ dnorm(0, 0.001) #mean, precision
+    beta1 ~ dnorm(0, 0.001)
+    
+  ## Likelihood
+    for(i in 1:N){
+      log(lambda[i]) <- beta0 + beta1 * x[i]
+      #Equivalently:
+      #lambda[i] <- exp(beta0 + beta1 * x[i])
+      y[i] ~ dpois(lambda[i])
+    }
+}) 
+```
+---
+## GLMs in Nimble - Binomial Link
+
+$$y_i \sim binomial(N, p_i)$$
+
+$$logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = \beta_0 + \beta_1 \times x_i$$
+```{r binomial, eval=F, echo = T}
+nimbleCode({
+  ## Priors
+    beta0 ~ dnorm(0, 0.001) #mean, precision
+    beta1 ~ dnorm(0, 0.001)
+    
+  ## Likelihood
+    for(i in 1:nobs){
+      logit(p[i]) <- beta0 + beta1 * x[i]
+      #Equivalently:
+      #p[i] <- exp(beta0 + beta1 * x[i])/(1+exp(beta0 + beta1 * x[i]))
+      y[i] ~ dbinom(p[i], J) #J = trials
+    }
+}) 
+```
+
+---
+class: inverse
+
+## Generalized linear models
+<br/>
+<br/>
+--
+- Flexible method to model observations arising from different probability distributions  
+<br/>
+<br/>
+--
+- Link many classical tests under unified framework  
+<br/>
+<br/>
+--
+- Underlie nearly all common ecological models  
+
