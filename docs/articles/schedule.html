@@ -41,6 +41,8 @@
     <li><a class="dropdown-item" href="../articles/lectures/01_inference/01_inference.html">Lecture 1: Statistical inference in ecology</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/02_probability/02_probability.html">Lecture 2: Probability refresher</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/03_bayes/03_bayes.html">Lecture 3: Principles of Bayesian inference</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/04_intro_nimble/Intro_Nimble.html">Lecture 4: Introduction to Nimble</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/05_glms/05_glms.html">Lecture 5: Generalized linear model review</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/06_priors/06_priors.html">Lecture 6: More about priors</a></li>
   </ul>
 </li>
@@ -51,6 +53,7 @@
     <li><a class="dropdown-item" href="../articles/Lab01b_Mathematical_Notation.html">Lab 1: Mathematical Notation</a></li>
     <li><a class="dropdown-item" href="../articles/Lab2_simulation.html">Lab 2: Data Simulation</a></li>
     <li><a class="dropdown-item" href="../articles/Lab3_BasicMCMC.html">Lab 3: Basic MCMC</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab4_glms.html">Lab 4: GLMs</a></li>
     <li><a class="dropdown-item" href="../articles/priors.html">Lab 5: Priors</a></li>
   </ul>
 </li>
@@ -121,7 +124,7 @@ M
 Jan. 6
 </td>
 <td style="text-align:center;">
-Course introduction
+Course Introduction
 </td>
 <td style="text-align:center;">
 </td>
@@ -138,7 +141,7 @@ W
 Jan. 8
 </td>
 <td style="text-align:center;">
-Introduction to statistics
+Introduction to Statistics
 </td>
 <td style="text-align:center;">
 Using R Markdown/Common Mathematical Notation
@@ -171,7 +174,7 @@ M
 Jan. 13
 </td>
 <td style="text-align:center;">
-Probability refresher
+Probability Refresher
 </td>
 <td style="text-align:center;">
 </td>
@@ -188,7 +191,7 @@ W
 Jan. 15
 </td>
 <td style="text-align:center;">
-Probability refresher
+Probability Refresher
 </td>
 <td style="text-align:center;">
 Data simulation techniques
@@ -221,7 +224,7 @@ M
 Jan. 20
 </td>
 <td style="text-align:center;">
-Principles of Bayesian inference
+Principles of Bayesian Inference
 </td>
 <td style="text-align:center;">
 </td>
@@ -238,7 +241,7 @@ W
 Jan. 22
 </td>
 <td style="text-align:center;">
-Principles of Bayesian inference
+Principles of Bayesian Inference
 </td>
 <td style="text-align:center;">
 Basic MCMC
@@ -288,7 +291,7 @@ W
 Jan. 29
 </td>
 <td style="text-align:center;">
-Introduction to Linear Models and Nimble
+Generalized Linear Model Review
 </td>
 <td style="text-align:center;">
 Regression analysis using Nimble
@@ -321,7 +324,7 @@ M
 Feb. 3
 </td>
 <td style="text-align:center;">
-Random/fixed effects in linear models
+Random vs. fixed effects in Linear models
 </td>
 <td style="text-align:center;">
 </td>
@@ -391,7 +394,7 @@ Feb. 12
 Observation error, intro to hierarchical models
 </td>
 <td style="text-align:center;">
-Lab 6
+Prior Predictive Checks
 </td>
 <td style="text-align:center;">
 </td>
@@ -438,7 +441,7 @@ W
 Feb. 19
 </td>
 <td style="text-align:center;">
-Estimating occupancy from presence/absence data
+Abundance from N-mixture models
 </td>
 <td style="text-align:center;">
 Solving Nimble errors
@@ -471,6 +474,7 @@ M
 Feb. 24
 </td>
 <td style="text-align:center;">
+Zero-inflated models
 </td>
 <td style="text-align:center;">
 </td>
@@ -487,6 +491,7 @@ W
 Feb. 26
 </td>
 <td style="text-align:center;">
+Different types of observation processes
 </td>
 <td style="text-align:center;">
 Lab 8
@@ -568,6 +573,7 @@ M
 Mar. 10
 </td>
 <td style="text-align:center;">
+Known Fate
 </td>
 <td style="text-align:center;">
 </td>
@@ -584,9 +590,10 @@ W
 Mar. 12
 </td>
 <td style="text-align:center;">
+Simple Movement Models
 </td>
 <td style="text-align:center;">
-Lab 9
+Imputing Missing Information
 </td>
 <td style="text-align:center;">
 </td>
@@ -616,6 +623,7 @@ M
 Mar. 17
 </td>
 <td style="text-align:center;">
+Closed-population mark-recapture
 </td>
 <td style="text-align:center;">
 </td>
@@ -632,9 +640,10 @@ W
 Mar. 19
 </td>
 <td style="text-align:center;">
+Closed-population mark-recapture
 </td>
 <td style="text-align:center;">
-Lab 10
+Simple Model Selection and CMR
 </td>
 <td style="text-align:center;">
 </td>
@@ -664,6 +673,7 @@ M
 Mar. 24
 </td>
 <td style="text-align:center;">
+CJS models
 </td>
 <td style="text-align:center;">
 </td>
@@ -680,9 +690,10 @@ W
 Mar. 26
 </td>
 <td style="text-align:center;">
+CJS models
 </td>
 <td style="text-align:center;">
-Lab 11
+Survival Models with Detection Error
 </td>
 <td style="text-align:center;">
 </td>
@@ -712,6 +723,7 @@ M
 Mar. 31
 </td>
 <td style="text-align:center;">
+Jolly-Seber models
 </td>
 <td style="text-align:center;">
 </td>
@@ -728,6 +740,7 @@ W
 Apr. 2
 </td>
 <td style="text-align:center;">
+Jolly-Seber models
 </td>
 <td style="text-align:center;">
 Lab 12
@@ -760,6 +773,7 @@ M
 Apr. 7
 </td>
 <td style="text-align:center;">
+Multi-state CMR
 </td>
 <td style="text-align:center;">
 </td>
@@ -776,6 +790,7 @@ W
 Apr. 9
 </td>
 <td style="text-align:center;">
+Multi-state CMR
 </td>
 <td style="text-align:center;">
 Lab 13
@@ -808,6 +823,7 @@ M
 Apr. 14
 </td>
 <td style="text-align:center;">
+Spatial Capture Recapture
 </td>
 <td style="text-align:center;">
 </td>
@@ -824,6 +840,7 @@ W
 Apr. 16
 </td>
 <td style="text-align:center;">
+Spatial Capture Recapture
 </td>
 <td style="text-align:center;">
 Lab 14
@@ -856,6 +873,7 @@ M
 Apr. 21
 </td>
 <td style="text-align:center;">
+TBD
 </td>
 <td style="text-align:center;">
 </td>
@@ -918,7 +936,7 @@ Apr. 28
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Clark Rushing.</p>
+  <p>Developed by Clark Rushing, Heather Gaya.</p>
 </div>
 
 <div class="pkgdown-footer-right">

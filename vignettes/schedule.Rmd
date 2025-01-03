@@ -44,35 +44,35 @@ schedule <- data.frame(WK = c("1", "", "",
                               "17"),
                        Day = c(rep(c("M", "W", ""), 16), "M"),
                        Week = MW(first.day = "2025/01/06", last.day = "2025/04/28"),
-                       Lecture = c("Course introduction", "Introduction to statistics", "", #1
-      "Probability refresher", "Probability refresher", "", #2
-      "Principles of Bayesian inference", "Principles of Bayesian inference", "", #3
-      "Introduction to Linear Models and Nimble", "Introduction to Linear Models and Nimble", "", #4
-      "Random/fixed effects in linear models", "Informative Priors", "", #5
+                       Lecture = c("Course Introduction", "Introduction to Statistics", "", #1
+      "Probability Refresher", "Probability Refresher", "", #2
+      "Principles of Bayesian Inference", "Principles of Bayesian Inference", "", #3
+      "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #4
+      "Random vs. fixed effects in Linear models", "Informative Priors", "", #5
       "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #6
-      "Estimating occupancy from presence/absence data", "Estimating occupancy from presence/absence data", "", #7
-      "", "", "", #8 
+      "Estimating occupancy from presence/absence data", "Abundance from N-mixture models", "", #7
+      "Zero-inflated models", "Different types of observation processes", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
-      "", "", "", #10
-      "", "", "", #11
-      "", "", "", #12
-      "", "", "", #13 
-      "", "", "", #14
-      "", "", "", #15
-      "", "", "", #16
+      "Known Fate", "Simple Movement Models", "", #10
+      "Closed-population mark-recapture", "Closed-population mark-recapture", "", #11
+      "CJS models", "CJS models", "", #12
+      "Jolly-Seber models", "Jolly-Seber models", "", #13
+      "Multi-state CMR", "Multi-state CMR", "", #14 
+      "Spatial Capture Recapture", "Spatial Capture Recapture", "", #15
+      "TBD", "", "", #16
       ""), 
                        Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
                                "", "Data simulation techniques", "", 
                                "", "Basic MCMC", "",
                                "", "Regression analysis using Nimble", "", 
-                               "", "Choosing Priors", "", 
-                               "", "Lab 6", "", 
+                               "", "Choosing Priors", "",
+                               "", "Prior Predictive Checks", "", #be sure to include something about transformed priors
                                "", "Solving Nimble errors", "", 
                                "", "Lab 8", "",
                                "", "", "", # Spring break
-                               "", "Lab 9", "",
-                               "", "Lab 10", "", 
-                               "", "Lab 11", "", 
+                               "", "Imputing Missing Information", "",
+                               "", "Simple Model Selection and CMR", "", 
+                               "", "Survival Models with Detection Error", "", 
                                "", "Lab 12", "",
                                "", "Lab 13", "", 
                                "", "Lab 14", "", 

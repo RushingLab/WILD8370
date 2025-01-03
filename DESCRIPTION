@@ -2,7 +2,8 @@ Package: WILD8370
 Type: Package
 Title: Course Materials for WILD 8370
 Version: 2025.1.0
-Author: person("Clark", "Rushing", role = c("aut", "cre"), email = "clark.rushing@uga.edu")
+Authors@R: c(person("Clark", "Rushing", role = c("aut", "cre"), email = "clark.rushing@uga.edu"), 
+        person("Heather", "Gaya", role = c("aut"), email = "heather.gaya@uga.edu"))
 Maintainer: Clark Rushing <clark.rushing@uga.edu>
 Description: WILD8370: Bayesian Models for Conservation Science at the University of Georgia. This package primarily exists to distribute data, code, and other materials in an efficient manner.
 License: CC0
@@ -29,7 +30,8 @@ Imports:
     mapproj,
     abind,
     ggforce,
-    glue
+    glue,
+    MCMCvis
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)

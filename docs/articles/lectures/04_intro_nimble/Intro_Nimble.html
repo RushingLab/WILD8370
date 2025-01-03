@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>lecture 4: introduction to bayesian analysis using nimble</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# lecture 4: introduction to bayesian analysis using nimble
+]
+.subtitle[
+## FANR 8370
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# readings
+
+&gt; Kéry &amp; Schaub 38-40; 58-64
+
+
+---
+class: inverse, middle, center
+
+# from custom mcmc to bugs
+
+---
+# the bugs language
+
+#### **B**ayesian **A**nalysis **U**sing **G**ibbs **S**ampling  
+
+--
+
+Language/program invented in the 1990's by epidemiologists in Cambridge  
+
+--
+
+Later became WinBUGS  
+
+- First customizable MCMC software  
+
+--
+
+- Revolutionized the use of Bayesian methods in applied statistics
+
+---
+# the bugs language
+
+Since the development of WinBUGS, other Bayesian software programs have been developed:
+
+- OpenBugs
+
+- [JAGS](https://sourceforge.net/projects/mcmc-jags/files/)
+
+- [Nimble](https://r-nimble.org/)
+
+- [Stan](https://mc-stan.org/)
+
+
+--
+
+For the remainder of the course, we will fit models using Nimble  
+
+- Uses BUGS language and R (easy to learn, lots of online documentation)  
+
+- Out-performs WinBUGS  
+
+- Available for all operating systems
+
+- Highly customizable
+
+---
+# the bugs language
+
+#### Last week, we learned how to:  
+
+--
+
+- Define a likelihood and priors
+
+- Write a custom MCMC sampler to produce samples from the joint posterior distribution  
+
+
+--
+
+Given a statistical model and user-specified prior distributions, Nimble does these steps for you! 
+
+--
+
+- Possible to fit arbitrarily complex models  
+
+
+--
+
+- "Frees the modeler in you"  
+
+
+???
+
+remember, just because you *can* fit it doesn't mean it will return robust inferences. As we have already discussed, complex models often suffer from lack of identifiability and poor sampling of the joint posterior distribution. But, if you can write out a valid statistical model, Nimble can create a sampler and draw samples from the joint posterior distribution
+
+---
+# running nimble in r
+
+### Uses the `nimble` package
+
+--
+
+- Write model in `R` script using the `nimbleCode()` function
+
+
+- Send the model to nimble along with initial values and data using `nimbleModel()`
+
+
+- Build the MCMC automatically, compile the model and run it
+
+
+- Diagnostics/analysis/visualization conducted in `R`  
+
+---
+# the bugs language
+
+Very similar to `R` (but slight differences)  
+
+- Limited ability to vectorize operations  
+
+- Order of code less important (doesn't read top to bottom like `R`)
+
+If you can write your model on the whiteboard, you can write it in Nimble
+
+- Stochastic relationships represented by `~`
+
+- Deterministic relationships represented by `&lt;-`
+
+- Since this is likelihood, uses the `d` part of distributions (e.g. dnorm, dpois, dgamma, etc.)
+
+---
+# the bugs language
+
+#### Linear regression model
+&lt;br/&gt;
+&lt;br/&gt;
+
+`$$\LARGE y_i = \alpha + \beta \times x_i + \epsilon_i$$`
+&lt;/br&gt;
+
+`$$\LARGE \epsilon_i \sim normal(0, \sigma)$$`
+
+---
+# the bugs language
+
+#### Linear regression model
+
+&lt;br/&gt;
+&lt;br/&gt;
+
+`$$\LARGE y_i = \underbrace{\alpha + \beta \times x_i}_{Deterministic} + \underbrace{\epsilon_i}_{Stochastic}$$`
+
+
+???
+
+
+---
+# the bugs language
+
+#### Linear regression model
+&lt;br/&gt;
+&lt;br/&gt;
+
+`$$\underbrace{\LARGE \mu_i = \alpha + \beta \times x_i}_{Deterministic}$$`
+&lt;/br&gt;
+
+`$$\underbrace{\LARGE y_i \sim normal(\mu_i, \sigma)}_{Stochastic}$$`
+
+--
+
+Remember that these equations define the *likelihood* of our data given values of `\(\alpha\)`, `\(\beta\)`, and `\(\sigma\)`
+
+
+---
+# the bugs language
+
+#### Linear regression model
+
+To specify a fully Bayesian model, we also need to define the priors:
+&lt;br/&gt;
+&lt;br/&gt;
+&lt;br/&gt;
+
+--
+
+
+`$$\LARGE [\alpha] \sim normal(\alpha|0, 10)$$`
+&lt;/br&gt;
+
+`$$\LARGE [\beta] \sim normal(\alpha|0, 10)$$`
+&lt;/br&gt;
+
+`$$\LARGE [\sigma] \sim Gamma(\sigma|0.01, 0.01)$$`
+&lt;/br&gt;
+
+---
+# the bugs language
+
+Linear regression model 
+
+
+```r
+library(nimble)
+
+seedmod &lt;- nimbleCode({
+  ## Priors
+    alpha ~ dnorm(0, sd = 10) #specify sd argument to use stand dev rather than precision
+    beta ~ dnorm(0, sd = 10)
+    sigma ~ dgamma(.001,.001) # residual sd
+    
+  ## Likelihood
+    for(i in 1:N){
+      mu[i] &lt;- alpha + beta * x[i]
+      y[i] ~ dnorm(mu[i], sd = sigma)
+    }
+}) 
+```
+
+---
+# preparing the data
+
+
+```r
+## Read simulated data frame
+dat &lt;- readRDS("data/sim_seed_counts.rds")
+
+## Store data for as a named list. 
+#Only 'data' if stochastic
+nimdat &lt;- list(y = dat$y)
+
+#constants are for KNOWN values not from distributions
+nimconsts &lt;- list(x = dat$visits.c, N = nrow(dat))
+
+## Create function that returns random initial values
+niminits &lt;- function(){list(alpha = runif(1, 200, 300), 
+                              beta = runif(1, 25, 75), 
+                              sigma = runif(1))}
+
+## Store which parameters we want to monitor
+params &lt;- c("alpha", "beta", "sigma")
+```
+
+---
+# run the model (one step method)
+
+
+```r
+ ## Run the model
+nimfit &lt;- nimbleMCMC(code = seedmod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 10000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+
+
+
+---
+# diagnostics
+ 
+.small-code[
+
+```r
+str(nimfit)
+```
+
+```
+## List of 3
+##  $ chain1: 'mcmc' num [1:7500, 1:3] 252 250 251 250 251 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:3] "alpha" "beta" "sigma"
+##   ..- attr(*, "mcpar")= num [1:3] 1 7500 1
+##  $ chain2: 'mcmc' num [1:7500, 1:3] 252 251 251 250 250 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:3] "alpha" "beta" "sigma"
+##   ..- attr(*, "mcpar")= num [1:3] 1 7500 1
+##  $ chain3: 'mcmc' num [1:7500, 1:3] 250 250 250 251 251 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:3] "alpha" "beta" "sigma"
+##   ..- attr(*, "mcpar")= num [1:3] 1 7500 1
+##  - attr(*, "class")= chr "mcmc.list"
+```
+]
+
+---
+# diagnostics
+ 
+
+```r
+library(coda)
+plot(nimfit)
+```
+
+&lt;img src="Intro_Nimble_files/figure-html/unnamed-chunk-6-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+# structure of the output
+ 
+
+```r
+class(nimfit)
+```
+
+```
+## [1] "mcmc.list"
+```
+
+```r
+names(nimfit)
+```
+
+```
+## [1] "chain1" "chain2" "chain3"
+```
+
+---
+# structure of the output
+
+.small-code[
+
+```r
+summary(nimfit)
+```
+
+```
+## 
+## Iterations = 1:7500
+## Thinning interval = 1 
+## Number of chains = 3 
+## Sample size per chain = 7500 
+## 
+## 1. Empirical mean and standard deviation for each variable,
+##    plus standard error of the mean:
+## 
+##         Mean    SD Naive SE Time-series SE
+## alpha 250.55 0.578  0.00385        0.00425
+## beta   48.94 0.568  0.00379        0.00373
+## sigma   7.49 0.412  0.00274        0.00599
+## 
+## 2. Quantiles for each variable:
+## 
+##         2.5%    25%    50%    75%  97.5%
+## alpha 249.41 250.16 250.55 250.94 251.66
+## beta   47.83  48.56  48.94  49.32  50.05
+## sigma   6.75   7.19   7.47   7.77   8.34
+```
+]
+
+---
+# saving model output
+
+
+```r
+saveRDS(nimfit, "output/regression_out.rds")
+```
+
+
+Alternatively:
+
+
+```r
+MCMCvis::MCMCdiag(nimfit, 
+                  mkdir = "regression",
+                  file_name = 'regression_out',
+                  dir = 'output',
+                  save_obj = TRUE)
+```
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

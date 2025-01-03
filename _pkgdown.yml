@@ -4,6 +4,11 @@ template:
   bootstrap: 5
   bootswatch: spacelab
 
+authors:
+footer:
+roles: [cre, fnd]
+text: "Developed by"
+
 reference:
 
 navbar:
@@ -28,6 +33,10 @@ navbar:
           href: articles/lectures/02_probability/02_probability.html
         - text: "Lecture 3: Principles of Bayesian inference"
           href: articles/lectures/03_bayes/03_bayes.html
+        - text: "Lecture 4: Introduction to Nimble"
+          href: articles/lectures/04_intro_nimble/Intro_Nimble.html
+        - text: "Lecture 5: Generalized linear model review"
+          href: articles/lectures/05_glms/05_glms.html
         - text: "Lecture 6: More about priors"
           href: articles/lectures/06_priors/06_priors.html
     - text: "Labs"
@@ -41,6 +50,8 @@ navbar:
           href: articles/Lab2_simulation.html
         - text: "Lab 3: Basic MCMC"
           href: articles/Lab3_BasicMCMC.html
+        - text: "Lab 4: GLMs"
+          href: articles/Lab4_glms.html
         - text: "Lab 5: Priors"
           href: articles/priors.html
     - icon: far fa-bookmark
