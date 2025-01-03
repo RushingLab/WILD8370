@@ -1,4 +1,4 @@
-pandoc: '3.3'
+pandoc: 3.1.4
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
@@ -14,7 +14,7 @@ articles:
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2024-12-30T21:13Z
+last_built: 2025-01-01T13:32Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles
