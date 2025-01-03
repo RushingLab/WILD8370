@@ -50,7 +50,7 @@ schedule <- data.frame(WK = c("1", "", "",
       "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #4
       "Random vs. fixed effects in Linear models", "Informative Priors", "", #5
       "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #6
-      "Estimating occupancy from presence/absence data", "Abundance from N-mixture models", "", #7
+      "More about N-mixture Models", "More about N-mixture Models", "", #7
       "Zero-inflated models", "Different types of observation processes", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
       "Known Fate", "Simple Movement Models", "", #10
