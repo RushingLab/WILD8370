@@ -46,10 +46,10 @@ schedule <- data.frame(WK = c("1", "", "",
                        Week = MW(first.day = "2025/01/06", last.day = "2025/04/28"),
                        Lecture = c("Course Introduction", "Introduction to Statistics", "", #1
       "Probability Refresher", "Probability Refresher", "", #2
-      "Principles of Bayesian Inference", "Principles of Bayesian Inference", "", #3
-      "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #4
-      "Random vs. fixed effects in Linear models", "Informative Priors", "", #5
-      "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #6
+      "No class (MLK Day)", "Principles of Bayesian Inference (Part 1)", "", #3
+      "Principles of Bayesian Inference (Part 2)" , "Introduction to Linear Models and Nimble", "", #4
+      "Generalized Linear Model Review", "Informative Priors", "", #5
+      "Random Effects", "Observation error", "", #6
       "More about N-mixture Models", "More about N-mixture Models", "", #7
       "Zero-inflated models", "Different types of observation processes", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9

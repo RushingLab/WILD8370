@@ -320,7 +320,7 @@ nimbleCode({
 ```
 
 ---
-# glms in nimble - poisson Link
+# glms in nimble - poisson link
 
 $$y_i \sim Poisson(\lambda_i)$$
 

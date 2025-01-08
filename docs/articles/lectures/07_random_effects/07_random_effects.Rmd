@@ -1,0 +1,309 @@
+---
+title: "lecture 7: Random Effects"
+subtitle: "FANR 8370"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+source(here::here("R/zzz.R"))
+library(nimble)
+library(gganimate)
+```
+
+## Readings
+
+> Kéry & Schaub 73-82
+
+---
+class: inverse, center, middle
+
+# What are random effects?
+
+---
+## What are random effects?
+<br/>
+
+--
+- Fixed effects are constant across observational units, random effects vary across units  
+<br/>
+
+--
+- Fixed effects are used when you are interested in the specific factor levels, random effects are used when you are interested in the underlying population  
+<br/>
+
+--
+- When factors levels are exhaustive, they are fixed. When they are a sample of the possible levels, they are random  
+<br/>
+
+--
+- Random effects are the realized values of a random variable  
+<br/>
+
+--
+- Fixed effects are estimated by maximum likelihood, random effects are estimated with shrinkage  
+
+???
+
+Definitions from Gelman & Hill (2007) pg. 245
+
+---
+## A simple linear model
+
+$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$
+
+$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$
+
+--
+- If $\beta_{[1]} = \beta_{[2]} = \beta_{[3]} = ...=\beta_{[J]}$
+
+--
+```
+nimbleCode({
+  # Priors
+  beta0 ~ dnorm(0, 1)
+  sd ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd)        
+    mu[i] <- beta0
+  } #i
+})
+```
+
+---
+## A simple linear model
+
+$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$
+
+$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$
+
+--
+- If $\beta_{[1]} \perp \beta_{[2]} \perp \beta_{[3]} \perp ...\perp \beta_{[J]}$
+
+--
+```
+nimbleCode({
+  # Priors
+  for(j in 1:J){
+    beta0[j] ~ dnorm(0, 1)
+  }
+  sd ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd)        
+    mu[i] <- beta0[group[i]]
+  } #i
+})
+```
+???
+
+nb $\perp$ means "independent of"
+
+This should look familiar - it's the means parameterization of the ANOVA model
+
+In this case, since 'group' is not defined as a random variable, it must be provided as a constant to Nimble
+
+---
+## A simple linear model
+
+$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$
+
+$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$
+
+--
+- If $\beta_{[j]} \sim Normal(\mu_{\beta}, \sigma^2_{\beta})$
+
+```{r, fig.height = 5, fig.width = 8}
+x <- seq(from = 0, to = 20, length.out = 200)
+
+df <- data.frame(x = x, density = dnorm(x, mean = 10, sd = 2))
+
+beta0 <- c(4, 8, 10, 11, 13)
+
+
+ggplot(df, aes(x = x, y = density))  +
+  scale_x_continuous("", breaks = beta0, 
+                     label = c(expression(beta[0[1]]), 
+                               expression(beta[0[2]]),
+                               expression(beta[0[3]]),
+                               expression(beta[0[4]]),
+                               expression(beta[0[5]]))) +
+  geom_segment(aes(x = beta0[1], xend = beta0[1], y = -Inf, yend = dnorm(beta0[1], 10, 2)), color = "grey60") +
+  geom_segment(aes(x = beta0[2], xend = beta0[2], y = -Inf, yend = dnorm(beta0[2], 10, 2)), color = "grey60") +
+  geom_segment(aes(x = beta0[3], xend = beta0[3], y = -Inf, yend = dnorm(beta0[3], 10, 2)), color = "grey60") +
+  geom_segment(aes(x = beta0[4], xend = beta0[4], y = -Inf, yend = dnorm(beta0[4], 10, 2)), color = "grey60") +
+  geom_segment(aes(x = beta0[5], xend = beta0[5], y = -Inf, yend = dnorm(beta0[5], 10, 2)), color = "grey60") +
+  geom_path(size = 2, color = WILD6900_colors$value[WILD6900_colors$name=="primary"])
+```
+
+---
+## A simple linear model
+
+$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$
+
+$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$
+
+--
+- If $\beta_{[j]} \sim Normal(\mu_{\beta}, \sigma^2_{\beta})$
+
+--
+```
+nimbleCode({
+  # Priors
+  for(j in 1:J){
+    beta0[j] ~ dnorm(mu.beta, sd = sd.beta)
+  }
+  mu.beta ~ dnorm(0, 0.33)
+  sd.beta ~ dgamma(0.25, 0.25)
+  sd.mu ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd.mu)        
+    mu[i] <- beta0[group[i]]
+  } #i
+})
+```
+
+---
+## Random effects
+<br/>
+
+--
+- Only apply to factors  
+<br/>
+
+--
+- Imply grouped effects  
+<br/>
+
+--
+- Can include intercept, slope, and variance parameters  
+<br/>
+
+--
+- Assume exchangeability  
+<br/>
+
+--
+- Represent a compromise between total pooling $(\beta_{[1]}=\beta_{[2]}=...=\beta_{[J]})$ and no pooling $(\beta_{[1]} \perp \beta_{[2]} \perp ...\perp \beta_{[J]})$  
+<br/>
+
+--
+- Typically require $>5-10$ factor levels  
+
+
+---
+## Random effects = hierarchical model
+<br/>
+<br/>
+
+
+$$\Large [\beta_{[j]}, \mu_{\beta}, \sigma^2_{\beta}, \sigma^2|y_{ij}] = [y_{ij}|\beta_{[j]}, \sigma^2][\beta_{[j]}|\mu_{\beta}, \sigma^2_{\beta}][\sigma^2][\mu_{\beta}][\sigma^2_{\beta}]$$
+<br/>
+
+--
+- Can include multiple random effects  
+
+- Can include fixed and random effects (mixed-models)  
+
+- Can include multiple levels of hierarchy  
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+- learn about $\beta_{[j]}$ **and** $\mu_{\beta}$, $\sigma^2_{\beta}$  
+
+- prediction to unsampled groups (in space or time)  
+
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+- Account for variability among groups vs. among observational units
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+- modeling $\sigma^2_{\beta}$ recognizes uncertainty from sampling groups
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+4) Avoiding psuedo-replication  
+
+- Account for non-independence within groups
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+4) Avoiding psuedo-replication  
+
+5) Borrowing strength  
+
+- $\beta_{[j]}$ estimating from group $j$ observations + all other groups  
+
+- "shrinkage"" towards mean  
+
+    + degree of shrinkage inversely proportional to precision  
+    
+---
+## Why not use random effects?
+
+#### Always use random effects (Gelman & Hill 2007)
+
+#### but...
+
+--
+- Assumption of exchangeability  
+<br/>
+
+--
+- Requires 5-10 levels  
+<br/>
+
+--
+- Computationally intensive  
+<br/>
+
+--
+- Harder to interpret  
