@@ -25,28 +25,27 @@ source(here::here("R/zzz.R"))
 library(WILD8370)
 ```
 
-Given the practical and philosophical advantages of informative priors, why aren't they more common in ecological models? As already discussed, one issue is cultural - many researchers are simply uncomfortable with the *idea* of informative priors. *"If we can choose any prior we want and that choice influences our inferences, doesn't that make the entire process too subjective?" "Shouldn't we let the data speak for itself?"* If one of these scientists is your adviser or the reviewer of your manuscript, you may be forced to use uninformative priors.  
+Given the practical and philosophical advantages of informative priors, why aren't they more common in ecological models? As already discussed, one issue is cultural - many researchers are simply uncomfortable with the *idea* of informative priors. *"If we can choose any prior we want and that choice influences our inferences, doesn't that make the entire process too subjective?" "Shouldn't we let the data speak for itself?"* If one of these scientists is your adviser or the reviewer of your manuscript, you may be forced to use uninformative priors.
 
-But another obstacle to using informative priors is that they can be hard to formulate. How do we translate our domain expertise into a probability distribution? How do we take a published estimate(s) of the parameter value and turn it (or them) into a probability distribution? The skills needed to translate prior knowledge into informative priors are not generally taught in the statistics classes taken by most ecologists. 
+But another obstacle to using informative priors is that they can be hard to formulate. How do we translate our domain expertise into a probability distribution? How do we take a published estimate(s) of the parameter value and turn it (or them) into a probability distribution? The skills needed to translate prior knowledge into informative priors are not generally taught in the statistics classes taken by most ecologists.
 
-In this activity, we'll work through a few examples of ways to create informative priors from a variety of types of information. 
+In this activity, we'll work through a few examples of ways to create informative priors from a variety of types of information.
 
 ## Question and model development
 
-One issue in many ecological studies is that it is logistically and financially difficult to collect data from a large number of individuals. As a result, vital rate estimates are often based on relatively small sample sizes, which can lead to high uncertainty and possibly spurious results.  
+One issue in many ecological studies is that it is logistically and financially difficult to collect data from a large number of individuals. As a result, vital rate estimates are often based on relatively small sample sizes, which can lead to high uncertainty and possibly spurious results.
 
-It is precisely in these instances where Bayesian methods can shine - as we saw in lecture, the ability to incorporate previous knowledge of parameter values via informative priors is equivalent to increasing your sample size. 
+It is precisely in these instances where Bayesian methods can shine - as we saw in lecture, the ability to incorporate previous knowledge of parameter values via informative priors is equivalent to increasing your sample size.
 
 To explore different ways of generating informative priors, we will borrow data and some clever ideas from a recently published paper on the dynamics of Polar Bear (*Ursus maritimus*) populations in the Chukchi Sea (Regehr et al. 2018). For this example, we will focus on a subset of the full model, namely estimating annual survival of adult female bears.
 
-In the model developed by Regehr et al. (2018), female survival was identifiable but estimates were imprecise using only the available data due to small sample sizes. As a result, the authors chose to develop informative priors based on published survival estimates from other populations. In this case, the authors were fortunate to have a handful of previous studies to lean-on and later in this exercise we will learn how they developed priors from those studies. But first, let's assume there are no published studies but we still want the benefits of informative priors. 
-
+In the model developed by Regehr et al. (2018), female survival was identifiable but estimates were imprecise using only the available data due to small sample sizes. As a result, the authors chose to develop informative priors based on published survival estimates from other populations. In this case, the authors were fortunate to have a handful of previous studies to lean-on and later in this exercise we will learn how they developed priors from those studies. But first, let's assume there are no published studies but we still want the benefits of informative priors.
 
 ## Example 1: Domain expertise
 
-Even if we have no previous estimates of polar bear survival, we are not completely ignorant about survival of this species. We can use our *domain expertise* to develop a prior that improves upon the non-informative option.  
+Even if we have no previous estimates of polar bear survival, we are not completely ignorant about survival of this species. We can use our *domain expertise* to develop a prior that improves upon the non-informative option.
 
-Polar bears are a large, long-lived carnivore with a life expectancy of about 20-25 years (Ramsay & Stirling 1988). This simple fact suggests that adult survival must be pretty high - even with an annual survival probability of $95\%$, an individual would only have a `r round((0.95^20),2)*100`% probability of surviving 20 years. So survival probabilities much less than $\sim 90\%$ would be pretty surprising and we would be pretty suspicious of estimates less than $\sim 80\%$ (which would imply $1\%$ of female polar bears make it to 20 years of age). 
+Polar bears are a large, long-lived carnivore with a life expectancy of about 20-25 years (Ramsay & Stirling 1988). This simple fact suggests that adult survival must be pretty high - even with an annual survival probability of $95\%$, an individual would only have a `r round((0.95^20),2)*100`% probability of surviving 20 years. So survival probabilities much less than $\sim 90\%$ would be pretty surprising and we would be pretty suspicious of estimates less than $\sim 80\%$ (which would imply $1\%$ of female polar bears make it to 20 years of age).
 
 Of course, polar bear populations in many areas are declining pretty quickly, suggesting that maybe adult survival rates could be lower than historical levels. So although we can be pretty that survival is high (e.g., $>80\%$), we're not super confident about the actual survival rate. With regards to our prior, this suggests we want a prior that puts most of the weight $>80\%$ but is wide enough to reflect our uncertainty about the actual survival rates.
 
@@ -74,12 +73,10 @@ ggplot(beta_df, aes(x = phi, y = density, color = dist)) + geom_path() +
 
 We learned in lecture how to turn the mean and variance of a random variable into the parameters of a probability distribution using moment matching. For the beta distribution:
 
-$$\alpha = \bigg(\frac{1-\mu}{\sigma^2}- \frac{1}{\mu} \bigg)\mu^2 \tag{1}$$         
-$$\beta = \alpha \bigg(\frac{1}{\mu}-1\bigg) \tag{2}$$
-Given our domain expertise, a reasonable choice for the mean and variance of the prior might be $\mu=0.9$ and $\sigma^2=0.005$ (this may seem like a small variance but as you'll see below, it actually produces a relatively diffuse prior. Figuring out an appropriate variance for probabilities is not easy so the best option is usually to play with a few values and then explore the properties of the resulting distribution to make sure it seems reasonable). Plugging those values into equations 1 and 2 gives:
+$$\alpha = \bigg(\frac{1-\mu}{\sigma^2}- \frac{1}{\mu} \bigg)\mu^2 \tag{1}$$\
+$$\beta = \alpha \bigg(\frac{1}{\mu}-1\bigg) \tag{2}$$ Given our domain expertise, a reasonable choice for the mean and variance of the prior might be $\mu=0.9$ and $\sigma^2=0.005$ (this may seem like a small variance but as you'll see below, it actually produces a relatively diffuse prior. Figuring out an appropriate variance for probabilities is not easy so the best option is usually to play with a few values and then explore the properties of the resulting distribution to make sure it seems reasonable). Plugging those values into equations 1 and 2 gives:
 
-$$\alpha = \bigg(\frac{1-0.9}{0.005}- \frac{1}{0.9} \bigg)0.9^2 = 15.3$$ 
-$$\beta = 3.6 \bigg(\frac{1}{0.9}-1\bigg) = 1.7$$
+$$\alpha = \bigg(\frac{1-0.9}{0.005}- \frac{1}{0.9} \bigg)0.9^2 = 15.3$$ $$\beta = 3.6 \bigg(\frac{1}{0.9}-1\bigg) = 1.7$$
 
 As always, we should visualize this distribution to make sure it matches what we think it should look like:
 
@@ -105,7 +102,7 @@ ggplot(beta_df, aes(x = phi, y = density, color = Approach)) +
   scale_x_continuous(expression(phi), limits = c(0.5, 1)) 
 ```
 
-This seems reasonable given our understanding of the species biology. However, because we essentially made up the variance term to give a relatively diffuse prior, we would likely have to be very careful about how we justified this choice and would probably need to include some formal prior sensitivity analyses. 
+This seems reasonable given our understanding of the species biology. However, because we essentially made up the variance term to give a relatively diffuse prior, we would likely have to be very careful about how we justified this choice and would probably need to include some formal prior sensitivity analyses.
 
 ## Example 2: Published studies
 
@@ -119,7 +116,8 @@ Rather than rely solely on our domain expertise a better option would be to conv
 
 ### Approach 1: Mean and variance of published estimates
 
-One reasonable way to turn the 6 published estimates into a single prior is to take the mean and the variance of the 6 estimates and then use moment matching to convert them into a single beta distribution. 
+One reasonable way to turn the 6 published estimates into a single prior is to take the mean and the variance of the 6 estimates and then use moment matching to convert them into a single beta distribution.
+
 ```{r}
 
 (mu2 <- mean(SurvPriorData$phi))
@@ -145,13 +143,13 @@ ggplot(beta_df, aes(x = phi, y = density, color = Approach)) + geom_path() +
 
 ```
 
-As you can see, even though the means of the two priors are not that different, the variance is much smaller on the prior based on published estimates, resulting in a much more informative prior (this prior suggests we're much more sure about the plausible values of $\phi$). 
+As you can see, even though the means of the two priors are not that different, the variance is much smaller on the prior based on published estimates, resulting in a much more informative prior (this prior suggests we're much more sure about the plausible values of $\phi$).
 
 ### Approach 2: Mean and variance of published estimates
 
-One of the reasons the informative prior based on published survival estimates is so narrow is that it ignores the study-specific uncertainties associated with each survival estimate. One could argue that ignoring this source of uncertainty leads to a prior that is too confident in the possible values of $\phi$. 
+One of the reasons the informative prior based on published survival estimates is so narrow is that it ignores the study-specific uncertainties associated with each survival estimate. One could argue that ignoring this source of uncertainty leads to a prior that is too confident in the possible values of $\phi$.
 
-However, incorporating study-specific uncertainty is not so straightforward. One clever approach is to convert estimates from each study into separate beta distributions, simulate survival estimates from each distribution, and then estimate "hyper-parameters" from all of the simulations together[^1]. Understanding how this approach works is best done through example. 
+However, incorporating study-specific uncertainty is not so straightforward. One clever approach is to convert estimates from each study into separate beta distributions, simulate survival estimates from each distribution, and then estimate "hyper-parameters" from all of the simulations together[^1]. Understanding how this approach works is best done through example.
 
 [^1]: h/t to Nathan Hostetter, a USGS researcher, for supplying example code and data to implement these ideas.
 
@@ -176,9 +174,9 @@ for(j in 1:dim(SurvPriorData)[1]){
 }
 ```
 
-Now hopefully you can see why this approach is so clever. We now have `r length(sim_phi)` plausible values of adult female survival probability that are consistent with published studies and reflect multiple sources of uncertainty about this vital rate[^2]. 
+Now hopefully you can see why this approach is so clever. We now have `r length(sim_phi)` plausible values of adult female survival probability that are consistent with published studies and reflect multiple sources of uncertainty about this vital rate[^2].
 
-[^2]: Beyond this specific example, simulating data from your prior is a very useful way to ensure that the prior produces values are consistent with your domain expertise. Although we will not go into the details in this class, simulating data from the priors (called *prior predictive checks*) and then checking that these simulated data are generally consistent with plausible values you would expect in real data is a potentially important step in Bayesian inference, especially for complicated models where interactions between multiple parameters can potentially generate unexpected support for implausible data. For more information about doing prior predictive checks, see this [great overview](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html) from Michael Betancourt. 
+[^2]: Beyond this specific example, simulating data from your prior is a very useful way to ensure that the prior produces values are consistent with your domain expertise. Simulating data from the priors and then checking that these simulated data are generally consistent with plausible values you would expect in real data is a potentially important step in Bayesian inference (called *prior predictive checks*), especially for complicated models where interactions between multiple parameters can potentially generate unexpected support for implausible data. For more information about doing prior predictive checks, see this [great overview](https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html) from Michael Betancourt.
 
 From these simulated values, we can now estimate "hyper-parameters" for a single beta distribution that will serve as our prior. First, we estimate the mean and variance of the simulated values:
 
@@ -211,18 +209,40 @@ ggplot() +
   scale_x_continuous(expression(phi), limits = c(0.7, 1)) 
 ```
 
-## Questions to consider[^3] 
+## Questions to consider[^3]
 
-1) **Informative vs vague**: On one hand, we want posteriors to reflect (and be affected by) prior knowledge. On the other hand, why collect more data if we basically know the answer?
+[^3]: h/t again to Nathan Hostetter for engaging discussions about these issues
 
-2) **How to assess 'sensitivity to the prior'**: Ideally, we should test how sensitive our inferences are to the choice of prior distribution. Should this be quantified by a change in the posterior mean, standard deviation, etc? If the posterior is unaffected by the prior, why go through the trouble of using informative priors?
+1)  **Informative vs vague**: On one hand, we want posteriors to reflect (and be affected by) prior knowledge. On the other hand, why collect more data if we basically know the answer?
 
-3) **Process vs sampling noise**: The studies used to create the priors reflect a range of conditions and population trajectories. In approach 1, we assume that the point estimates of survival reflect the process noise across populations. In approach 2, we use the uncertainty from each study to capture both the sampling and process uncertainty. Which sources of uncertainty should we care about when developing a prior? 
+2)  **How to assess 'sensitivity to the prior'**: Ideally, we should test how sensitive our inferences are to the choice of prior distribution. Should this be quantified by a change in the posterior mean, standard deviation, etc? If the posterior is unaffected by the prior, why go through the trouble of using informative priors?
 
-4) **Domain expertise**: Incorporating sampling uncertainty may increased prior weight for survival values that conflict with our domain expertise (for example, values much lower than we think are plausible). However, these values are consistent with possible survival values from published studies. How should we treat priors that are at the boundary of our statistical and domain expertise?  
+3)  **Process vs sampling noise**: The studies used to create the priors reflect a range of conditions and population trajectories. In approach 1, we assume that the point estimates of survival reflect the process noise across populations. In approach 2, we use the uncertainty from each study to capture both the sampling and process uncertainty. Which sources of uncertainty should we care about when developing a prior?
 
+4)  **Domain expertise**: Incorporating sampling uncertainty may increased prior weight for survival values that conflict with our domain expertise (for example, values much lower than we think are plausible). However, these values are consistent with possible survival values from published studies. How should we treat priors that are at the boundary of our statistical and domain expertise?
 
-[^3]: h/t again to Nathan Hostetter for engaging discussions about these issues 
+## Prior Predictive Checks
+
+One issue with priors is that they can do unexpected things when they undergo transformations. This means that a prior might look diffuse but can accidentally be very informative because of how your model is written. See <https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13407> for a great paper on this.
+
+For instance, let's say that polar bear survival $\phi$ is a function of the age of the individual, with cubs having much lower survival than adults:
+
+$$logit(\phi_i) = \beta_0 + \beta_1*age_i$$
+
+We might be tempted to use something simple like a uniform for both $\beta$ terms:
+
+$$\beta_0 \sim Uniform(-5, 5)$$ However, what does that imply about $\phi$? For instance, if $\beta_1$ is 0 and we have no data, $\phi$ looks like:
+
+```{r}
+beta0 <- runif(10000, -5, 5)
+par(mfrow = c(1,2))
+hist(beta0, main = "Prior")
+hist(plogis(beta0), main = "Posterior", xlab = 'Survival')
+```
+
+Uh-oh!
+
+In Nimble, you can run your model **without data** and monitor the latent variables to double check that your priors are doing what you expect. This is called a Prior Predictive Check and is a very useful tool.
 
 ## References
 
@@ -230,8 +250,27 @@ Ramsay, M.A. and Stirling, I., 1988. Reproductive biology and ecology of female 
 
 Regehr, E.V., Hostetter, N.J., Wilson, R.R., Rode, K.D., Martin, M.S. and Converse, S.J., 2018. Integrated population modeling provides the first empirical estimates of vital rates and abundance for polar bears in the Chukchi Sea. *Scientific reports*, 8(1), p.16780.
 
-## Homework Questions: 
+## Homework Questions:
 
-TBD :) 
+1.  You are studying a population of gopher tortoises, but you don't have a lot of data on survival. You want to model juvenile and adult survival as: $(\phi_i = \beta_0[age_i])$. You comb through the literature and find the following information. Using this information, choose a prior for $\beta_0$. Defend your choice of prior. (Note: you can choose to model $\beta_0$ as a random or fixed effect, but be sure to defend your choice.)
 
-4. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
+> At both study sites, apparent survival of immature tortoises was significantly lower than for adult tortoises, averaging 82.4 ± 3.8% at Conecuh and 69.7 ± 9.1% at Green Grove (Tuberville et al 2014)
+
+> Additionally, annual survivorship of immature tortoises (73.8%, 95% CI = 56.3–86.1%) was significantly lower than that of adults (93.4%, 95% CI = 88.6–96.9%) (Howell et al 2019)
+
+> Quarterly apparent survival did not differ significantly between size classes, although point estimates were lower for small tortoises (91.6% ± 3.5, 95% CI: 81.6%–96.4%; n = 19) than for large tortoises (96.4% ± 2.5, 95% CI: 86.8%–99.1%; n = 13) (Stemle et. al 2024)
+
+> Apparent annual survival for adult tortoises averaged 0.98 ± 0.01 for all years excluding the first two (Fig. 4). [...] Survival of immature tortoises was lower than that of adults and averaged 0.84 ± 0.05 across years. (Tuberville et al 2008)
+
+
+2.  The 2021 Species Status Assessment (SSA) for gopher tortoises used informed priors on juvenile and adult survival to model population viability across the Southeast USA. For juvenile tortoises, they used a beta distribution with a mean of 0.75 and a standard deviation of 0.06. For adult tortoises, they used a beta with mean 0.96 and a standard deviation of 0.03.  Write out the two beta distributions they used in math form. Visually compare these distributions with the prior you chose in Question 1.
+
+3.  Imagine we have an intercept-only occupancy model where $logit(\psi) = \alpha$. We want to put an uninformative prior on $\alpha$ but aren't sure what will happen when it goes through the logit transformation. Use R to simulate each of the following priors 5000 times, and then graph each prior and the resulting posterior of $\psi$ in ggplot. Which ones, if any, seem reasonably uninformative?
+
+-   $\alpha \sim Normal(0, 10)$ 
+-   $\alpha \sim Gamma(10, 10)$ (shape, rate parameterization)
+-   $\alpha \sim Beta(.3, .3)$
+-   $\alpha \sim Exp(1)$
+-   $\alpha \sim Cauchy(0, 1)$ (location, scale)
+
+4.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

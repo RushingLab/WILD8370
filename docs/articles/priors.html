@@ -321,14 +321,14 @@ survival probabilities:</p>
 consistent with published studies and reflect multiple sources of
 uncertainty about this vital rate<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Beyond this specific example, simulating data from your
 prior is a very useful way to ensure that the prior produces values are
-consistent with your domain expertise. Although we will not go into the
-details in this class, simulating data from the priors (called &lt;em&gt;prior
-predictive checks&lt;/em&gt;) and then checking that these simulated data are
-generally consistent with plausible values you would expect in real data
-is a potentially important step in Bayesian inference, especially for
-complicated models where interactions between multiple parameters can
-potentially generate unexpected support for implausible data. For more
-information about doing prior predictive checks, see this &lt;a href="https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html" class="external-link"&gt;great
+consistent with your domain expertise. Simulating data from the priors
+and then checking that these simulated data are generally consistent
+with plausible values you would expect in real data is a potentially
+important step in Bayesian inference (called &lt;em&gt;prior predictive
+checks&lt;/em&gt;), especially for complicated models where interactions
+between multiple parameters can potentially generate unexpected support
+for implausible data. For more information about doing prior predictive
+checks, see this &lt;a href="https://betanalpha.github.io/assets/case_studies/principled_bayesian_workflow.html" class="external-link"&gt;great
 overview&lt;/a&gt; from Michael Betancourt.&lt;/p&gt;'><sup>2</sup></a>.</p>
 <p>From these simulated values, we can now estimate “hyper-parameters”
 for a single beta distribution that will serve as our prior. First, we
@@ -395,6 +395,42 @@ are at the boundary of our statistical and domain expertise?</p></li>
 </ol>
 </div>
 <div class="section level2">
+<h2 id="prior-predictive-checks">Prior Predictive Checks<a class="anchor" aria-label="anchor" href="#prior-predictive-checks"></a>
+</h2>
+<p>One issue with priors is that they can do unexpected things when they
+undergo transformations. This means that a prior might look diffuse but
+can accidentally be very informative because of how your model is
+written. See <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13407" class="external-link uri">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13407</a>
+for a great paper on this.</p>
+<p>For instance, let’s say that polar bear survival
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
+is a function of the age of the individual, with cubs having much lower
+survival than adults:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>a</mi><mi>g</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">logit(\phi_i) = \beta_0 + \beta_1*age_i</annotation></semantics></math></p>
+<p>We might be tempted to use something simple like a uniform for both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+terms:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mn>0</mn></msub><mo>∼</mo><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>−</mi><mn>5</mn><mo>,</mo><mn>5</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta_0 \sim Uniform(-5, 5)</annotation></semantics></math>
+However, what does that imply about
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>?
+For instance, if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\beta_1</annotation></semantics></math>
+is 0 and we have no data,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
+looks like:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">beta0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10000</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">beta0</span>, main <span class="op">=</span> <span class="st">"Prior"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Logistic.html" class="external-link">plogis</a></span><span class="op">(</span><span class="va">beta0</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Posterior"</span>, xlab <span class="op">=</span> <span class="st">'Survival'</span><span class="op">)</span></span></code></pre></div>
+<p><img src="priors_files/figure-html/unnamed-chunk-11-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>Uh-oh!</p>
+<p>In Nimble, you can run your model <strong>without data</strong> and
+monitor the latent variables to double check that your priors are doing
+what you expect. This is called a Prior Predictive Check and is a very
+useful tool.</p>
+</div>
+<div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <p>Ramsay, M.A. and Stirling, I., 1988. Reproductive biology and ecology
@@ -408,7 +444,70 @@ in the Chukchi Sea. <em>Scientific reports</em>, 8(1), p.16780.</p>
 <div class="section level2">
 <h2 id="homework-questions">Homework Questions:<a class="anchor" aria-label="anchor" href="#homework-questions"></a>
 </h2>
-<p>TBD :)</p>
+<ol style="list-style-type: decimal">
+<li>You are studying a population of gopher tortoises, but you don’t
+have a lot of data on survival. You want to model juvenile and adult
+survival as:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>a</mi><mi>g</mi><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\phi_i = \beta_0[age_i])</annotation></semantics></math>.
+You comb through the literature and find the following information.
+Using this information, choose a prior for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>.
+Defend your choice of prior. (Note: you can choose to model
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
+as a random or fixed effect, but be sure to defend your choice.)</li>
+</ol>
+<blockquote>
+<p>At both study sites, apparent survival of immature tortoises was
+significantly lower than for adult tortoises, averaging 82.4 ± 3.8% at
+Conecuh and 69.7 ± 9.1% at Green Grove (Tuberville et al 2014)</p>
+</blockquote>
+<blockquote>
+<p>Additionally, annual survivorship of immature tortoises (73.8%, 95%
+CI = 56.3–86.1%) was significantly lower than that of adults (93.4%, 95%
+CI = 88.6–96.9%) (Howell et al 2019)</p>
+</blockquote>
+<blockquote>
+<p>Quarterly apparent survival did not differ significantly between size
+classes, although point estimates were lower for small tortoises
+(91.6% ± 3.5, 95% CI: 81.6%–96.4%; n = 19) than for large tortoises
+(96.4% ± 2.5, 95% CI: 86.8%–99.1%; n = 13) (Stemle et. al 2024)</p>
+</blockquote>
+<blockquote>
+<p>Apparent annual survival for adult tortoises averaged 0.98 ± 0.01 for
+all years excluding the first two (Fig. 4). […] Survival of immature
+tortoises was lower than that of adults and averaged 0.84 ± 0.05 across
+years. (Tuberville et al 2008)</p>
+</blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li><p>The 2021 Species Status Assessment (SSA) for gopher tortoises
+used informed priors on juvenile and adult survival to model population
+viability across the Southeast USA. For juvenile tortoises, they used a
+beta distribution with a mean of 0.75 and a standard deviation of 0.06.
+For adult tortoises, they used a beta with mean 0.96 and a standard
+deviation of 0.03. Write out the two beta distributions they used in
+math form. Visually compare these distributions with the prior you chose
+in Question 1.</p></li>
+<li><p>Imagine we have an intercept-only occupancy model where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>ψ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>α</mi></mrow><annotation encoding="application/x-tex">logit(\psi) = \alpha</annotation></semantics></math>.
+We want to put an uninformative prior on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+but aren’t sure what will happen when it goes through the logit
+transformation. Use R to simulate each of the following priors 5000
+times, and then graph each prior and the resulting posterior of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math>
+in ggplot. Which ones, if any, seem reasonably uninformative?</p></li>
+</ol>
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>10</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Normal(0, 10)</annotation></semantics></math></li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>G</mi><mi>a</mi><mi>m</mi><mi>m</mi><mi>a</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>10</mn><mo>,</mo><mn>10</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Gamma(10, 10)</annotation></semantics></math>
+(shape, rate parameterization)</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>B</mi><mi>e</mi><mi>t</mi><mi>a</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>.3</mn><mo>,</mo><mn>.3</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Beta(.3, .3)</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>E</mi><mi>x</mi><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Exp(1)</annotation></semantics></math></li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>C</mi><mi>a</mi><mi>u</mi><mi>c</mi><mi>h</mi><mi>y</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Cauchy(0, 1)</annotation></semantics></math>
+(location, scale)</li>
+</ul>
 <ol start="4" style="list-style-type: decimal">
 <li>On a 1-10 scale, with 1 being the worst week ever and 10 being the
 best, how would you rate this week’s content? What lingering

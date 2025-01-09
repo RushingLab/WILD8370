@@ -265,7 +265,7 @@ subadult, adult). I come up with the following potential model to
 explain the probability that each turtle
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
 survived the 6 week study:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>ϕ</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>r</mi><mi>e</mi><mi>l</mi><mi>a</mi><mi>s</mi><mi>e</mi><mi>a</mi><mi>g</mi><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>ϕ</mi><mn>1</mn></msub><mo>*</mo><mi>b</mi><mi>i</mi><mi>r</mi><mi>t</mi><mi>h</mi><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">logit(\phi_{i}) = \phi_0[relaseage_i] + \phi_1*birthweight_i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>B</mi><mi>e</mi><mi>r</mi><mi>n</mi><mi>o</mi><mi>u</mi><mi>l</mi><mi>l</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim Bernoulli(\phi_i)</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>ϕ</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>r</mi><mi>e</mi><mi>l</mi><mi>e</mi><mi>a</mi><mi>s</mi><mi>e</mi><mi>a</mi><mi>g</mi><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>ϕ</mi><mn>1</mn></msub><mo>*</mo><mi>b</mi><mi>i</mi><mi>r</mi><mi>t</mi><mi>h</mi><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">logit(\phi_{i}) = \phi_0[releaseage_i] + \phi_1*birthweight_i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>B</mi><mi>e</mi><mi>r</mi><mi>n</mi><mi>o</mi><mi>u</mi><mi>l</mi><mi>l</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim Bernoulli(\phi_i)</annotation></semantics></math></p>
 <p>What does this mean in English?</p>
 <p>Answer: The probability that a turtle survived the study is a
 function of the age group at release and the turtle’s birthweight.</p>
@@ -290,6 +290,8 @@ males and females. The observed bear weight is a normal distribution
 centered around with the expected weight with a standard deviation of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
 </blockquote>
+<p>Note: There are multiple ways to write this, so just choose which one
+makes sense to you</p>
 <ol start="2" style="list-style-type: decimal">
 <li>Looking at the following bear equation, how would you interpret (in
 english) if
@@ -300,10 +302,11 @@ were negative?</li>
 </ol>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>c</mi><mi>o</mi><mi>v</mi><mi>e</mi><msub><mi>r</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i </annotation></semantics></math></p>
 <ol start="3" style="list-style-type: decimal">
-<li><p>Looking at my data again, I notice that we also recorded each
-turtle’s sex before release. Sex was recorded as either juvenile, male
-or female. How would I add this information into the previous turtle
-model of survival probability?</p></li>
+<li><p>Looking at my data again (Example 2 in Lab), I notice that we
+also recorded each turtle’s sex before release. Sex was recorded as
+either unknown, male or female. How would I add this information into
+the previous turtle model of survival probability? (Assume that it’s
+possible for turtles of each sex category to be any age.)</p></li>
 <li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
 the best, how would you rate this week’s content? What lingering
 questions/confusion about the lecture or lab do you still have?</p></li>
