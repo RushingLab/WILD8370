@@ -308,10 +308,35 @@ When you want to use this object in the future, all you have to do is run[^3]:
 sim_df <- readRDS("data/sim_seed_counts.rds")
 ```
 
-# Homework Questions
+# Homework Questions Part 1 (Easier)
 
 1.  We are performing a study on deer with CWD and want to simulate 20 years of abundance data on a declining population. We have a general sense that the population is declining by an average of 5% each year (e.g. $E(N_{t+1}) = N_t\lambda_t$), but the realized population has some stochasticity ($N_{t+1} \sim Pois(E(N_{t+1}))$). The population in year 1 is 475 deer. Write out a simulation for this data and use ggplot to visualize the realized population values across 20 years. Use the set.seed() command to make it reproducible.
 
-2.  We decide to add more complexity to our simulation and have $\lambda_t$ vary by time. Our real data were collected between 1994 and 2016, so we'll use environmental data from that time period. We think lambda might have a positive relationship with the degree days (daily average number of degrees above 4 C) in December of each year (e.g. $\lambda_t = exp(l_0 + l_1*degreedays)$. Using the 'Weather_data' provided in the WILD8370 package (accessed via: data(Weather_data) ), simulate 20 years of population abundance. Be sure to choose reasonable values for $l_0$ and $l_1$ so that $\lambda_t$ stays below 1.1 for all values of degree days. Don't forget to scale the covariate! Use ggplot to visualize the realized population values across 20 years. 
+2.  We decide to add more complexity to our simulation and have $\lambda_t$ vary by time. Our real data were collected between 1994 and 2016, so we'll use environmental data from that time period. We think lambda might have a positive relationship with the degree days (daily average number of degrees above 4 C) in December of each year (e.g. $\lambda_t = exp(l_0 + l_1*degreedays)$. Using the 'Weather_data' provided in the WILD8370 package (accessed via: data(Weather_data) ), simulate 20 years of population abundance. Be sure to choose reasonable values for $l_0$ and $l_1$ so that $\lambda_t$ stays below 1.1 for all values of degree days. Don't forget to scale the covariate! Use ggplot to visualize the realized population values across 20 years. (Note: For years that have multiple weather stations recording degree days, use the average of all weather stations as the covariate)
 
-3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+# Homework Questions Part 2 (Slightly Harder)
+
+3.  We have some GPS data from leopard frogs that we want to fit to a random-walk movement model. However, before we use our real data, we want to make a fake data set first that we can use to develop our full model. We want our simulation to contain:
+
+-   locations (1 per day for 50 days, continuous coordinates).
+-   what day each location was measured (day 1 to day 30)
+
+We plan to fit the following model:
+
+$s_{i,x,t=1} \sim Uniform(0, 1)$
+
+$s_{i,y,t=1} \sim Uniform(0, 1)$
+
+$s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )$
+
+$s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )$
+
+$\sigma \sim Exp(3)$
+
+where $i$ is the individual, $x$ and $y$ are the x and y coordinates respectively, and $\sigma$ is related to the frog's average movement from their previous location. That is, the location of a frog in time $t+1$ is a normal centered around their location in time $t$. We assume we'll have 10 frogs in our dataset.
+
+Simulate some data based on the above model. Use $\sigma = .5$. Store the results as a 3-d array or matrix (10 by 2 by 50)
+
+4.  We realize we'll need to adjust our simulation as we adjust our model. Wrap your simulation above into a function that will allow you to run the simulation with different values of $\sigma$ and number of frogs and return the simulated movements. (E.g. `Sim <- function(sigma, nfrogs)`)
+
+5.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

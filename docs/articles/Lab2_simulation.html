@@ -560,7 +560,7 @@ when you read it in next time.&lt;/p&gt;'><sup>3</sup></a>:</p>
 <code class="sourceCode R"><span><span class="va">sim_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"data/sim_seed_counts.rds"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="homework-questions">Homework Questions<a class="anchor" aria-label="anchor" href="#homework-questions"></a>
+<h2 id="homework-questions-part-1-easier">Homework Questions Part 1 (Easier)<a class="anchor" aria-label="anchor" href="#homework-questions-part-1-easier"></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li><p>We are performing a study on deer with CWD and want to simulate
@@ -589,7 +589,54 @@ so that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
 stays below 1.1 for all values of degree days. Don’t forget to scale the
 covariate! Use ggplot to visualize the realized population values across
-20 years.</p></li>
+20 years. (Note: For years that have multiple weather stations recording
+degree days, use the average of all weather stations as the
+covariate)</p></li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="homework-questions-part-2-slightly-harder">Homework Questions Part 2 (Slightly Harder)<a class="anchor" aria-label="anchor" href="#homework-questions-part-2-slightly-harder"></a>
+</h2>
+<ol start="3" style="list-style-type: decimal">
+<li>We have some GPS data from leopard frogs that we want to fit to a
+random-walk movement model. However, before we use our real data, we
+want to make a fake data set first that we can use to develop our full
+model. We want our simulation to contain:</li>
+</ol>
+<ul>
+<li>locations (1 per day for 50 days, continuous coordinates).</li>
+<li>what day each location was measured (day 1 to day 30)</li>
+</ul>
+<p>We plan to fit the following model:</p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>t</mi><mo>=</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_{i,x,t=1} \sim Uniform(0, 1)</annotation></semantics></math></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>=</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_{i,y,t=1} \sim Uniform(0, 1)</annotation></semantics></math></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )</annotation></semantics></math></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )</annotation></semantics></math></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>∼</mo><mi>E</mi><mi>x</mi><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma \sim Exp(3)</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is the individual,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+are the x and y coordinates respectively, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
+is related to the frog’s average movement from their previous location.
+That is, the location of a frog in time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t+1</annotation></semantics></math>
+is a normal centered around their location in time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
+We assume we’ll have 10 frogs in our dataset.</p>
+<p>Simulate some data based on the above model. Use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>=</mo><mn>.5</mn></mrow><annotation encoding="application/x-tex">\sigma = .5</annotation></semantics></math>.
+Store the results as a 3-d array or matrix (10 by 2 by 50)</p>
+<ol start="4" style="list-style-type: decimal">
+<li><p>We realize we’ll need to adjust our simulation as we adjust our
+model. Wrap your simulation above into a function that will allow you to
+run the simulation with different values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
+and number of frogs and return the simulated movements. (E.g.
+<code>Sim &lt;- function(sigma, nfrogs)</code>)</p></li>
 <li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
 the best, how would you rate this week’s content? What lingering
 questions/confusion about the lecture or lab do you still have?</p></li>
