@@ -51,7 +51,7 @@ $\phi$
 
 Phi, usually used to indicate survival probability (but can also be used willy-nilly)
 
-$Norm( \mu, \sigma)$
+$Norm( \mu, \sigma^2)$
 
 The normal distribution with a mean of $\mu$ and a standard deviation of $\sigma$.
 
@@ -67,7 +67,7 @@ $\sum^w_{j=1} K_j$
 
 The sum of value $K_j$ for values of $j$ from 1 to $w$. For instance, if $K_j$ represents the number of personalized mugs in Dr. Rushing's office in year $j$ , the sum of all of them from year $j = 3$ to year 10 would be $\sum^{10}_{j=3} K_j$
 
-$\beta_0 + \epsilon \sim Norm(0, \sigma)$
+$\beta_0 + \epsilon \sim Norm(0, \sigma^2)$
 
 A shorthand way of saying that the residuals from an equation are normally distributed. This is the assumption for most linear models and it can be quicker to write it out this way rather than as a line for $E(x)$ and then a line for the residuals.
 
@@ -102,7 +102,7 @@ Let's say I come up with the following equation. What does this mean in English?
 
 $$E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-$$y_{it} \sim Normal(E(weight_{it}), \sigma)$$
+$$y_{it} \sim Normal(E(weight_{it}), \sigma^2)$$
 
 Answer: The expected weight of an individual bear at some time $t$ is a function of the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
@@ -110,7 +110,7 @@ What if the equation were the following?
 
 $$E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-$$y_{it} \sim Normal(E(weight_{it}), \sigma)$$ Answer: The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
+$$y_{it} \sim Normal(E(weight_{it}), \sigma^2)$$ Answer: The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
 ### Example: Turtles
 
