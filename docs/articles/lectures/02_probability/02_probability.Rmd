@@ -1,6 +1,6 @@
 ---
 title: "lecture 2: probability refresher (or introduction)"
-subtitle: "FANR 8370"
+subtitle: "WILD 8370"
 author: "<br/><br/><br/>Spring 2025"
 output:
   xaringan::moon_reader:
