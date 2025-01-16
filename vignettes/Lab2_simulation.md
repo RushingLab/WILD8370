@@ -9,21 +9,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-   warning = FALSE, message = FALSE,
-   fig.align = 'center', fig.retina = 2,
-  collapse = TRUE,
-  comment = "#>"
-)
-library(dplyr)
-library(knitr)
-source(here::here("R/zzz.R"))
-```
 
-```{r setup, echo=FALSE}
-library(WILD8370)
-```
+
+
 
 In this activity, we simulate data to familiarize ourselves with the parameters of a linear regression model.
 
@@ -53,7 +41,8 @@ Use of the tidyverse is somewhat [controversial](http://varianceexplained.org/r/
 
 Data simulation is a technique for generating random data from stochastic processes with known parameters. Although not framed as "data simulation", we have already done this several times this semester. For example,
 
-```{r eval = FALSE}
+
+``` r
 x <- rnorm(100, 3, 0.75)
 ```
 
@@ -69,7 +58,8 @@ $$y_i \sim Bernoulli(z_i \times p)$$
 
 We can simulate a data set from this model using a few lines of `R` code:
 
-```{r}
+
+``` r
 nSites <- 100  # Number of sites
 nVisits <- 3
 psi <- 0.75    # Occupancy probability
@@ -125,26 +115,11 @@ The distributional assumptions of a linear model refer to the *residuals* (the $
 
 For small counts, the Poisson distribution is asymmetrical, meaning that we are more likely to generate values that are larger than the mean than smaller than the mean. You can see this clearly in the histogram below, which was generated from $Poisson(\lambda = 2)$:
 
-```{r echo = FALSE, fig.width=6, fig.height=6}
-
-df <- data.frame(value = rpois(10000, 2),
-                 Distribution = rep("Poisson", 10000))
-
-ggplot(df, aes(x = value)) + 
-  geom_histogram(fill = WILD6900_colors$value[WILD6900_colors$name=="primary"]) 
-```
+<img src="Lab2_simulation_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" />
 
 In this case, assuming the error terms are normally distribution would likely be inappropriate. However, as counts get larger, the Poisson distribution starts to appear more "normal":
 
-```{r echo = FALSE, fig.width=8, fig.height=5}
-
-df <- data.frame(value = c(rnorm(10000, 500, 25), rpois(10000, 500)),
-                 Distribution = rep(c("Normal", "Poisson"), each = 10000))
-
-ggplot(df, aes(x = value)) + 
-  geom_histogram(fill = WILD6900_colors$value[WILD6900_colors$name=="primary"]) +
-  facet_wrap(~Distribution, nrow = 1)
-```
+<img src="Lab2_simulation_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" />
 
 In this case, $\mu = \lambda = 500$. So as counts get bigger, there will be very little difference in the results of a linear regression or a Poisson GLM.\
 \*\*\*
@@ -159,13 +134,15 @@ For this exercise, create a new script and add it to whatever sub-directory you 
 
 The first step to simulating data is to set the fixed values that are needed to generate the stochastic data. This usually includes the sample size, covariate and parameter values and any other fixed value relevant to the analysis. In this case, we'll first set the number of flowers that we counted seeds from:
 
-```{r}
+
+``` r
 N <- 175 # Number of flowers
 ```
 
 Next, we need to generate the covariate values, in this case pollination visits. We'll store these values in a data frame and assume the number of visits ranges from 0 to 25:
 
-```{r}
+
+``` r
 sim_df <- data.frame(visits = runif(N, 0, 25)) # Number of pollination visits
 ```
 
@@ -173,7 +150,8 @@ A common task during data preparation is adding new variables that are derived f
 
 In the tidyverse, the workhorse of adding new variables in `dplyr::mutate()`:
 
-```{r}
+
+``` r
 sim_df <- dplyr::mutate(sim_df, visits.c = (visits - mean(visits))/sd(visits))
 ```
 
@@ -189,13 +167,15 @@ It can sometimes be confusing to know which functions come from which packages (
 
 Finally, we need to set the parameter values for the regression models. This is where understanding what each parameter represents is very helpful. For example, $\alpha$ is the expected number of seeds when the covariate has a value of 0 (because we centered visits, we interpret $\alpha$ to be the expected number of seeds at the mean number of visits):
 
-```{r}
+
+``` r
 alpha <- 250 # Expected number of seeds at mean number of visits
 ```
 
 Now we set $\beta$ coefficient. We have already said the $\beta$ is positive (seed count increases with visits). All that's left is to decide a specific value. Remember that we interpret $\beta$ as the additional number of seeds for 1 sd increase in the number of visits.
 
-```{r}
+
+``` r
 beta <- 50   # Effect of visits on seed count
 ```
 
@@ -233,7 +213,8 @@ The matrix of predicted responses is called the *linear predictor*.
 
 Now that we have a refreshed our memory of the basic linear model structure, let's add the predicted seed counts to the data frame:
 
-```{r}
+
+``` r
 sim_df <- dplyr::mutate(sim_df, mu = alpha + beta*visits.c)
 ```
 
@@ -253,29 +234,37 @@ The `ggplot()` function initiates a new plot. In this function, you tell `ggplot
 
 The `ggplot()` function simply initiates a graph so if you run just that portion of the code you will get a blank graph. We can see that by creating a new plot showing the relationship between elevation (the x-axis of the plot) and predicted abundance (the y-axis):
 
-```{r fig.width=6, fig.height=6}
+
+``` r
 ggplot(data = sim_df, aes(x = visits, y = mu))
 ```
 
+<img src="Lab2_simulation_files/figure-html/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;" />
+
 You can see that `ggplot` created a figure with the correct axes and labels. But no data. That's because we didn't tell `ggplot` what type of *geometry* to use to represent the data. Geometry refers to the actual type geometric object(s) we want to use to display the data. Common geometries include points (e.g., scatterplot), lines (e.g., time series), and bars (e.g., histograms). There are many others. Once we add a geometry, we can see the data:
 
-```{r fig.width=6, fig.height=6}
+
+``` r
 ggplot(data = sim_df, aes(x = visits, y = mu)) + geom_point()
 ```
 
-So we can see that our model predicts seed counts ranging from `r round(min(sim_df$mu),2)` individuals to `r round(max(sim_df$mu),2)`. Is that reasonable? Who knows, this is a made up species. But if it wasn't, this would be a good time to go back and play with different parameter values to generate abundances that are consistent with our domain expertise. For example, the model predicts $\approx$ `r round(min(sim_df$mu),2)` seeds for a flower with 0 pollination visits. Maybe that makes sense (perhaps the orchids can self-pollinate if necessary) or maybe it doesn't. If it doesn't, we need to re-think the model structure.
+<img src="Lab2_simulation_files/figure-html/unnamed-chunk-13-1.png" width="576" style="display: block; margin: auto;" />
+
+So we can see that our model predicts seed counts ranging from 162.85 individuals to 332.61. Is that reasonable? Who knows, this is a made up species. But if it wasn't, this would be a good time to go back and play with different parameter values to generate abundances that are consistent with our domain expertise. For example, the model predicts $\approx$ 162.85 seeds for a flower with 0 pollination visits. Maybe that makes sense (perhaps the orchids can self-pollinate if necessary) or maybe it doesn't. If it doesn't, we need to re-think the model structure.
 
 # Step 3: Generate the actual seed counts
 
 So far, our simulated seed counts contain no stochastic variation (the visitation covariate is stochastic but given that value, the predicted counts are completely deterministic). To create a realistic data set, we need to add some process variance ($\sigma^2_p$). In our example, this requires setting another parameter that controls the amount of process variation.
 
-```{r}
+
+``` r
 sigma <- 7.5
 ```
 
 Now we simply generate random seed counts using the linear predictor and the process variation
 
-```{r, fig.height=6, fig.width=6}
+
+``` r
 ### Generate actual abundance for each site
 sim_df <- dplyr::mutate(sim_df, y = rnorm(n = N, mu, sigma))
 
@@ -286,25 +275,27 @@ ggplot(data = sim_df, aes(x = mu, y = y)) + geom_point() +
   geom_abline(slope = 1, intercept = 0)
 ```
 
+<img src="Lab2_simulation_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" />
+
 As expected, seed count increases with $\mu$, though you can see the process variation that is added to the model at this stage.
 
 # Step 4: Save the simulated data
 
 Now that we have a simulated data set, let's save it so it's available for future use. There are many ways to save objects in `R` but one of the most [well-behaved](https://www.fromthebottomoftheheap.net/2012/04/01/saving-and-loading-r-objects/) is `saveRDS()`.
 
-```{r eval=FALSE}
+
+``` r
 saveRDS(object = sim_df, file = "data/sim_seed_counts.rds")
 ```
 
-```{r echo=FALSE, eval = FALSE}
-saveRDS(object = sim_df, file = here::here("data/sim_seed_counts.rds"))
-```
+
 
 When you want to use this object in the future, all you have to do is run[^3]:
 
 [^3]: Note that with `readRDS()` you do have to assign the object you are reading to a new object. If you don't create a new object, `readRDS()` will simply print the data frame. This has the advantage that you can rename the object something else when you read it in next time.
 
-```{r eval = FALSE}
+
+``` r
 sim_df <- readRDS("data/sim_seed_counts.rds")
 ```
 

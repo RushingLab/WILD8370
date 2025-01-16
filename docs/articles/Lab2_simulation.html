@@ -606,7 +606,7 @@ model. We want our simulation to contain:</li>
 </ol>
 <ul>
 <li>locations (1 per day for 50 days, continuous coordinates).</li>
-<li>what day each location was measured (day 1 to day 30)</li>
+<li>what day each location was measured (day 1 to day 50)</li>
 </ul>
 <p>We plan to fit the following model:</p>
 <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>t</mi><mo>=</mo><mn>1</mn></mrow></msub><mo>∼</mo><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_{i,x,t=1} \sim Uniform(0, 1)</annotation></semantics></math></p>
@@ -628,9 +628,8 @@ That is, the location of a frog in time
 is a normal centered around their location in time
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
 We assume we’ll have 10 frogs in our dataset.</p>
-<p>Simulate some data based on the above model. Use
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>=</mo><mn>.5</mn></mrow><annotation encoding="application/x-tex">\sigma = .5</annotation></semantics></math>.
-Store the results as a 3-d array or matrix (10 by 2 by 50)</p>
+<p>Simulate some data based on the above model. Store the results as a
+3-d array or matrix (10 by 2 by 50)</p>
 <ol start="4" style="list-style-type: decimal">
 <li><p>We realize we’ll need to adjust our simulation as we adjust our
 model. Wrap your simulation above into a function that will allow you to
