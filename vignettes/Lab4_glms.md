@@ -154,7 +154,7 @@ $$log(\lambda_t) = \alpha + \beta_1 \times year_t + \beta_2 \times year^2_t + \b
 
 ### Accessing and viewing the Nimble model
 
-You can copy and paste the following code into your own R script. 
+You can copy and paste the following code into your own R script.
 
 
 ``` r
@@ -288,87 +288,87 @@ summary(falcon_res[,c('alpha', 'beta1', 'beta2', 'beta3', 'lambda[1]', 'lambda[2
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 4.1734 </td>
-   <td style="text-align:right;"> 4.2128 </td>
-   <td style="text-align:right;"> 4.2325 </td>
-   <td style="text-align:right;"> 4.2530 </td>
-   <td style="text-align:right;"> 4.2914 </td>
+   <td style="text-align:right;"> 4.1747 </td>
+   <td style="text-align:right;"> 4.2115 </td>
+   <td style="text-align:right;"> 4.2323 </td>
+   <td style="text-align:right;"> 4.2521 </td>
+   <td style="text-align:right;"> 4.2887 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> 1.0205 </td>
-   <td style="text-align:right;"> 1.0780 </td>
-   <td style="text-align:right;"> 1.1110 </td>
-   <td style="text-align:right;"> 1.1459 </td>
-   <td style="text-align:right;"> 1.2055 </td>
+   <td style="text-align:right;"> 1.0246 </td>
+   <td style="text-align:right;"> 1.0811 </td>
+   <td style="text-align:right;"> 1.1145 </td>
+   <td style="text-align:right;"> 1.1477 </td>
+   <td style="text-align:right;"> 1.2112 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
    <td style="text-align:right;"> -0.0399 </td>
-   <td style="text-align:right;"> -0.0089 </td>
-   <td style="text-align:right;"> 0.0064 </td>
-   <td style="text-align:right;"> 0.0219 </td>
-   <td style="text-align:right;"> 0.0522 </td>
+   <td style="text-align:right;"> -0.0088 </td>
+   <td style="text-align:right;"> 0.0072 </td>
+   <td style="text-align:right;"> 0.0227 </td>
+   <td style="text-align:right;"> 0.0512 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta3 </td>
-   <td style="text-align:right;"> -0.2802 </td>
-   <td style="text-align:right;"> -0.2491 </td>
-   <td style="text-align:right;"> -0.2315 </td>
-   <td style="text-align:right;"> -0.2135 </td>
-   <td style="text-align:right;"> -0.1830 </td>
+   <td style="text-align:right;"> -0.2829 </td>
+   <td style="text-align:right;"> -0.2496 </td>
+   <td style="text-align:right;"> -0.2323 </td>
+   <td style="text-align:right;"> -0.2156 </td>
+   <td style="text-align:right;"> -0.1865 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[1] </td>
-   <td style="text-align:right;"> 26.5437 </td>
-   <td style="text-align:right;"> 30.1233 </td>
-   <td style="text-align:right;"> 32.1760 </td>
-   <td style="text-align:right;"> 34.2912 </td>
-   <td style="text-align:right;"> 38.7877 </td>
+   <td style="text-align:right;"> 26.4988 </td>
+   <td style="text-align:right;"> 30.1904 </td>
+   <td style="text-align:right;"> 32.2370 </td>
+   <td style="text-align:right;"> 34.4262 </td>
+   <td style="text-align:right;"> 38.8879 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[2] </td>
-   <td style="text-align:right;"> 25.6247 </td>
-   <td style="text-align:right;"> 28.5548 </td>
-   <td style="text-align:right;"> 30.1847 </td>
-   <td style="text-align:right;"> 31.8593 </td>
-   <td style="text-align:right;"> 35.3949 </td>
+   <td style="text-align:right;"> 25.5494 </td>
+   <td style="text-align:right;"> 28.5784 </td>
+   <td style="text-align:right;"> 30.2273 </td>
+   <td style="text-align:right;"> 31.9583 </td>
+   <td style="text-align:right;"> 35.4437 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[3] </td>
-   <td style="text-align:right;"> 25.0300 </td>
-   <td style="text-align:right;"> 27.4625 </td>
-   <td style="text-align:right;"> 28.7829 </td>
-   <td style="text-align:right;"> 30.1523 </td>
-   <td style="text-align:right;"> 32.9565 </td>
+   <td style="text-align:right;"> 24.9038 </td>
+   <td style="text-align:right;"> 27.4418 </td>
+   <td style="text-align:right;"> 28.8076 </td>
+   <td style="text-align:right;"> 30.2113 </td>
+   <td style="text-align:right;"> 32.9684 </td>
   </tr>
 </tbody>
 </table>
 
 
 
-Note that beta2 appears to cross 0 - there's not much of an effect of year^2 on lambda. 
+Note that beta2 appears to cross 0 - there's not much of an effect of year\^2 on lambda.
 
-This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. To do this, we'll use the `gelman.diag()` function from the `coda` package. 
+This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. To do this, we'll use the `gelman.diag()` function from the `coda` package.
 
 
 ``` r
 library(coda)
 gelman.diag(falcon_res, multivariate = F)$psrf[1:10,] #don't want to print out all 40 lambdas
 #>           Point est. Upper C.I.
-#> alpha          1.011      1.038
-#> beta1          1.024      1.082
-#> beta2          1.010      1.034
-#> beta3          1.027      1.092
-#> lambda[1]      1.010      1.036
-#> lambda[2]      1.008      1.027
-#> lambda[3]      1.005      1.017
-#> lambda[4]      1.002      1.008
-#> lambda[5]      1.001      1.002
-#> lambda[6]      1.000      1.001
+#> alpha          1.004      1.015
+#> beta1          1.027      1.093
+#> beta2          1.003      1.011
+#> beta3          1.030      1.105
+#> lambda[1]      1.007      1.025
+#> lambda[2]      1.005      1.017
+#> lambda[3]      1.002      1.009
+#> lambda[4]      1.001      1.003
+#> lambda[5]      1.000      1.001
+#> lambda[6]      1.001      1.005
 ```
 
-All parameters appear to have converged. 
+All parameters appear to have converged.
 
 As usual, let's check the trace plots to see how they look:
 
@@ -494,51 +494,51 @@ summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quanti
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 0.6747 </td>
-   <td style="text-align:right;"> 0.7434 </td>
-   <td style="text-align:right;"> 0.7816 </td>
-   <td style="text-align:right;"> 0.8192 </td>
-   <td style="text-align:right;"> 0.8908 </td>
+   <td style="text-align:right;"> 0.6757 </td>
+   <td style="text-align:right;"> 0.7467 </td>
+   <td style="text-align:right;"> 0.7833 </td>
+   <td style="text-align:right;"> 0.8217 </td>
+   <td style="text-align:right;"> 0.8921 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> -0.0319 </td>
-   <td style="text-align:right;"> 0.0279 </td>
-   <td style="text-align:right;"> 0.0588 </td>
-   <td style="text-align:right;"> 0.0904 </td>
-   <td style="text-align:right;"> 0.1457 </td>
+   <td style="text-align:right;"> -0.0314 </td>
+   <td style="text-align:right;"> 0.0294 </td>
+   <td style="text-align:right;"> 0.0598 </td>
+   <td style="text-align:right;"> 0.0899 </td>
+   <td style="text-align:right;"> 0.1456 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
-   <td style="text-align:right;"> -0.3869 </td>
-   <td style="text-align:right;"> -0.3317 </td>
-   <td style="text-align:right;"> -0.3024 </td>
-   <td style="text-align:right;"> -0.2748 </td>
-   <td style="text-align:right;"> -0.2216 </td>
+   <td style="text-align:right;"> -0.3870 </td>
+   <td style="text-align:right;"> -0.3330 </td>
+   <td style="text-align:right;"> -0.3047 </td>
+   <td style="text-align:right;"> -0.2772 </td>
+   <td style="text-align:right;"> -0.2256 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[1] </td>
-   <td style="text-align:right;"> 0.3878 </td>
-   <td style="text-align:right;"> 0.4349 </td>
-   <td style="text-align:right;"> 0.4605 </td>
-   <td style="text-align:right;"> 0.4863 </td>
-   <td style="text-align:right;"> 0.5337 </td>
+   <td style="text-align:right;"> 0.3880 </td>
+   <td style="text-align:right;"> 0.4344 </td>
+   <td style="text-align:right;"> 0.4593 </td>
+   <td style="text-align:right;"> 0.4841 </td>
+   <td style="text-align:right;"> 0.5316 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[2] </td>
-   <td style="text-align:right;"> 0.4148 </td>
-   <td style="text-align:right;"> 0.4588 </td>
-   <td style="text-align:right;"> 0.4827 </td>
-   <td style="text-align:right;"> 0.5066 </td>
-   <td style="text-align:right;"> 0.5500 </td>
+   <td style="text-align:right;"> 0.4155 </td>
+   <td style="text-align:right;"> 0.4586 </td>
+   <td style="text-align:right;"> 0.4816 </td>
+   <td style="text-align:right;"> 0.5047 </td>
+   <td style="text-align:right;"> 0.5484 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[3] </td>
-   <td style="text-align:right;"> 0.4409 </td>
-   <td style="text-align:right;"> 0.4818 </td>
-   <td style="text-align:right;"> 0.5038 </td>
-   <td style="text-align:right;"> 0.5259 </td>
-   <td style="text-align:right;"> 0.5656 </td>
+   <td style="text-align:right;"> 0.4415 </td>
+   <td style="text-align:right;"> 0.4816 </td>
+   <td style="text-align:right;"> 0.5030 </td>
+   <td style="text-align:right;"> 0.5241 </td>
+   <td style="text-align:right;"> 0.5645 </td>
   </tr>
 </tbody>
 </table>
@@ -570,15 +570,15 @@ ggplot(falcons) +
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;" />
 
-# Homework Questions 
+# Homework Questions
 
-Using what you've learned in this lab, write out a model for the expected number of nestlings (Eyasses) per reproducing pair (R.pairs) in each year.  
+Using what you've learned in this lab, write out a model for the expected number of nestlings (Eyasses) per reproducing pair (R.pairs) in each year.
 
-a. Begin by writing out the mathematical formulation of your model 
-b. Write out the Nimble code. 
-c. Provide your model with data, constants and initial values 
-d. Check your output for convergence 
-e. Display a ggplot showing the expected number of nestlings per reproducing pair in each year (with 95% credible interval) vs the raw data. Don't forget a title and axis labels.
+a.  Begin by writing out the mathematical formulation of your model
+b.  Write out the Nimble code.
+c.  Provide your model with data, constants and initial values
+d.  Check your output for convergence
+e.  Display a ggplot showing the expected number of nestlings per reproducing pair in each year (with 95% credible interval) vs the raw data. Don't forget a title and axis labels.
 
 It may help to plot the data first to see what type of data you are working with:
 
@@ -592,8 +592,8 @@ ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" />
 
-2. In our second analysis, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
+2.  In our second analysis, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
 
-Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data. 
+Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
 
-3. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
+3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
