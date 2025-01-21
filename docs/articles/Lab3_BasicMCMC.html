@@ -816,18 +816,52 @@ Make sure to also change this line to match the new prior:</li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>.
 What do you see?</p>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Go back to the original prior for alpha. We didn’t discuss it
-much in lab, but the tuning parameter affects how fast the sampler will
+<li>Go back to the original prior for alpha. We didn’t discuss it much
+in lab, but the tuning parameter affects how fast the sampler will
 explore the state space. If it’s really small, it might take forever. If
 it’s really large, it can make giant jumps and reject a lot of possible
 values, which wastes time and causes the sampler to ‘stall’. We can see
 what the acceptance rate of our sampler was by calculating the mean of
 the accept.alpha, accept.beta and accept.tau columns. Run the sampler
 with a tuning parameter of .05 and 50. Calculate the acceptance rates
-for each of the 3 parameters. What do you notice?</p></li>
-<li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
-the best, how would you rate this week’s content? What lingering
-questions/confusion about the lecture or lab do you still have?</p></li>
+for each of the 3 parameters. What do you notice?</li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="homework-1-bonus-point">Homework (+1 Bonus Point)<a class="anchor" aria-label="anchor" href="#homework-1-bonus-point"></a>
+</h2>
+<ol start="3" style="list-style-type: decimal">
+<li>When we generated the seed count data, we did so assuming a linear
+model that linked pollination visits to seed counts:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>*</mo><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">y_i = \alpha + \beta * x_i + \epsilon_i</annotation></semantics></math>.
+Because we used simulated data, we know this model ahead of time.
+However in real life, we wouldn’t know the true model ahead of time and
+might try to fit a different model to the data. Adding on to what we
+already have, create an MCMC that also includes a second beta term that
+looks at visits squared:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>*</mo><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">y_i = \alpha + \beta * x_i + \beta_2 * x_i^2 + \epsilon_i</annotation></semantics></math>.
+Run the MCMC and look at the output. What does the MCMC estimate for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\beta_2</annotation></semantics></math>?</li>
+</ol>
+<blockquote>
+<p>Hint: Approach this problem one step at a time.</p>
+<p>- Begin by changing the mcmc_df to allow you to store an additional
+beta parameter.</p>
+<p>- Next, choose an initial value for beta2.</p>
+<p>- Change your calc_like function to include beta2. Remember that lp
+will just be alpha + beta<em>x + beta2</em>x*x.</p>
+<p>- Optionally, create another function for priorBeta2 (or just re-use
+the priorBeta function for beta2 as well).</p>
+<p>Next create a section in your sampler to update Beta2. It will look
+almost identical to the one already present for Beta.</p>
+<p>- Run your model.</p>
+<p>- Finally, use the quantile function to look at the estimate:
+quantile(mcmc_df$beta2, probs = c(0.025,0.5, 0.975))</p>
+</blockquote>
+<ol start="4" style="list-style-type: decimal">
+<li>On a 1-10 scale, with 1 being the worst week ever and 10 being the
+best, how would you rate this week’s content? What lingering
+questions/confusion about the lecture or lab do you still have?</li>
 </ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

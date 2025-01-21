@@ -116,16 +116,15 @@ par(mfrow = c(1,2))
 
 We can see that the value of p is probably close to .3 because that's where the highest probability density was, but we can also see that this method tried a bunch of points (AKA wastes a lot of time) over around values that we basically know aren't going to be good answers. For instance, we're pretty sure this coin isn't going to have a success probability of .9, so we would kind of prefer that the model not spend so much time testing values over there.
 
-Is there a way we could have the function spend more time in "good" areas, trying to estimate the exact value of p and less time in "bad" areas where the answer is very unlikely? And what about for equations where the math isn't just one distribution but a bunch of distributions combined? 
+Is there a way we could have the function spend more time in "good" areas, trying to estimate the exact value of p and less time in "bad" areas where the answer is very unlikely? And what about for equations where the math isn't just one distribution but a bunch of distributions combined?
 
-Why yes! It's called MCMC. And it makes our ineffective plug-and-chug methods much faster. 
+Why yes! It's called MCMC. And it makes our ineffective plug-and-chug methods much faster.
 
-# Seed count model 
+# Seed count model
 
 When we generated the seed count data, we did so assuming a linear model that linked pollination visits to seed counts:
 
-$$y_i = \alpha + \beta * x_i + \epsilon_i$$
-$$\epsilon_i \sim Normal(0, \sigma^2)$$
+$$y_i = \alpha + \beta * x_i + \epsilon_i$$ $$\epsilon_i \sim Normal(0, \sigma^2)$$
 
 This model includes 3 random variables that we want to estimate posterior distributions for: $\alpha$, $\beta$, and $\sigma^2$ (remember that the $y_i$ and $x_i$ are *observed* and therefore treated as *fixed* and *known* rather than random variables governed by probability distributions). So:
 
@@ -141,7 +140,7 @@ $$[\alpha] = Normal(\alpha|0, 50)$$
 
 $$[\beta] = Normal(\beta|0, 50)$$
 
-These are relatively non-informative priors for the intercept and slope coefficients. 
+These are relatively non-informative priors for the intercept and slope coefficients.
 
 We also need a model for $\sigma$. A lot of MCMC codes (such as the BUGS language) model a normal distribution as $Normal(mean, precision)$ where precision = ($1/\sigma^2$). To get use to this, we will also model the precision ($\tau$) noting that:
 
@@ -153,7 +152,7 @@ $$[\tau] = Gamma(\tau|0.01, 0.01)$$
 
 # Custom functions
 
-At each iteration of the sampler, we will need to perform the same set of tasks, namely estimating the likelihood and joint distributions for the proposed and current parameter values. We could do this by copying and pasting the code necessary for these calculations at each point in the sampler code where we need them. However, any time you find yourself copying and pasting the same code more than once or twice, it's a good idea to consider wrapping that code in a function, which will do here. 
+At each iteration of the sampler, we will need to perform the same set of tasks, namely estimating the likelihood and joint distributions for the proposed and current parameter values. We could do this by copying and pasting the code necessary for these calculations at each point in the sampler code where we need them. However, any time you find yourself copying and pasting the same code more than once or twice, it's a good idea to consider wrapping that code in a function, which will do here.
 
 ## Function for calculating likelihood
 
@@ -170,7 +169,7 @@ Given values of $\alpha$, $\beta$, and $\tau$, we can estimate the likelihood in
   sum(dnorm(y, lp, sigma, log = TRUE)) 
 ```
 
-To turn this code into a function, first open a new script and call it  `calc_like.R`. Save it in the `R/` sub-directory. This script will contain the function code. The function code is: 
+To turn this code into a function, first open a new script and call it `calc_like.R`. Save it in the `R/` sub-directory. This script will contain the function code. The function code is:
 
 ```{r}
 calc_like <- function(y, alpha, beta, tau, x) {
@@ -181,13 +180,13 @@ calc_like <- function(y, alpha, beta, tau, x) {
 }
 ```
 
-This allows us to put in the data (`y`), covariate values (`x`), and values of $\alpha$, $\beta$, and $\tau$ as arguments and the function will return the log likelihood. 
+This allows us to put in the data (`y`), covariate values (`x`), and values of $\alpha$, $\beta$, and $\tau$ as arguments and the function will return the log likelihood.
 
-Save this code in the script and then close the script. 
+Save this code in the script and then close the script.
 
 ## Functions for calculating prior probabilities
 
-We also need functions to estimate the prior probabilities for specific values of $\alpha$, $\beta$, and $\tau$. Create a new script titled `priors.R` and save it to the `R/` sub-directory. The following functions will take values of each parameter and estimate the prior probability given the prior distributions we defined above: 
+We also need functions to estimate the prior probabilities for specific values of $\alpha$, $\beta$, and $\tau$. Create a new script titled `priors.R` and save it to the `R/` sub-directory. The following functions will take values of each parameter and estimate the prior probability given the prior distributions we defined above:
 
 ```{r}
 priorAlpha <- function(alpha, mu = 0, tau = 0.001){
@@ -212,12 +211,11 @@ priorTau <- function(tau, shape1 = 0.01, rate1 = 0.01){
 
 Now we are ready to create the sampler. Remember that when there are multiple parameters, we need to define the full conditionals. For each random variable in the model, we define the full conditional by including any element on the right hand side of eq. 1 that contains the parameter (note the change to $\tau$):
 
-$$[\alpha|.] = [y_i|\alpha, \beta, \tau][\alpha]$$
-$$[\beta|.] = [y_i|\alpha, \beta, \tau][\beta]$$
+$$[\alpha|.] = [y_i|\alpha, \beta, \tau][\alpha]$$ $$[\beta|.] = [y_i|\alpha, \beta, \tau][\beta]$$
 
 $$[\tau|.] = [y_i|\alpha, \beta, \tau][\tau]$$
 
-In the sampler, we loop over each parameter, going through the Metropolis steps for each and treating the other parameters as known (based on their current value in the chain). If this in not clear, walking through the `R` code will hopefully make it more concrete (don't worry about trying to copy and run the code in this section, which is simply for illustration. In the next section, we will *slightly* modify this code to run the sampler for our seed count data). 
+In the sampler, we loop over each parameter, going through the Metropolis steps for each and treating the other parameters as known (based on their current value in the chain). If this in not clear, walking through the `R` code will hopefully make it more concrete (don't worry about trying to copy and run the code in this section, which is simply for illustration. In the next section, we will *slightly* modify this code to run the sampler for our seed count data).
 
 First, we set the length of our chains, set the tuning parameter for the proposal distribution, and create an empty data frame to store the samples and a binary variable for estimating the acceptance rate:
 
@@ -285,13 +283,13 @@ Now we create the actual sampler. Below, we will create a loop that implements t
   }
 ```
 
-Let's go through this line by line. In `step 1a`, we generate a new value of $\alpha$ from a normal distribution centered on the previous value. Remember that the tuning parameter we set earlier determines how big the jumps are between the current and proposed values. 
+Let's go through this line by line. In `step 1a`, we generate a new value of $\alpha$ from a normal distribution centered on the previous value. Remember that the tuning parameter we set earlier determines how big the jumps are between the current and proposed values.
 
-In `step 1b`, we use the `calc_like()` function to estimate the likelihood of our data given the new value of $\alpha$ and the previous values of $\beta$ and $\tau$. This is what we mean when we say that we treat the other parameters as *fixed* and *known*. 
+In `step 1b`, we use the `calc_like()` function to estimate the likelihood of our data given the new value of $\alpha$ and the previous values of $\beta$ and $\tau$. This is what we mean when we say that we treat the other parameters as *fixed* and *known*.
 
-In `step 1c`, we estimate the joint probability of both the current and proposed values by adding the log likelihood to the log prior probability (note that sum of the log values is the same as the product of the probabilities). 
+In `step 1c`, we estimate the joint probability of both the current and proposed values by adding the log likelihood to the log prior probability (note that sum of the log values is the same as the product of the probabilities).
 
-In `step 1d`, we estimate the probability of accepting the new value. Note that if the proposed value is more likely than the current value ($R > 1$), this function will return 1. Otherwise, it returns the ratio. The closer the joint probabilities are, the closer $R$ will be to 1. The less likely the proposed value is relative to the current value, the smaller $R$ will be. This means that we will be much less likely to accept new values of $\alpha$ that are a lot less probable than the current value (though not impossible). 
+In `step 1d`, we estimate the probability of accepting the new value. Note that if the proposed value is more likely than the current value ($R > 1$), this function will return 1. Otherwise, it returns the ratio. The closer the joint probabilities are, the closer $R$ will be to 1. The less likely the proposed value is relative to the current value, the smaller $R$ will be. This means that we will be much less likely to accept new values of $\alpha$ that are a lot less probable than the current value (though not impossible).
 
 Finally, in `step 1e` we accept or reject the proposed value. Note that we compare $R$ to a random value generated from a $Uniform(0,1)$ distribution. If $R=1$, it will always be greater than this value so we will always accept the proposed value (`mcmc_df$alpha[i] <- cand`) and we update the current likelihood to match the current value of $\alpha$. If $R<1$, it turns out testing whether $R$ is less than our randomly generated value from $Uniform(0,1)$ ensures that we accept $\alpha$ with probability $R$ (I'll leave it to you to prove this based on the properties of the uniform distribution).
 
@@ -325,9 +323,9 @@ Next we do the same thing for $\beta$, using the new value of $alpha$ (`mcmc_df$
     }
 ```
 
-Finally, we update $\tau$ using the new values of both $\alpha$ and $\beta$. The only difference here is that because $\tau$ has to be $>0$, the normal proposal distribution we used for $\alpha$ and $\beta$ will not work (it could create negative values). As we learned in lecture, you could create a proposal distribution that generates positive value (e.g., gamma) and use moment matching to estimate the parameters with regards to the current $\tau$ and the tuning parameter. We'll use a slightly less efficient approach here to demonstrate there are different ways to enforcing the behavior we want in the sampler. In this cases, will simply add a small value to the current $\tau$ and automatically reject the proposed value if it's less than 0. The small value can be negative or positive to allow us to explore the posterior. 
+Finally, we update $\tau$ using the new values of both $\alpha$ and $\beta$. The only difference here is that because $\tau$ has to be $>0$, the normal proposal distribution we used for $\alpha$ and $\beta$ will not work (it could create negative values). As we learned in lecture, you could create a proposal distribution that generates positive value (e.g., gamma) and use moment matching to estimate the parameters with regards to the current $\tau$ and the tuning parameter. We'll use a slightly less efficient approach here to demonstrate there are different ways to enforcing the behavior we want in the sampler. In this cases, will simply add a small value to the current $\tau$ and automatically reject the proposed value if it's less than 0. The small value can be negative or positive to allow us to explore the posterior.
 
-```{r eval = FALSE}  
+```{r eval = FALSE}
 ########################
 #### 3. Update tau
 ########################
@@ -526,7 +524,7 @@ for(i in 2:nIter){
 }
 ```
 
-At this point, you should be able to run the script from start to finish and create the posterior samples for each parameter. 
+At this point, you should be able to run the script from start to finish and create the posterior samples for each parameter.
 
 # Checking the output
 
@@ -551,13 +549,13 @@ mean(mcmc_df$alpha)
 quantile(mcmc_df$alpha, probs = c(0.025, 0.975))
 ```
 
-Pretty close to the data generating value of 250. Now let's check $\beta$: 
+Pretty close to the data generating value of 250. Now let's check $\beta$:
 
 ```{r fig.width=7, fig.height=4}
 ggplot(mcmc_df, aes(x = x, y = beta)) + geom_path()
 ```
 
-and 
+and
 
 ```{r}
 mean(mcmc_df$beta)
@@ -565,7 +563,6 @@ quantile(mcmc_df$beta, probs = c(0.025, 0.975))
 ```
 
 Also pretty close to the data generating value of 50. Finally, $\tau$
-
 
 ```{r fig.width=7, fig.height=4}
 ggplot(mcmc_df, aes(x = x, y = tau)) + geom_path()
@@ -587,15 +584,36 @@ quantile(mcmc_df$sigma, probs = c(0.025, 0.975))
 
 Wasn't that easy?
 
-
 # Homework
 
-1. In simulation, we set $\alpha$ = 250, and we provided a reasonable, diffuse prior in the example above. But what happens if we give a restrictive (and wrong) prior for $\alpha$? Change your `priorAlpha` function to instead match $\alpha \sim Uniform(0, 150)$. Make sure to also change this line to match the new prior:
+1.  In simulation, we set $\alpha$ = 250, and we provided a reasonable, diffuse prior in the example above. But what happens if we give a restrictive (and wrong) prior for $\alpha$? Change your `priorAlpha` function to instead match $\alpha \sim Uniform(0, 150)$. Make sure to also change this line to match the new prior:
+
 ```{r, echo = T, eval = F}
 mcmc_df$alpha[1] <-  runif(1, 200, 300) #change this to something reasonable
 ```
+
 Run your sampler again and print out the chain for $\alpha$. What do you see?
 
-2. Go back to the original prior for alpha. We didn't discuss it much in lab, but the tuning parameter affects how fast the sampler will explore the state space. If it's really small, it might take forever. If it's really large, it can make giant jumps and reject a lot of possible values, which wastes time and causes the sampler to 'stall'. We can see what the acceptance rate of our sampler was by calculating the mean of the accept.alpha, accept.beta and accept.tau columns. Run the sampler with a tuning parameter of .05 and 50. Calculate the acceptance rates for each of the 3 parameters. What do you notice? 
+2.  Go back to the original prior for alpha. We didn't discuss it much in lab, but the tuning parameter affects how fast the sampler will explore the state space. If it's really small, it might take forever. If it's really large, it can make giant jumps and reject a lot of possible values, which wastes time and causes the sampler to 'stall'. We can see what the acceptance rate of our sampler was by calculating the mean of the accept.alpha, accept.beta and accept.tau columns. Run the sampler with a tuning parameter of .05 and 50. Calculate the acceptance rates for each of the 3 parameters. What do you notice?
 
-3. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+# Homework (+1 Bonus Point)
+
+3.  When we generated the seed count data, we did so assuming a linear model that linked pollination visits to seed counts: $y_i = \alpha + \beta * x_i + \epsilon_i$. Because we used simulated data, we know this model ahead of time. However in real life, we wouldn't know the true model ahead of time and might try to fit a different model to the data. Adding on to what we already have, create an MCMC that also includes a second beta term that looks at visits squared: $y_i = \alpha + \beta * x_i + \beta_2 * x_i^2 + \epsilon_i$. Run the MCMC and look at the output. What does the MCMC estimate for $\beta_2$?
+
+> Hint: Approach this problem one step at a time.
+>
+> \- Begin by changing the mcmc_df to allow you to store an additional beta parameter.
+>
+> \- Next, choose an initial value for beta2.
+>
+> \- Change your calc_like function to include beta2. Remember that lp will just be alpha + beta*x + beta2*x\*x.
+>
+> \- Optionally, create another function for priorBeta2 (or just re-use the priorBeta function for beta2 as well).
+>
+> Next create a section in your sampler to update Beta2. It will look almost identical to the one already present for Beta.
+>
+> \- Run your model.
+>
+> \- Finally, use the quantile function to look at the estimate: quantile(mcmc_df\$beta2, probs = c(0.025,0.5, 0.975))
+
+4.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
