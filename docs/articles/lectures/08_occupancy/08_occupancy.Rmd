@@ -61,6 +61,8 @@ class: inverse, middle, center
 
 - Hierarchical models  
 
+- Extremely common 
+
 --
 - Decompose time series into:  
 
@@ -336,5 +338,7 @@ ggplot() +
 
 - computationally intensive  
 
-- usually produce biased estimates of $N$  
+- Can produce biased estimates of $N$ unless observations are repeated 
+
+- Often imprecise 
 

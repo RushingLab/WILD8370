@@ -59,6 +59,8 @@ navbar:
           href: articles/Lab4_glms.html
         - text: "Lab 5: Priors"
           href: articles/priors.html
+        - text: "Lab 6: Missing Data"
+          href: articles/Lab6_MissingData.html
     - icon: far fa-bookmark
       text: "References"
       menu:
