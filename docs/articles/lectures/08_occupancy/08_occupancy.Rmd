@@ -109,7 +109,6 @@ $$\Large y_{t} \sim Bernoulli\big(z_t p_t\big)$$
 
 $$\Large z_{t+1} \sim Bernoulli\big(z_t \phi_t\big)$$ 
 
-### Observation Model 
 
 ### Survival
 
