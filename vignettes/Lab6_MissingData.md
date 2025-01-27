@@ -31,7 +31,7 @@ Over the past few weeks, we've covered a lot of the foundational concepts that y
 
 Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland.Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
 
-<img src="https://en.wikipedia.org/wiki/European_hare#/media/File:Lepus_europaeus_(Causse_M%C3%A9jean,_Loz%C3%A8re)-cropped.jpg" width="50%" style="display: block; margin: auto;" />
+<img src="Hare.webp" width="50%" style="display: block; margin: auto;" />
 
 Let's begin by taking a look at the data:
 
@@ -219,17 +219,17 @@ constants_prep <- Central_hares %>%
         area = first(area),        # Get the area for each site
         .groups = "drop"           # To remove grouping after summarizing
     )
-
+constants_prep$area_s <- scale(constants_prep$area) #scale the area
 head(constants_prep)
-#> # A tibble: 6 × 3
-#>   site  landuse  area
-#>   <chr>   <dbl> <dbl>
-#> 1 AG01        1  2.23
-#> 2 AG02        1  3.58
-#> 3 AG03        1  4.79
-#> 4 AG04        1  5.8 
-#> 5 LU01        2 16.5 
-#> 6 LU07A       2  5.85
+#> # A tibble: 6 × 4
+#>   site  landuse  area area_s[,1]
+#>   <chr>   <dbl> <dbl>      <dbl>
+#> 1 AG01        1  2.23    -0.861 
+#> 2 AG02        1  3.58    -0.573 
+#> 3 AG03        1  4.79    -0.315 
+#> 4 AG04        1  5.8     -0.0999
+#> 5 LU01        2 16.5      2.18  
+#> 6 LU07A       2  5.85    -0.0892
 ```
 
 
@@ -237,7 +237,7 @@ head(constants_prep)
 hare.consts <- list(nsites = length(unique(Central_hares$site_n)),
                     nyears = length(1992:2008), 
                     landuse = constants_prep$landuse,
-                    site_area = constants_prep$area,
+                    site_area = c(constants_prep$area_s), #remove the 'attributes' part
                     site = 1:nrow(constants_prep),
                     effort = effort,
                     nlandtypes = 2)
@@ -549,15 +549,25 @@ ggplot(gg_alphas, aes(x = param, y = Median, col = Model))+
 ```
 
 <img src="Lab6_MissingData_files/figure-html/unnamed-chunk-34-1.png" width="576" style="display: block; margin: auto;" />
-We can see numerically that the spread of the alphas is a little smaller for the second model, but not much of a difference. 
+
+We can see numerically that the spread of the alphas is a little smaller for the second model. 
 
 ``` r
 var(mod1_alphas[,3])
-#> [1] 0.4809
+#> [1] 0.4704
 var(mod2_alphas[,3])
-#> [1] 0.4044
+#> [1] 0.3972
 ```
 
 
 ## Homework 
-4.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+
+1. In the lab example, we just looked at hares in the central region. Using the entire dataset, fit the two working model we ran above - one where detection is a random effect of site and one where it is a fixed effect. Use ggplot to create a graph showing the difference in the parameter estimates and calculate the variance in the mean alpha parameter value. How does the change in variance between the two models compare with our lab run on just a subset of data?
+
+2. When this data was formally analyzed, the authors used a random effect of year in the process model and a random effect of site in the detection process. Run the model with both of these random effects. Use ggplot to compare the beta1 values (the effect of landuse type on the expected abundance) produced by this new mode vs the model in Question 1. At a site with average area (scaled area = 0), what is the expected abundance for each land use type?
+
+3. Since this is an abundance model, it makes sense to make a plot of abundance over time. Inside the model that you used for Question 2, create 2 *derived parameterS* that represents the total abundance of all sites of each landtype (one parameter for each landtype) in each year. Use ggplot to graph the estimated total average density by landtype over time, including the CIs.  (Note: To get density, determine the total area of all plots of each landtype, then divide your estimates by this number). 
+
+4. To practice converting model code to the mathematical notation expected in a scientific paper, write your model for Question 2 in its full mathematical form, including priors. 
+
+5.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

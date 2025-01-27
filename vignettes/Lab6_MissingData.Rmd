@@ -48,7 +48,7 @@ Over the past few weeks, we've covered a lot of the foundational concepts that y
 Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland.Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
 
 ```{r out.width="50%", echo = FALSE}
-knitr::include_graphics("https://en.wikipedia.org/wiki/European_hare#/media/File:Lepus_europaeus_(Causse_M%C3%A9jean,_Loz%C3%A8re)-cropped.jpg")
+knitr::include_graphics('Hare.webp')
 ```
 
 Let's begin by taking a look at the data:
@@ -214,7 +214,7 @@ constants_prep <- Central_hares %>%
         area = first(area),        # Get the area for each site
         .groups = "drop"           # To remove grouping after summarizing
     )
-
+constants_prep$area_s <- scale(constants_prep$area) #scale the area
 head(constants_prep)
 ```
 
@@ -222,7 +222,7 @@ head(constants_prep)
 hare.consts <- list(nsites = length(unique(Central_hares$site_n)),
                     nyears = length(1992:2008), 
                     landuse = constants_prep$landuse,
-                    site_area = constants_prep$area,
+                    site_area = c(constants_prep$area_s), #remove the 'attributes' part
                     site = 1:nrow(constants_prep),
                     effort = effort,
                     nlandtypes = 2)
@@ -512,7 +512,8 @@ ggplot(gg_alphas, aes(x = param, y = Median, col = Model))+
   geom_hline(yintercept = mean(mod2_alphas[,3]), lty = 2, col = '#C88B37')+
   theme(axis.text.x = element_text(angle = 30, hjust = .75))
 ```
-We can see numerically that the spread of the alphas is a little smaller for the second model, but not much of a difference. 
+
+We can see numerically that the spread of the alphas is a little smaller for the second model. 
 ```{r}
 var(mod1_alphas[,3])
 var(mod2_alphas[,3])
@@ -523,9 +524,9 @@ var(mod2_alphas[,3])
 
 1. In the lab example, we just looked at hares in the central region. Using the entire dataset, fit the two working model we ran above - one where detection is a random effect of site and one where it is a fixed effect. Use ggplot to create a graph showing the difference in the parameter estimates and calculate the variance in the mean alpha parameter value. How does the change in variance between the two models compare with our lab run on just a subset of data?
 
-2. When this data was formally analyzed, the authors used a random effect of year in the process model and a random effect of site in the detection process. Run the model with both of these random effects. Use ggplot to make a plot of the beta1 values (the effect of landuse type on the expected abundance) produced by both models. 
+2. When this data was formally analyzed, the authors used a random effect of year in the process model and a random effect of site in the detection process. Run the model with both of these random effects. Use ggplot to compare the beta1 values (the effect of landuse type on the expected abundance) produced by this new mode vs the model in Question 1. At a site with average area (scaled area = 0), what is the expected abundance for each land use type?
 
-3. Since this is an abundance model, it makes sense to make a plot of abundance over time. Inside the model that you used for Question 2, create a *derived parameter* that represents the total abundance of all sites of each landtype in each year. Use ggplot to graph the estimated total abundance by landtype over time, including the CIs.  
+3. Since this is an abundance model, it makes sense to make a plot of abundance over time. Inside the model that you used for Question 2, create 2 *derived parameterS* that represents the total abundance of all sites of each landtype (one parameter for each landtype) in each year. Use ggplot to graph the estimated total average density by landtype over time, including the CIs.  (Note: To get density, determine the total area of all plots of each landtype, then divide your estimates by this number). 
 
 4. To practice converting model code to the mathematical notation expected in a scientific paper, write your model for Question 2 in its full mathematical form, including priors. 
 

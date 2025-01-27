@@ -118,7 +118,7 @@ Switzerland.Each year, two counts were conducted during a two-week
 period. Sites vary in area, elevation, and belong to two types of
 habitat (arable and grassland). You can read more about this study here:
 <a href="https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub" class="external-link uri">https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub</a></p>
-<p><img src="https://en.wikipedia.org/wiki/European_hare#/media/File:Lepus_europaeus_(Causse_M%C3%A9jean,_Loz%C3%A8re)-cropped.jpg" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="Hare.webp" width="50%" style="display: block; margin: auto;"></p>
 <p>Let’s begin by taking a look at the data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"swiss_hares"</span><span class="op">)</span></span>
@@ -299,22 +299,22 @@ list next.</p>
 <span>        area <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">area</span><span class="op">)</span>,        <span class="co"># Get the area for each site</span></span>
 <span>        .groups <span class="op">=</span> <span class="st">"drop"</span>           <span class="co"># To remove grouping after summarizing</span></span>
 <span>    <span class="op">)</span></span>
-<span></span>
+<span><span class="va">constants_prep</span><span class="op">$</span><span class="va">area_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">constants_prep</span><span class="op">$</span><span class="va">area</span><span class="op">)</span> <span class="co">#scale the area</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">constants_prep</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
-<span><span class="co">#&gt;   site  landuse  area</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AG01        1  2.23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AG02        1  3.58</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AG03        1  4.79</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AG04        1  5.8 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> LU01        2 16.5 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> LU07A       2  5.85</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   site  landuse  area area_s[,1]</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AG01        1  2.23    -<span style="color: #BB0000;">0.861</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AG02        1  3.58    -<span style="color: #BB0000;">0.573</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AG03        1  4.79    -<span style="color: #BB0000;">0.315</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AG04        1  5.8     -<span style="color: #BB0000;">0.099</span><span style="color: #BB0000; text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> LU01        2 16.5      2.18  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> LU07A       2  5.85    -<span style="color: #BB0000;">0.089</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hare.consts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>nsites <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Central_hares</span><span class="op">$</span><span class="va">site_n</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                    nyears <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fl">1992</span><span class="op">:</span><span class="fl">2008</span><span class="op">)</span>, </span>
 <span>                    landuse <span class="op">=</span> <span class="va">constants_prep</span><span class="op">$</span><span class="va">landuse</span>,</span>
-<span>                    site_area <span class="op">=</span> <span class="va">constants_prep</span><span class="op">$</span><span class="va">area</span>,</span>
+<span>                    site_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">constants_prep</span><span class="op">$</span><span class="va">area_s</span><span class="op">)</span>, <span class="co">#remove the 'attributes' part</span></span>
 <span>                    site <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">constants_prep</span><span class="op">)</span>,</span>
 <span>                    effort <span class="op">=</span> <span class="va">effort</span>,</span>
 <span>                    nlandtypes <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
@@ -603,14 +603,14 @@ compare.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mod1_alphas</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">'#7C94EC'</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mod2_alphas</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">'#C88B37'</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, hjust <span class="op">=</span> <span class="fl">.75</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab6_MissingData_files/figure-html/unnamed-chunk-34-1.png" width="576" style="display: block; margin: auto;">
-We can see numerically that the spread of the alphas is a little smaller
-for the second model, but not much of a difference.</p>
+<p><img src="Lab6_MissingData_files/figure-html/unnamed-chunk-34-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>We can see numerically that the spread of the alphas is a little
+smaller for the second model.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mod1_alphas</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.4809</span></span>
+<span><span class="co">#&gt; [1] 0.4704</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mod2_alphas</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.4044</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.3972</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="homework">Homework<a class="anchor" aria-label="anchor" href="#homework"></a>
@@ -626,14 +626,18 @@ compare with our lab run on just a subset of data?</p></li>
 <li><p>When this data was formally analyzed, the authors used a random
 effect of year in the process model and a random effect of site in the
 detection process. Run the model with both of these random effects. Use
-ggplot to make a plot of the beta1 values (the effect of landuse type on
-the expected abundance) produced by both models.</p></li>
+ggplot to compare the beta1 values (the effect of landuse type on the
+expected abundance) produced by this new mode vs the model in Question
+1. At a site with average area (scaled area = 0), what is the expected
+abundance for each land use type?</p></li>
 <li><p>Since this is an abundance model, it makes sense to make a plot
 of abundance over time. Inside the model that you used for Question 2,
-create a <em>derived parameter</em> that represents the total abundance
-of all sites of each landtype in each year. Use ggplot to graph the
-estimated total abundance by landtype over time, including the
-CIs.</p></li>
+create 2 <em>derived parameterS</em> that represents the total abundance
+of all sites of each landtype (one parameter for each landtype) in each
+year. Use ggplot to graph the estimated total average density by
+landtype over time, including the CIs. (Note: To get density, determine
+the total area of all plots of each landtype, then divide your estimates
+by this number).</p></li>
 <li><p>To practice converting model code to the mathematical notation
 expected in a scientific paper, write your model for Question 2 in its
 full mathematical form, including priors.</p></li>
