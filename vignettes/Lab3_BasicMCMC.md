@@ -10,21 +10,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-   warning = FALSE, message = FALSE,
-   fig.align = 'center', fig.retina = 2,
-  collapse = TRUE,
-  comment = "#>"
-)
-library(dplyr)
-library(knitr)
-source(here::here("R/zzz.R"))
-```
 
-```{r setup, echo=FALSE}
-library(WILD8370)
-```
+
+
 
 In this activity, we will use `R` to create a simple Metropolis sampler to estimate the posterior distributions of the parameters in a linear regression model. This sounds like a giant task but once you understand the mechanisms, it's not too hard.
 
@@ -54,16 +42,22 @@ The basic steps of the Metropolis sampler are:
 
 First, let's simulate some fake data from a binomial distribution as an example. Maybe we're flipping a coin and want to know if it's fair. We flip it 20 times and these are the results we get:
 
-```{r}
+
+``` r
 set.seed(20)
 x <- rbinom(20, size = 1, prob = .2)
 x
+#>  [1] 1 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 ```
 
 Let's take a look at our data with a table:
 
-```{r}
+
+``` r
 table(x)
+#> x
+#>  0  1 
+#> 16  4
 ```
 
 Looks like we have 16 zeros ("failures") and 4 1's ("successes"). Probably not a fair coin. But what if we want to estimate the probability of success? If it were truly fair, we'd expect a probability of 0.5.
@@ -74,24 +68,30 @@ We know that the equation for a binomial distribution with size 20 is: $\frac{20
 
 So how do we go about finding p? Well, to start, what's the probability density of 4 successes if p = .1?
 
-```{r}
+
+``` r
 dbinom(4, 20, .1)
+#> [1] 0.08978
 ```
 
 Okay, not too high.
 
 How about if p = .4?
 
-```{r}
+
+``` r
 dbinom(4, 20, .4)
+#> [1] 0.03499
 ```
 
 Hmm, a little lower.
 
 What about p = .7?
 
-```{r}
+
+``` r
 dbinom(4, 20, .7)
+#> [1] 5.008e-06
 ```
 
 Oof, lower again.
@@ -100,7 +100,8 @@ So we could do this over and over and over again and eventually we'd see that so
 
 Obviously picking random values of p by hand isn't very efficient. Let's have a function do it for us and graph what the result is:
 
-```{r}
+
+``` r
 pick.ps <- function(n){
   p <- runif(n, min = 0, max = 1)
   d <- dbinom(4,20,p)
@@ -108,11 +109,7 @@ pick.ps <- function(n){
 }
 ```
 
-```{r fig.width=7, fig.height=4, echo = F}
-par(mfrow = c(1,2))
-  plot(pick.ps(500)[,1:2], cex = .5)
- hist(pick.ps(500)[,1], breaks = seq(0,1, by = .1), main = "Tested values of p", xlab = "Value of p")
-```
+<img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" />
 
 We can see that the value of p is probably close to .3 because that's where the highest probability density was, but we can also see that this method tried a bunch of points (AKA wastes a lot of time) over around values that we basically know aren't going to be good answers. For instance, we're pretty sure this coin isn't going to have a success probability of .9, so we would kind of prefer that the model not spend so much time testing values over there.
 
@@ -158,7 +155,8 @@ At each iteration of the sampler, we will need to perform the same set of tasks,
 
 Given values of $\alpha$, $\beta$, and $\sigma$, we can estimate the likelihood in `R` using the `dnorm()` function (note that we will take the sum of the log likelihoods rather than the product of the likelihoods to avoid numerical issues):
 
-```{r eval = FALSE}
+
+``` r
 # Calculate the predicted count for each flower
   lp <- alpha + beta * x  
   
@@ -168,7 +166,8 @@ Given values of $\alpha$, $\beta$, and $\sigma$, we can estimate the likelihood 
 
 To turn this code into a function, first open a new script and call it `calc_like.R`. Save it in the `R/` sub-directory. This script will contain the function code. The function code is:
 
-```{r}
+
+``` r
 calc_like <- function(y, alpha, beta, sigma, x) {
   lp <- alpha + beta * x
   ll <- sum(dnorm(y, lp, sigma, log = TRUE))
@@ -184,7 +183,8 @@ Save this code in the script and then close the script.
 
 We also need functions to estimate the prior probabilities for specific values of $\alpha$, $\beta$, and $\sigma$. Create a new script titled `priors.R` and save it to the `R/` sub-directory. The following functions will take values of each parameter and estimate the prior probability given the prior distributions we defined above:
 
-```{r}
+
+``` r
 priorAlpha <- function(alpha, mu = 0, sigma = 50){
   prob <- dnorm(alpha, mu, sigma, log = TRUE)
   return(prob)
@@ -213,7 +213,8 @@ In the sampler, we loop over each parameter, going through the Metropolis steps 
 
 First, we set the length of our chains, set the tuning parameter for the proposal distribution, and create an empty data frame to store the samples and a binary variable for estimating the acceptance rate:
 
-```{r eval = FALSE}
+
+``` r
 ## Length of chains
   nIter <- 10000
 
@@ -232,7 +233,8 @@ First, we set the length of our chains, set the tuning parameter for the proposa
 
 Next, we will randomly generate initial values for each parameter. Remember that these are quite big numbers in the data generating model so we will create initial values of the same magnitude:
 
-```{r eval = FALSE}
+
+``` r
 ## Initial values
   mcmc_df$alpha[1] <-  runif(1, 200, 300)
   mcmc_df$beta[1] <- runif(1, 25, 75)
@@ -241,7 +243,8 @@ Next, we will randomly generate initial values for each parameter. Remember that
 
 The final "set up" step is to estimate the likelihood of our data given these initial values. To do this, we use the `calc_like()` function we created earlier:
 
-```{r eval = FALSE}
+
+``` r
 ## Initial likelihood
 likelihood <- calc_like(y = y, alpha = mcmc_df$alpha[1], 
                        beta = mcmc_df$beta[1], sigma = mcmc_df$sigma[1], 
@@ -250,7 +253,8 @@ likelihood <- calc_like(y = y, alpha = mcmc_df$alpha[1],
 
 Now we create the actual sampler. Below, we will create a loop that implements these steps for each iteration of the chains. Here, we will simply go through each step to make sure you understand what it's doing. We'll start by going through the Metropolis steps for $\alpha$ (though remember the order doesn't matter):
 
-```{r eval = FALSE}
+
+``` r
 ########################
 #### 1. Update alpha
 ########################
@@ -289,7 +293,8 @@ Finally, in `step 1e` we accept or reject the proposed value. Note that we compa
 
 Next we do the same thing for $\beta$, using the new value of $alpha$ (`mcmc_df$alpha[i]`) and the previous value of $\sigma$ (`mcmc_df$sigma[i - 1]`):
 
-```{r eval = FALSE}
+
+``` r
 ########################
 #### 2. Update beta
 ########################
@@ -319,7 +324,8 @@ Next we do the same thing for $\beta$, using the new value of $alpha$ (`mcmc_df$
 
 Finally, we update $\sigma$ using the new values of both $\alpha$ and $\beta$. The only difference here is that because $\sigma$ has to be $>0$, the normal proposal distribution we used for $\alpha$ and $\beta$ will not work (it could create negative values). As we learned in lecture, you could create a proposal distribution that generates positive value (e.g., gamma) and use moment matching to estimate the parameters with regards to the current $\sigma$ and the tuning parameter. We'll use a slightly less efficient approach here to demonstrate there are different ways to enforcing the behavior we want in the sampler. In this cases, will simply add a small value to the current $\sigma$ and automatically reject the proposed value if it's less than 0. The small value can be negative or positive to allow us to explore the posterior.
 
-```{r eval = FALSE}
+
+``` r
 ########################
 #### 3. Update sigma
 ########################
@@ -357,7 +363,8 @@ Finally, we update $\sigma$ using the new values of both $\alpha$ and $\beta$. T
 
 Finally, we can run the sampler. Create a new script called `metroplis.R` (or something similar) and put it in `scripts/`. First, we will load the packages we need and use the `source()` function to read in our custom functions (`source()` runs the `.R` files given in the argument which in this case will make the functions available for our sampler):
 
-```{r eval = FALSE}
+
+``` r
 library(WILD6900)
 
 source("R/calc_like.R")
@@ -366,7 +373,8 @@ source("R/priors.R")
 
 Next, read in the simulated data and set the initial values for the MCMC:
 
-```{r eval = FALSE}
+
+``` r
 ## Read simulated data
   sim_dat <- readRDS("data/sim_seed_counts.rds")
 
@@ -396,39 +404,12 @@ Next, read in the simulated data and set the initial values for the MCMC:
                        x = sim_dat$visits.c) 
 ```
 
-```{r echo = FALSE}
-data("sim_seed_counts")
-sim_dat <- sim_seed_counts
 
-## Length of chains
-  nIter <- 10000
-
-## Tuning parameter
-  tuning <- 1.5
-
-## Empty data frame to store posterior samples of each parameter
-  mcmc_df <- data.frame(x = 1:nIter,
-                        alpha = numeric(nIter),
-                        beta = numeric(nIter),
-                        sigma = numeric(nIter),
-                        accept.alpha = 0,
-                        accept.beta = 0, 
-                        accept.sigma = 0)
-
-## Initial values
-  mcmc_df$alpha[1] <-  runif(1, 200, 300)
-  mcmc_df$beta[1] <- runif(1, 25, 75)
-  mcmc_df$sigma[1] <- runif(1, 0, 10)
-  
-## Initial likelihood
-  likelihood <- calc_like(y = sim_dat$y, alpha = mcmc_df$alpha[1], 
-                       beta = mcmc_df$beta[1], sigma = mcmc_df$sigma[1], 
-                       x = sim_dat$visits.c) 
-```
 
 Now take the sampler code and put it inside a `for` loop to create the chains. Note that in the likelihood functions we will need to reference our simulated data and covariates:
 
-```{r}
+
+``` r
 for(i in 2:nIter){
 ########################
 #### 1. Update alpha
@@ -524,45 +505,71 @@ At this point, you should be able to run the script from start to finish and cre
 
 Now we can determine whether the sampler returns the data generating values from our data simulation. When assessing the output of MCMC chains, a good first diagnostic is usually checking the trace plots:
 
-```{r fig.width=7, fig.height=4}
+
+``` r
 ggplot(mcmc_df, aes(x = x, y = alpha)) + geom_path()
 ```
 
+<img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" />
+
 The chain for $\alpha$ moved rapidly from the initial value to the stationary posterior distribution but those first few samples will obviously bias our parameter estimates if we include them in the posterior. Let's remove them by using the `dplyr` function `slice()`:
 
-```{r fig.width=7, fig.height=4}
+
+``` r
 mcmc_df <- dplyr::slice(mcmc_df, 1000:nIter)
 
 ggplot(mcmc_df, aes(x = x, y = alpha)) + geom_path()
 ```
 
+<img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" />
+
 That looks better. Now we can estimate the mean and 95% credible interval of the posterior:
 
-```{r}
+
+``` r
 mean(mcmc_df$alpha)
+#> [1] 251.3
 quantile(mcmc_df$alpha, probs = c(0.025, 0.975))
+#>  2.5% 97.5% 
+#> 250.2 252.4
 ```
 
 Pretty close to the data generating value of 250. Now let's check $\beta$:
 
-```{r fig.width=7, fig.height=4}
+
+``` r
 ggplot(mcmc_df, aes(x = x, y = beta)) + geom_path()
 ```
 
+<img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" />
+
 and
 
-```{r}
+
+``` r
 mean(mcmc_df$beta)
+#> [1] 49.1
 quantile(mcmc_df$beta, probs = c(0.025, 0.975))
+#>  2.5% 97.5% 
+#> 48.02 50.17
 ```
 
 Also pretty close to the data generating value of 50. Finally, $\sigma$
 
-```{r fig.width=7, fig.height=4}
+
+``` r
 ggplot(mcmc_df, aes(x = x, y = sigma)) + geom_path()
+```
+
+<img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" />
+
+``` r
 
 mean(mcmc_df$sigma)
+#> [1] 7.424
 quantile(mcmc_df$sigma, probs = c(0.025, 0.975))
+#>  2.5% 97.5% 
+#> 6.690 8.254
 ```
 
 Wasn't that easy?
@@ -571,7 +578,8 @@ Wasn't that easy?
 
 1.  In simulation, we set $\alpha$ = 250, and we provided a reasonable, diffuse prior in the example above. But what happens if we give a restrictive (and wrong) prior for $\alpha$? Change your `priorAlpha` function to instead match $\alpha \sim Uniform(0, 150)$. Make sure to also change this line to match the new prior:
 
-```{r, echo = T, eval = F}
+
+``` r
 mcmc_df$alpha[1] <-  runif(1, 200, 300) #change this to something reasonable
 ```
 

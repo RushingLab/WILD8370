@@ -114,7 +114,6 @@ Can easily switch out observation models
 
 `$$\Large z_{t+1} \sim Bernoulli\big(z_t \phi_t\big)$$` 
 
-### Observation Model 
 
 ### Survival
 
@@ -150,17 +149,31 @@ Can easily switch out observation models
 
 &lt;img src="08_occupancy_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
-
-
-
 ---
 ## Example: Population Growth Rate
 
+``` r
+pop_grow &lt;- nimbleCode({
+N[1] ~ dunif(0, 500)            # Prior for initial population size
+sigma.obs ~ dexp(1)       # Prior for sd of observation process
+b0 ~ dnorm(0, 1) #prior for beta0
+b1 ~ dnorm(0, 1) #prior for beta1
+# Likelihood
+# State process
+for (t in 1:(n.years-1)){
+   log(lambda[t]) &lt;- b0 + b1*X[t] #some covariate association
+   N[t+1] &lt;- N[t] * lambda[t] 
+   }
+# Observation process
+for (t in 1:n.years) {
+   y[t] ~ dnorm(N[t], sd = sigma.obs)
+   }
+})
+```
 
 ---
 ## Example: Population Growth Rate
 &lt;img src="08_occupancy_files/figure-html/unnamed-chunk-6-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
 
 ---
 
@@ -173,10 +186,11 @@ What if you get better at detection over time? Or there's no change in populatio
 
 
 
+
 &lt;img src="08_occupancy_files/figure-html/unnamed-chunk-9-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
-
+## Example: Wrong Model
 
 &lt;img src="08_occupancy_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
@@ -204,6 +218,7 @@ What if you get better at detection over time? Or there's no change in populatio
 - Can produce biased estimates of `\(N\)` unless observations are repeated 
 
 - Often imprecise 
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

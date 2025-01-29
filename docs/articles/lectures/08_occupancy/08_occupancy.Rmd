@@ -209,12 +209,9 @@ ggplot() +
    ggtitle('True vs Observed')
 ```
 
-
-
-
 ---
 ## Example: Population Growth Rate
-```{r, eval =F, include = T}
+```{r, eval =F, include = T, echo = T}
 pop_grow <- nimbleCode({
 N[1] ~ dunif(0, 500)            # Prior for initial population size
 sigma.obs ~ dexp(1)       # Prior for sd of observation process
@@ -248,13 +245,13 @@ ggplot() +
    ggtitle('True vs Observed vs Estimated')
 ```
 
-
 ---
 
 
 ## Example: Wrong Model
 
 What if you get better at detection over time? Or there's no change in population? 
+
 ```{r include=FALSE}
 n.years <- 25           # Number of years
 y2 <- pp <- array(NA, n.years)
@@ -300,7 +297,7 @@ ggplot() +
 ```
 
 ---
-
+## Example: Wrong Model
 
 ```{r, echo = F, fig.width=7, fig.height=6}
 ggplot() + 
@@ -340,4 +337,9 @@ ggplot() +
 - Can produce biased estimates of $N$ unless observations are repeated 
 
 - Often imprecise 
+
+
+---
+
+
 
