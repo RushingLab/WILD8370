@@ -204,7 +204,7 @@ nimbleCode({
 --
 - Can include multiple random effects  
 
-- Can include fixed and random effects (mixed-models)  
+- Can include fixed and random effects (mixed-effect models, multi-level models)  
 
 - Can include multiple levels of hierarchy  
 
@@ -269,6 +269,7 @@ nimbleCode({
 - "shrinkage"" towards mean  
 
     + degree of shrinkage inversely proportional to precision  
+
     
 ---
 ## Why not use random effects?
@@ -291,6 +292,73 @@ nimbleCode({
 
 --
 - Harder to interpret  
+
+---
+## Example - Neonate feral hogs  at SREL
+
+&lt;img src="pig_study1.png" width="1084" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Neonate feral hogs  at SREL
+
+--
+- Neonate pig survival is based on many factors  
+&lt;br/&gt;
+
+
+--
+- Neonate survival seems to vary between sows. Some are better parents than others.  
+&lt;br/&gt;
+
+
+--
+- Should sow be treated as a fixed or random effect?   
+&lt;br/&gt;
+
+
+--
+-  Sow should be fixed. The success of one parent is unrelated to the success of another 
+&lt;br/&gt;
+
+
+--
+-  Sow should be a random effect. Probably most pigs aren't that different from each other; What if we want to estimate piglet survival for a sow that's not in our dataset?   
+&lt;br/&gt;
+
+
+--
+-  Sow should be ignored. Differences in survival between neonates of different sows can be absorbed in the uncertainty for the  process model  
+&lt;br/&gt;
+
+---
+## Example - Neonate feral hogs  at SREL
+
+- Neonate survival might also vary by pelt color pattern   
+&lt;br/&gt;
+
+
+--
+- Should color be treated as a fixed or random effect?   
+&lt;br/&gt;
+
+
+--
+-  Color should be fixed. No specific reason to believe that survival is similar between pelt colors. Only 6 color types. 
+
+&lt;br/&gt;
+
+--
+-  Color should be a random effect -  Some colors are less common, so we have less data; Potentially easier to estimate (shrinkage). 
+&lt;br/&gt;
+
+
+---
+## Example - Neonate feral hogs  at SREL
+
+The authors chose to use a random effect for sow. How would we expect these estimates to change if they had modeled these as fixed effects?  
+
+
+&lt;img src="Fig2_pigs.png" width="457" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

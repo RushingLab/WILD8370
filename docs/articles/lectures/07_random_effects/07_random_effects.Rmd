@@ -220,7 +220,7 @@ $$\Large [\beta_{[j]}, \mu_{\beta}, \sigma^2_{\beta}, \sigma^2|y_{ij}] = [y_{ij}
 --
 - Can include multiple random effects  
 
-- Can include fixed and random effects (mixed-models)  
+- Can include fixed and random effects (mixed-effect models, multi-level models)  
 
 - Can include multiple levels of hierarchy  
 
@@ -285,6 +285,7 @@ $$\Large [\beta_{[j]}, \mu_{\beta}, \sigma^2_{\beta}, \sigma^2|y_{ij}] = [y_{ij}
 - "shrinkage"" towards mean  
 
     + degree of shrinkage inversely proportional to precision  
+
     
 ---
 ## Why not use random effects?
@@ -307,3 +308,74 @@ $$\Large [\beta_{[j]}, \mu_{\beta}, \sigma^2_{\beta}, \sigma^2|y_{ij}] = [y_{ij}
 
 --
 - Harder to interpret  
+
+---
+## Example - Neonate feral hogs  at SREL
+
+```{r, echo=FALSE}
+knitr::include_graphics("pig_study1.png")
+```
+
+---
+## Example - Neonate feral hogs  at SREL
+
+--
+- Neonate pig survival is based on many factors  
+<br/>
+
+
+--
+- Neonate survival seems to vary between sows. Some are better parents than others.  
+<br/>
+
+
+--
+- Should sow be treated as a fixed or random effect?   
+<br/>
+
+
+--
+-  Sow should be fixed. The success of one parent is unrelated to the success of another 
+<br/>
+
+
+--
+-  Sow should be a random effect. Probably most pigs aren't that different from each other; What if we want to estimate piglet survival for a sow that's not in our dataset?   
+<br/>
+
+
+--
+-  Sow should be ignored. Differences in survival between neonates of different sows can be absorbed in the uncertainty for the  process model  
+<br/>
+
+---
+## Example - Neonate feral hogs  at SREL
+
+- Neonate survival might also vary by pelt color pattern   
+<br/>
+
+
+--
+- Should color be treated as a fixed or random effect?   
+<br/>
+
+
+--
+-  Color should be fixed. No specific reason to believe that survival is similar between pelt colors. Only 6 color types. 
+
+<br/>
+
+--
+-  Color should be a random effect -  Some colors are less common, so we have less data; Potentially easier to estimate (shrinkage). 
+<br/>
+
+
+---
+## Example - Neonate feral hogs  at SREL
+
+The authors chose to use a random effect for sow. How would we expect these estimates to change if they had modeled these as fixed effects?  
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("Fig2_pigs.png")
+```
