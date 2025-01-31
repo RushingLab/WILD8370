@@ -19,6 +19,7 @@ options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
 library(WILD8370)
 library(nimble)
+library(MCMCvis)
 source(here::here("R/zzz.R"))
 # library(gganimate)
 ```
@@ -340,6 +341,194 @@ ggplot() +
 
 
 ---
+## Example - Population Reconstruction NC Bears
+
+- For game species, we get yearly data on populations in the form of hunter harvest records. Can we use this information to estimate population size? 
+
+--
+
+Initial Population:
+
+*BH = before harvest, AH = after harvest
+
+$$N^{AH}_{t=1} \sim Pois(\lambda_0) $$
+
+ t > 2
+ 
+$$N^{BH}_{t} \sim Pois(N^{AH}_{t-1}*\lambda_1)$$
+
+$$N^{AH}_{t} = N^{BH}_{t} - H_{t}$$
+
+Observation Model:
+
+$$H_{t} \sim Binomial(N^{BH}_{t}, hr)$$
+---
+## Example - Population Reconstruction NC Bears
+
+Harvest data for black bears in North Carolina over the past decade:
+```{r, echo = F}
+NC_bears <- WILD8370::NC_bears
+#Rmarkdown being cranky 
+```
+
+```{r, eval = F, include = T}
+data('NC_bears')
+```
+
+```{r, echo = T, fig.width=6, fig.height=4}
+NC_bears <- subset(NC_bears, NC_bears$Year > 2013 & NC_bears$Year < 2024) #2014 to 2023
+ggplot(NC_bears, aes(x = Year, y = Total_Harvest))+
+  geom_line()+
+  geom_point()+
+  theme_bw()
+```
+---
+## Example - Population Reconstruction NC Bears
+
+We can turn our mathematical model into loose nimble code and then fix it from there:
+
+```{r, eval = F, include = T, echo = T}
+Harvestmod <- nimbleCode({
+N_AH[1] ~ dpois(lambda_0)
+  
+N_BH[t] ~ dpois(N_AH[t-1]*lambda_1)
+
+N_AH[t] <- N_BH[t] - H[t]
+H[t] ~ dbinom(hr, N_BH[t]) #remember nimble switches these
+}) 
+#will not run because no loops or priors
+```
+
+---
+## Example - Population Reconstruction NC Bears
+
+Let's clean up the loops and add priors for the growth rate, initial population and hr (harvest probability)
+
+```{r, eval = T, echo = T}
+Harvestmod <- nimbleCode({
+N_AH[1] ~ dpois(lambda_0)
+
+for(t in 2:nyears){
+  N_BH[t] ~ dpois(N_AH[t-1]*lambda_1)
+  N_AH[t] <- N_BH[t] - H[t]
+
+  H[t] ~ dbinom(hr, N_BH[t])
+}
+
+lambda_0 ~ dpois(5000) #there are a lot of bears in NC
+lambda_1 ~ dgamma(2, 0.5) #mean of 1
+hr ~ dbeta(1, 1)  #roughly uniform 
+
+}) 
+```
+
+Quick quiz - which values are known? Which parameters will need initial values?
+
+---
+## Example - Population Reconstruction NC Bears
+
+Time to put in our known information. 
+
+```{r, echo = T}
+nim.consts <- list(nyears = length(NC_bears$Year))
+```
+
+```{r, echo = T}
+nim.dat <- list(H = NC_bears$Total_Harvest) 
+```
+
+---
+## Example - Population Reconstruction NC Bears
+
+Initial values are tricky here, so we can simulate some to make sure they make sense:
+
+```{r, echo = T}
+set.seed(1)
+N_AH <- N_BH <- array(0, 10) #10 years of harvest records
+lambda_0 <- rpois(1, 5000)
+lambda_1 <- runif(1, 1, 2) 
+hr <- runif(1, 0, .2) #keep harvest small
+N_AH[1] <- rpois(1, lambda_0)
+H <- NC_bears$Total_Harvest
+for(t in 2:10){
+  N_BH[t] <- rpois(1, N_AH[t-1]*lambda_1)
+  N_AH[t] <- N_BH[t] - H[t]
+  if(N_AH[t] < 0) print('uh oh')
+}
+```
+
+```{r, echo = T}
+nim.inits <- list(lambda_0 = lambda_0,   lambda_1 = lambda_1,  hr = hr,  
+                  N_AH = c(N_AH[1], rep(NA, 9)),  N_BH = N_BH)
+```
+
+---
+## Example - Population Reconstruction NC Bears
+
+Run the model:
+
+```{r, eval = F, include = T, echo = T}
+params <- c("lambda_0", "lambda_1", "hr", 'N_AH', 'N_BH')
+nimfit <- nimbleMCMC(code = Harvestmod,
+                     data = nim.dat,
+                     constants = nim.consts,
+                     inits = nim.inits,
+                     monitors = params,
+                     thin = 1,
+                     niter = 10000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+```{r,eval = T, include = F, echo = F}
+nimfit <- readRDS('bears_mod.rds')
+```
+
+---
+## Example - Population Reconstruction NC Bears
+
+Plots
+```{r, fig.width=6, fig.height=5, echo = T}
+library(MCMCvis)
+MCMCtrace(nimfit[,c('lambda_0', 'lambda_1', 'hr')], pdf = F, Rhat = T)
+```
+
+---
+## Example - Population Reconstruction NC Bears
+
+Plot the estimated abundance
+```{r, fig.width=7, fig.height=5, echo = T}
+N_outs <- summary(nimfit[,grep('N_AH', colnames(nimfit[[1]])),])$quantiles
+Ns <- data.frame(Abundance = N_outs[,3], LCI = N_outs[,1], UCI = N_outs[,5], year = 2014:2023)
+ggplot(Ns, aes(x = year, y = Abundance))+
+  geom_line()+
+  geom_pointrange(aes(ymin = LCI, ymax = UCI))
+```
+---
+## Example - Population Reconstruction NC Bears
 
 
+But... 
 
+--
+Other studies show bear populations are likely declining in North Carolina. 
+
+```{r, echo = F, eval = T, fig.width=4, fig.height=3}
+knitr::include_graphics("bear_fig1.png")
+```
+
+
+--
+Why didn't we see that? 
+
+- Harvest rates weren't stable (regulation changes)
+
+
+- Not all bears equally likely to be harvested (age structure)
+
+ 
+- Variable growth rates 
+
+
+Be cautious! 
