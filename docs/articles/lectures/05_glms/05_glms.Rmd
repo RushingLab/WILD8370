@@ -49,7 +49,7 @@ $$\underbrace{\LARGE \mu_i = \beta_0 + \beta_1 \times x_i}_{Deterministic}$$
 
 --
 
-$$\underbrace{\LARGE y_i \sim normal(\mu_i, \tau)}_{Stochastic}$$  
+$$\underbrace{\LARGE y_i \sim normal(\mu_i, \sigma^2)}_{Stochastic}$$  
 
 ???
 
@@ -85,7 +85,7 @@ ggplot(df, aes(x, y)) + geom_boxplot(color = "white") +
 
 $$\LARGE \mu_i = -2 + 0.5 \times x_i$$
 
-$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \tau)}_{Stochastic}$$  
+$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \sigma^2)}_{Stochastic}$$  
 
 --
 
@@ -119,7 +119,7 @@ ggplot(df, aes(x, y)) + geom_point(color = "white") +
 
 $$\LARGE \mu_i = -2 + 0.5 \times x_i$$
 
-$$\LARGE y_i \sim Normal(\mu_i, \tau)$$  
+$$\LARGE y_i \sim Normal(\mu_i, \sigma^2)$$  
 
 ```{r fig.height=4, fig.width=4}
 ggplot(df, aes(x, y)) +
@@ -137,7 +137,7 @@ class: inverse, center, middle
 
 ### 1) Distribution
 
-$$\LARGE y_i \sim normal(\mu_i, \tau)$$
+$$\LARGE y_i \sim normal(\mu_i, \sigma^2)$$
 
 --
 
@@ -174,7 +174,7 @@ ggplot(df, aes(x, y)) +
 
 #### 1) Distribution
 
-$$\LARGE y_i \sim normal(\mu_i, \tau)$$
+$$\LARGE y_i \sim normal(\mu_i, \sigma^2)$$
 
 ---
 # components of the generalized linear model
@@ -302,7 +302,7 @@ $$\LARGE \beta_0 + \beta_1 \times x_i$$
 # glms in nimble - normal link
 
 $$\mu_i = \beta_0 + \beta_1 \times x_i$$
-$$y_i \sim Normal(\mu_i, \tau)$$  
+$$y_i \sim Normal(\mu_i, \sigma^2)$$  
 
 ```{r, eval=F, echo = T}
 nimbleCode({
@@ -388,3 +388,97 @@ class: inverse
 
 - Underlie nearly all common ecological models  
 
+
+---
+# In-class Example 
+
+In the week 2 homework, we simulated data from a deer population declining because of CWD. Let's fit our simulated data to a model in Nimble! 
+
+```{r, echo = T, eval = T}
+set.seed(4) #reproducible
+nocc <- 20
+EN <- N <- array(NA, nocc) #create empty arrays with space for 20 years
+N[1] <- 475
+lambda <- .95
+
+#simulate:
+for(t in 2:nocc){
+  EN[t] <- N[t-1]*lambda
+  N[t] <- rpois(1, EN[t])
+}
+```
+
+---
+# In-class Example
+
+First we need a model:
+```{r, echo = T, eval = T}
+library(nimble)
+deermod <- nimbleCode({
+  N[1] <- 475
+  
+for(t in 2:nocc){
+  EN[t] <- N[t-1]*lambda
+  N[t] ~ dpois(EN[t])
+} #end t
+  
+lambda ~ dgamma(1, 1)
+  
+})
+```
+---
+# In-class Example
+
+Parameters of interest:
+```{r, echo = T, eval = T}
+params <- c("lambda")
+```
+
+Constants:
+```{r, echo = T, eval = T}
+nimconsts <- list(nocc = nocc)
+```
+
+Data
+```{r, echo = T, eval = T}
+nimdat <- list(N = N)
+```
+
+Inits
+```{r, echo = T, eval = T}
+niminits <- function(){list(lambda = rgamma(1,1,1))}
+```
+
+---
+# In-class Example
+
+```{r, echo = T, eval = T}
+nimfit <- nimbleMCMC(code = deermod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 1000,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+# In-class Example
+
+```{r, echo = T, eval = T}
+library(MCMCvis)
+MCMCtrace(nimfit, pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+# In-class Example
+
+Unsurprisngly accurate! 
+
+```{r, echo = T, eval = T}
+summary(nimfit)$quantiles
+```
