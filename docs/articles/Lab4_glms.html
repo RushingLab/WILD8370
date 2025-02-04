@@ -408,13 +408,7 @@ model is to run it in one command:</p>
 <span>                     nburnin <span class="op">=</span> <span class="va">nB</span>,</span>
 <span>                     nchains <span class="op">=</span> <span class="va">nC</span>,</span>
 <span>                     samplesAsCodaMCMC <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>                      <span class="op">)</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span></code></pre></div>
+<span>                      <span class="op">)</span></span></code></pre></div>
 <p>However, sometimes (when you get more advanced), you’ll want to be
 able to customize your Nimble runs a little bit more. It’s also much
 easier to error check your initial values on models that take a very
@@ -461,19 +455,19 @@ like with one chain:</p>
 alpha
 </td>
 <td style="text-align:right;">
-4.1739
+4.1685
 </td>
 <td style="text-align:right;">
-4.2103
+4.2085
 </td>
 <td style="text-align:right;">
-4.2301
+4.2289
 </td>
 <td style="text-align:right;">
-4.2516
+4.2499
 </td>
 <td style="text-align:right;">
-4.2887
+4.2879
 </td>
 </tr>
 <tr>
@@ -481,19 +475,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
-1.0190
+1.0288
 </td>
 <td style="text-align:right;">
-1.0836
+1.0880
 </td>
 <td style="text-align:right;">
-1.1170
+1.1184
 </td>
 <td style="text-align:right;">
-1.1489
+1.1499
 </td>
 <td style="text-align:right;">
-1.2057
+1.2151
 </td>
 </tr>
 <tr>
@@ -501,19 +495,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.0399
+-0.0388
 </td>
 <td style="text-align:right;">
--0.0079
+-0.0077
 </td>
 <td style="text-align:right;">
-0.0078
+0.0086
 </td>
 <td style="text-align:right;">
-0.0241
+0.0255
 </td>
 <td style="text-align:right;">
-0.0530
+0.0560
 </td>
 </tr>
 <tr>
@@ -521,19 +515,19 @@ beta2
 beta3
 </td>
 <td style="text-align:right;">
--0.2810
+-0.2844
 </td>
 <td style="text-align:right;">
--0.2514
+-0.2515
 </td>
 <td style="text-align:right;">
--0.2347
+-0.2346
 </td>
 <td style="text-align:right;">
--0.2168
+-0.2191
 </td>
 <td style="text-align:right;">
--0.1832
+-0.1886
 </td>
 </tr>
 <tr>
@@ -541,19 +535,19 @@ beta3
 lambda[1]
 </td>
 <td style="text-align:right;">
-26.5225
+26.6575
 </td>
 <td style="text-align:right;">
-30.3368
+30.3234
 </td>
 <td style="text-align:right;">
-32.4247
+32.3956
 </td>
 <td style="text-align:right;">
-34.6385
+34.6393
 </td>
 <td style="text-align:right;">
-38.9902
+39.1547
 </td>
 </tr>
 <tr>
@@ -561,19 +555,19 @@ lambda[1]
 lambda[2]
 </td>
 <td style="text-align:right;">
-25.5318
+25.6918
 </td>
 <td style="text-align:right;">
-28.6873
+28.6464
 </td>
 <td style="text-align:right;">
-30.3652
+30.3324
 </td>
 <td style="text-align:right;">
-32.1225
+32.0912
 </td>
 <td style="text-align:right;">
-35.5587
+35.6505
 </td>
 </tr>
 <tr>
@@ -581,19 +575,19 @@ lambda[2]
 lambda[3]
 </td>
 <td style="text-align:right;">
-24.9367
+25.0395
 </td>
 <td style="text-align:right;">
-27.5302
+27.4815
 </td>
 <td style="text-align:right;">
-28.9135
+28.8635
 </td>
 <td style="text-align:right;">
-30.3248
+30.2923
 </td>
 <td style="text-align:right;">
-33.1395
+33.1345
 </td>
 </tr>
 </tbody>
@@ -608,22 +602,22 @@ package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">coda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/coda/man/gelman.diag.html" class="external-link">gelman.diag</a></span><span class="op">(</span><span class="va">falcon_res</span>, multivariate <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">psrf</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span> <span class="co">#don't want to print out all 40 lambdas</span></span>
 <span><span class="co">#&gt;           Point est. Upper C.I.</span></span>
-<span><span class="co">#&gt; alpha          1.004      1.014</span></span>
-<span><span class="co">#&gt; beta1          1.016      1.056</span></span>
-<span><span class="co">#&gt; beta2          1.003      1.010</span></span>
-<span><span class="co">#&gt; beta3          1.016      1.058</span></span>
-<span><span class="co">#&gt; lambda[1]      1.004      1.015</span></span>
-<span><span class="co">#&gt; lambda[2]      1.003      1.010</span></span>
-<span><span class="co">#&gt; lambda[3]      1.001      1.004</span></span>
-<span><span class="co">#&gt; lambda[4]      1.000      1.001</span></span>
-<span><span class="co">#&gt; lambda[5]      1.000      1.000</span></span>
-<span><span class="co">#&gt; lambda[6]      1.001      1.003</span></span></code></pre></div>
+<span><span class="co">#&gt; alpha          1.004      1.013</span></span>
+<span><span class="co">#&gt; beta1          1.007      1.013</span></span>
+<span><span class="co">#&gt; beta2          1.004      1.016</span></span>
+<span><span class="co">#&gt; beta3          1.005      1.011</span></span>
+<span><span class="co">#&gt; lambda[1]      1.003      1.009</span></span>
+<span><span class="co">#&gt; lambda[2]      1.003      1.011</span></span>
+<span><span class="co">#&gt; lambda[3]      1.003      1.013</span></span>
+<span><span class="co">#&gt; lambda[4]      1.004      1.014</span></span>
+<span><span class="co">#&gt; lambda[5]      1.004      1.015</span></span>
+<span><span class="co">#&gt; lambda[6]      1.004      1.015</span></span></code></pre></div>
 <p>All parameters appear to have converged.</p>
 <p>As usual, let’s check the trace plots to see how they look:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View traceplots for alpha, beta1, beta2, and beta3 (not for lambda)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">falcon_res</span><span class="op">[</span>,<span class="va">params</span><span class="op">[</span><span class="op">-</span><span class="fl">5</span><span class="op">]</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;"></p>
+<span><span class="fu">MCMCvis</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MCMCvis/man/MCMCtrace.html" class="external-link">MCMCtrace</a></span><span class="op">(</span><span class="va">falcon_res</span><span class="op">[</span>,<span class="va">params</span><span class="op">[</span><span class="op">-</span><span class="fl">5</span><span class="op">]</span>,<span class="op">]</span>, Rhat <span class="op">=</span> <span class="cn">T</span>, pdf <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;"><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-2.png" width="576" style="display: block; margin: auto;"></p>
 <p>By monitoring <code>lambda</code> we can also plot the predicted
 counts along with the observed counts. First, we need to calculate the
 posterior means and upper/lower bounds of the 95% credible interval and
@@ -640,8 +634,9 @@ add them to the falcons data frame, then use ggplot to visualize:</p>
 <span>  <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, ymin <span class="op">=</span> <span class="va">q2.5</span>, ymax <span class="op">=</span> <span class="va">q97.5</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"grey90"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_path</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">lambda</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">Pairs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
@@ -716,13 +711,7 @@ then size, unlike what we would type in R:</p>
 <span>                     nburnin <span class="op">=</span> <span class="va">nB</span>,</span>
 <span>                     nchains <span class="op">=</span> <span class="va">nC</span>,</span>
 <span>                     samplesAsCodaMCMC <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>                      <span class="op">)</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span></code></pre></div>
+<span>                      <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'alpha'</span>, <span class="st">'beta1'</span>, <span class="st">'beta2'</span>, <span class="st">'p[1]'</span>, <span class="st">'p[2]'</span>, <span class="st">'p[3]'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">quantiles</span></span></code></pre></div>
 <table class="table">
@@ -751,19 +740,19 @@ then size, unlike what we would type in R:</p>
 alpha
 </td>
 <td style="text-align:right;">
-0.6767
+0.6743
 </td>
 <td style="text-align:right;">
-0.7476
+0.7485
 </td>
 <td style="text-align:right;">
-0.7847
+0.7860
 </td>
 <td style="text-align:right;">
-0.8212
+0.8233
 </td>
 <td style="text-align:right;">
-0.8918
+0.8950
 </td>
 </tr>
 <tr>
@@ -771,19 +760,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
--0.0317
+-0.0278
 </td>
 <td style="text-align:right;">
-0.0285
+0.0292
 </td>
 <td style="text-align:right;">
-0.0588
+0.0584
 </td>
 <td style="text-align:right;">
-0.0890
+0.0886
 </td>
 <td style="text-align:right;">
-0.1487
+0.1444
 </td>
 </tr>
 <tr>
@@ -791,19 +780,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.3854
+-0.3868
 </td>
 <td style="text-align:right;">
--0.3333
+-0.3330
 </td>
 <td style="text-align:right;">
--0.3048
+-0.3059
 </td>
 <td style="text-align:right;">
--0.2772
+-0.2782
 </td>
 <td style="text-align:right;">
--0.2204
+-0.2247
 </td>
 </tr>
 <tr>
@@ -811,19 +800,19 @@ beta2
 p[1]
 </td>
 <td style="text-align:right;">
-0.3869
+0.3903
 </td>
 <td style="text-align:right;">
 0.4349
 </td>
 <td style="text-align:right;">
-0.4593
+0.4595
 </td>
 <td style="text-align:right;">
-0.4852
+0.4843
 </td>
 <td style="text-align:right;">
-0.5344
+0.5307
 </td>
 </tr>
 <tr>
@@ -831,19 +820,19 @@ p[1]
 p[2]
 </td>
 <td style="text-align:right;">
-0.4139
+0.4171
 </td>
 <td style="text-align:right;">
 0.4591
 </td>
 <td style="text-align:right;">
-0.4819
+0.4820
 </td>
 <td style="text-align:right;">
-0.5056
+0.5047
 </td>
 <td style="text-align:right;">
-0.5509
+0.5477
 </td>
 </tr>
 <tr>
@@ -851,27 +840,27 @@ p[2]
 p[3]
 </td>
 <td style="text-align:right;">
-0.4400
+0.4433
 </td>
 <td style="text-align:right;">
-0.4821
+0.4823
 </td>
 <td style="text-align:right;">
 0.5033
 </td>
 <td style="text-align:right;">
-0.5250
+0.5243
 </td>
 <td style="text-align:right;">
-0.5665
+0.5639
 </td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View traceplots for alpha, beta1, and beta2(not for p)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="va">params2</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-20-1.png" width="576" style="display: block; margin: auto;"></p>
+<span><span class="fu">MCMCvis</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MCMCvis/man/MCMCtrace.html" class="external-link">MCMCtrace</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="va">params2</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span>,<span class="op">]</span>, pdf <span class="op">=</span> <span class="cn">F</span>, Rhat <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'p['</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">40</span>, <span class="st">']'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">quantiles</span> </span>
@@ -883,8 +872,9 @@ p[3]
 <span>  <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, ymin <span class="op">=</span> <span class="va">q2.5_p</span>, ymax <span class="op">=</span> <span class="va">q97.5_p</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"grey90"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_path</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">p</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">R.Pairs</span><span class="op">/</span><span class="va">Pairs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="homework-questions">Homework Questions<a class="anchor" aria-label="anchor" href="#homework-questions"></a>
@@ -907,11 +897,12 @@ working with:</p>
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">falcons</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">Eyasses</span><span class="op">/</span><span class="va">R.Pairs</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">geom_line</span><span class="op">(</span>lwd <span class="op">=</span> <span class="fl">1</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu">geom_smooth</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-24-1.png" width="576" style="display: block; margin: auto;"></p>
 <ol start="2" style="list-style-type: decimal">
-<li>In our second analysis, we used a binomial GLM to describe the
-proportion of successful peregrine pairs per year in the French Jura
+<li>In our second analysis in lab, we used a binomial GLM to describe
+the proportion of successful peregrine pairs per year in the French Jura
 mountains. To see the connections between three important types of GLMs,
 first use a Poisson GLM to model the number of successful pairs (thus
 disregarding the fact that the binomial total varies by year), and

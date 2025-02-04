@@ -126,13 +126,19 @@ Remember the equation for a curved line with a single peak (or bottom):
 
 $$\Large y = a + b \times x + c \times x^2$$
 
+
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
 
 Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ where this maximum (or minimum) occurs and $c$ determines whether the peak is a maximum ($c<0$) or a minimum ($c>0$).
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
-$$\Large y = a + b \times x + c \times x^2 + d \times x^3$$
+
+
+$$
+\Large y = a + b \times x + c \times x^2 + d \times x^3
+$$
+
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
 
@@ -243,13 +249,8 @@ falcon_res <- nimbleMCMC(code = falcon_mod,
                      nchains = nC,
                      samplesAsCodaMCMC = TRUE
                       )
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
 ```
+
 
 However, sometimes (when you get more advanced), you'll want to be able to customize your Nimble runs a little bit more. It's also much easier to error check your initial values on models that take a very long time to run if you run it step by step. Here's what that would look like with one chain:
 
@@ -288,59 +289,59 @@ summary(falcon_res[,c('alpha', 'beta1', 'beta2', 'beta3', 'lambda[1]', 'lambda[2
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 4.1747 </td>
-   <td style="text-align:right;"> 4.2115 </td>
-   <td style="text-align:right;"> 4.2323 </td>
-   <td style="text-align:right;"> 4.2521 </td>
-   <td style="text-align:right;"> 4.2887 </td>
+   <td style="text-align:right;"> 4.1685 </td>
+   <td style="text-align:right;"> 4.2085 </td>
+   <td style="text-align:right;"> 4.2289 </td>
+   <td style="text-align:right;"> 4.2499 </td>
+   <td style="text-align:right;"> 4.2879 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> 1.0246 </td>
-   <td style="text-align:right;"> 1.0811 </td>
-   <td style="text-align:right;"> 1.1145 </td>
-   <td style="text-align:right;"> 1.1477 </td>
-   <td style="text-align:right;"> 1.2112 </td>
+   <td style="text-align:right;"> 1.0288 </td>
+   <td style="text-align:right;"> 1.0880 </td>
+   <td style="text-align:right;"> 1.1184 </td>
+   <td style="text-align:right;"> 1.1499 </td>
+   <td style="text-align:right;"> 1.2151 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
-   <td style="text-align:right;"> -0.0399 </td>
-   <td style="text-align:right;"> -0.0088 </td>
-   <td style="text-align:right;"> 0.0072 </td>
-   <td style="text-align:right;"> 0.0227 </td>
-   <td style="text-align:right;"> 0.0512 </td>
+   <td style="text-align:right;"> -0.0388 </td>
+   <td style="text-align:right;"> -0.0077 </td>
+   <td style="text-align:right;"> 0.0086 </td>
+   <td style="text-align:right;"> 0.0255 </td>
+   <td style="text-align:right;"> 0.0560 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta3 </td>
-   <td style="text-align:right;"> -0.2829 </td>
-   <td style="text-align:right;"> -0.2496 </td>
-   <td style="text-align:right;"> -0.2323 </td>
-   <td style="text-align:right;"> -0.2156 </td>
-   <td style="text-align:right;"> -0.1865 </td>
+   <td style="text-align:right;"> -0.2844 </td>
+   <td style="text-align:right;"> -0.2515 </td>
+   <td style="text-align:right;"> -0.2346 </td>
+   <td style="text-align:right;"> -0.2191 </td>
+   <td style="text-align:right;"> -0.1886 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[1] </td>
-   <td style="text-align:right;"> 26.4988 </td>
-   <td style="text-align:right;"> 30.1904 </td>
-   <td style="text-align:right;"> 32.2370 </td>
-   <td style="text-align:right;"> 34.4262 </td>
-   <td style="text-align:right;"> 38.8879 </td>
+   <td style="text-align:right;"> 26.6575 </td>
+   <td style="text-align:right;"> 30.3234 </td>
+   <td style="text-align:right;"> 32.3956 </td>
+   <td style="text-align:right;"> 34.6393 </td>
+   <td style="text-align:right;"> 39.1547 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[2] </td>
-   <td style="text-align:right;"> 25.5494 </td>
-   <td style="text-align:right;"> 28.5784 </td>
-   <td style="text-align:right;"> 30.2273 </td>
-   <td style="text-align:right;"> 31.9583 </td>
-   <td style="text-align:right;"> 35.4437 </td>
+   <td style="text-align:right;"> 25.6918 </td>
+   <td style="text-align:right;"> 28.6464 </td>
+   <td style="text-align:right;"> 30.3324 </td>
+   <td style="text-align:right;"> 32.0912 </td>
+   <td style="text-align:right;"> 35.6505 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[3] </td>
-   <td style="text-align:right;"> 24.9038 </td>
-   <td style="text-align:right;"> 27.4418 </td>
-   <td style="text-align:right;"> 28.8076 </td>
-   <td style="text-align:right;"> 30.2113 </td>
-   <td style="text-align:right;"> 32.9684 </td>
+   <td style="text-align:right;"> 25.0395 </td>
+   <td style="text-align:right;"> 27.4815 </td>
+   <td style="text-align:right;"> 28.8635 </td>
+   <td style="text-align:right;"> 30.2923 </td>
+   <td style="text-align:right;"> 33.1345 </td>
   </tr>
 </tbody>
 </table>
@@ -356,16 +357,16 @@ This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. 
 library(coda)
 gelman.diag(falcon_res, multivariate = F)$psrf[1:10,] #don't want to print out all 40 lambdas
 #>           Point est. Upper C.I.
-#> alpha          1.004      1.015
-#> beta1          1.027      1.093
-#> beta2          1.003      1.011
-#> beta3          1.030      1.105
-#> lambda[1]      1.007      1.025
-#> lambda[2]      1.005      1.017
-#> lambda[3]      1.002      1.009
-#> lambda[4]      1.001      1.003
-#> lambda[5]      1.000      1.001
-#> lambda[6]      1.001      1.005
+#> alpha          1.004      1.013
+#> beta1          1.007      1.013
+#> beta2          1.004      1.016
+#> beta3          1.005      1.011
+#> lambda[1]      1.003      1.009
+#> lambda[2]      1.003      1.011
+#> lambda[3]      1.003      1.013
+#> lambda[4]      1.004      1.014
+#> lambda[5]      1.004      1.015
+#> lambda[6]      1.004      1.015
 ```
 
 All parameters appear to have converged.
@@ -375,10 +376,10 @@ As usual, let's check the trace plots to see how they look:
 
 ``` r
 # View traceplots for alpha, beta1, beta2, and beta3 (not for lambda)
-plot(falcon_res[,params[-5],])
+MCMCvis::MCMCtrace(falcon_res[,params[-5],], Rhat = T, pdf = F)
 ```
 
-<img src="Lab4_glms_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" />
+<img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-2.png" width="576" style="display: block; margin: auto;" />
 
 By monitoring `lambda` we can also plot the predicted counts along with the observed counts. First, we need to calculate the posterior means and upper/lower bounds of the 95% credible interval and add them to the falcons data frame, then use ggplot to visualize:
 
@@ -395,10 +396,11 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5, ymax = q97.5), fill = "grey90") +
   geom_path(aes(x = Year, y = lambda), color = "red") +
   geom_point(aes(x = Year, y = Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_bw()
 ```
 
-<img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" />
+<img src="Lab4_glms_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" />
 
 ## Analysis 2: Nest success model
 
@@ -467,13 +469,9 @@ pairs_res <- nimbleMCMC(code = pairs_mod,
                      nchains = nC,
                      samplesAsCodaMCMC = TRUE
                       )
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
-#> |-------------|-------------|-------------|-------------|
-#> |-------------------------------------------------------|
 ```
+
+
 
 
 ``` r
@@ -494,51 +492,51 @@ summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quanti
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 0.6757 </td>
-   <td style="text-align:right;"> 0.7467 </td>
-   <td style="text-align:right;"> 0.7833 </td>
-   <td style="text-align:right;"> 0.8217 </td>
-   <td style="text-align:right;"> 0.8921 </td>
+   <td style="text-align:right;"> 0.6743 </td>
+   <td style="text-align:right;"> 0.7485 </td>
+   <td style="text-align:right;"> 0.7860 </td>
+   <td style="text-align:right;"> 0.8233 </td>
+   <td style="text-align:right;"> 0.8950 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> -0.0314 </td>
-   <td style="text-align:right;"> 0.0294 </td>
-   <td style="text-align:right;"> 0.0598 </td>
-   <td style="text-align:right;"> 0.0899 </td>
-   <td style="text-align:right;"> 0.1456 </td>
+   <td style="text-align:right;"> -0.0278 </td>
+   <td style="text-align:right;"> 0.0292 </td>
+   <td style="text-align:right;"> 0.0584 </td>
+   <td style="text-align:right;"> 0.0886 </td>
+   <td style="text-align:right;"> 0.1444 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
-   <td style="text-align:right;"> -0.3870 </td>
+   <td style="text-align:right;"> -0.3868 </td>
    <td style="text-align:right;"> -0.3330 </td>
-   <td style="text-align:right;"> -0.3047 </td>
-   <td style="text-align:right;"> -0.2772 </td>
-   <td style="text-align:right;"> -0.2256 </td>
+   <td style="text-align:right;"> -0.3059 </td>
+   <td style="text-align:right;"> -0.2782 </td>
+   <td style="text-align:right;"> -0.2247 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[1] </td>
-   <td style="text-align:right;"> 0.3880 </td>
-   <td style="text-align:right;"> 0.4344 </td>
-   <td style="text-align:right;"> 0.4593 </td>
-   <td style="text-align:right;"> 0.4841 </td>
-   <td style="text-align:right;"> 0.5316 </td>
+   <td style="text-align:right;"> 0.3903 </td>
+   <td style="text-align:right;"> 0.4349 </td>
+   <td style="text-align:right;"> 0.4595 </td>
+   <td style="text-align:right;"> 0.4843 </td>
+   <td style="text-align:right;"> 0.5307 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[2] </td>
-   <td style="text-align:right;"> 0.4155 </td>
-   <td style="text-align:right;"> 0.4586 </td>
-   <td style="text-align:right;"> 0.4816 </td>
+   <td style="text-align:right;"> 0.4171 </td>
+   <td style="text-align:right;"> 0.4591 </td>
+   <td style="text-align:right;"> 0.4820 </td>
    <td style="text-align:right;"> 0.5047 </td>
-   <td style="text-align:right;"> 0.5484 </td>
+   <td style="text-align:right;"> 0.5477 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[3] </td>
-   <td style="text-align:right;"> 0.4415 </td>
-   <td style="text-align:right;"> 0.4816 </td>
-   <td style="text-align:right;"> 0.5030 </td>
-   <td style="text-align:right;"> 0.5241 </td>
-   <td style="text-align:right;"> 0.5645 </td>
+   <td style="text-align:right;"> 0.4433 </td>
+   <td style="text-align:right;"> 0.4823 </td>
+   <td style="text-align:right;"> 0.5033 </td>
+   <td style="text-align:right;"> 0.5243 </td>
+   <td style="text-align:right;"> 0.5639 </td>
   </tr>
 </tbody>
 </table>
@@ -548,10 +546,10 @@ summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quanti
 
 ``` r
 # View traceplots for alpha, beta1, and beta2(not for p)
-plot(pairs_res[,params2[-4],])
+MCMCvis::MCMCtrace(pairs_res[,params2[-4],], pdf = F, Rhat = T)
 ```
 
-<img src="Lab4_glms_files/figure-html/unnamed-chunk-20-1.png" width="576" style="display: block; margin: auto;" />
+<img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" />
 
 
 ``` r
@@ -565,10 +563,11 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5_p, ymax = q97.5_p), fill = "grey90") +
   geom_path(aes(x = Year, y = p), color = "red") +
   geom_point(aes(x = Year, y = R.Pairs/Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_classic()
 ```
 
-<img src="Lab4_glms_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;" />
+<img src="Lab4_glms_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;" />
 
 # Homework Questions
 
@@ -587,12 +586,13 @@ It may help to plot the data first to see what type of data you are working with
 ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
   geom_line(lwd = 1, lty = 2)+
   geom_point()+
-  geom_smooth()
+  geom_smooth()+
+  theme_bw()
 ```
 
-<img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" />
+<img src="Lab4_glms_files/figure-html/unnamed-chunk-24-1.png" width="576" style="display: block; margin: auto;" />
 
-2.  In our second analysis, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
+2.  In our second analysis in lab, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
 
 Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
 

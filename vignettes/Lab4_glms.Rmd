@@ -92,6 +92,7 @@ Remember the equation for a curved line with a single peak (or bottom):
 
 $$\Large y = a + b \times x + c \times x^2$$
 
+
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 25
 b <- 5
@@ -111,7 +112,12 @@ Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ wher
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
-$$\Large y = a + b \times x + c \times x^2 + d \times x^3$$
+
+
+$$
+\Large y = a + b \times x + c \times x^2 + d \times x^3
+$$
+
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 4
@@ -220,7 +226,7 @@ nT <- 1 #thin
 
 Now we're ready to run the model. The easiest way to run a Nimble model is to run it in one command:
 
-```{r}
+```{r, echo =T, eval = F}
 falcon_res <- nimbleMCMC(code = falcon_mod,
                      data = nimdat,
                      constants = nimconsts,
@@ -234,6 +240,9 @@ falcon_res <- nimbleMCMC(code = falcon_mod,
                       )
 ```
 
+```{r, echo= F, eval = T}
+falcon_res <- readRDS('falcon_mod.rds')
+```
 However, sometimes (when you get more advanced), you'll want to be able to customize your Nimble runs a little bit more. It's also much easier to error check your initial values on models that take a very long time to run if you run it step by step. Here's what that would look like with one chain:
 
 ```{r, eval = F, echo = T}
@@ -274,7 +283,7 @@ As usual, let's check the trace plots to see how they look:
 
 ```{r, fig.width=6, fig.height=6}
 # View traceplots for alpha, beta1, beta2, and beta3 (not for lambda)
-plot(falcon_res[,params[-5],])
+MCMCvis::MCMCtrace(falcon_res[,params[-5],], Rhat = T, pdf = F)
 ```
 
 By monitoring `lambda` we can also plot the predicted counts along with the observed counts. First, we need to calculate the posterior means and upper/lower bounds of the 95% credible interval and add them to the falcons data frame, then use ggplot to visualize:
@@ -291,7 +300,8 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5, ymax = q97.5), fill = "grey90") +
   geom_path(aes(x = Year, y = lambda), color = "red") +
   geom_point(aes(x = Year, y = Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_bw()
 ```
 
 ## Analysis 2: Nest success model
@@ -332,7 +342,7 @@ pairs_mod <- nimbleCode({
 
 As before, we prepare the data and run the model:
 
-```{r}
+```{r, eval = F, echo = T}
 #using standardized year from above
 nimdat2 <- list(C = falcons$R.Pairs)
 nimconsts2 <- list(N = falcons$Pairs, year = year, nyears = nrow(falcons))
@@ -361,6 +371,12 @@ pairs_res <- nimbleMCMC(code = pairs_mod,
                       )
 ```
 
+```{r, eval = T, echo = F}
+pairs_res <- readRDS('falcon_mod2.rds')
+
+params2 <- c("alpha", "beta1", "beta2", "p")
+```
+
 ```{r eval = FALSE}
 summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quantiles
 ```
@@ -371,7 +387,7 @@ knitr::kable(summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[
 
 ```{r fig.width=6, fig.height=6}
 # View traceplots for alpha, beta1, and beta2(not for p)
-plot(pairs_res[,params2[-4],])
+MCMCvis::MCMCtrace(pairs_res[,params2[-4],], pdf = F, Rhat = T)
 ```
 
 ```{r fig.width=6, fig.height=6}
@@ -385,7 +401,8 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5_p, ymax = q97.5_p), fill = "grey90") +
   geom_path(aes(x = Year, y = p), color = "red") +
   geom_point(aes(x = Year, y = R.Pairs/Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_classic()
 ```
 
 # Homework Questions
@@ -404,10 +421,11 @@ It may help to plot the data first to see what type of data you are working with
 ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
   geom_line(lwd = 1, lty = 2)+
   geom_point()+
-  geom_smooth()
+  geom_smooth()+
+  theme_bw()
 ```
 
-2.  In our second analysis, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
+2.  In our second analysis in lab, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
 
 Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
 
