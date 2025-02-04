@@ -126,19 +126,15 @@ Remember the equation for a curved line with a single peak (or bottom):
 
 $$\Large y = a + b \times x + c \times x^2$$
 
-
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
 
 Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ where this maximum (or minimum) occurs and $c$ determines whether the peak is a maximum ($c<0$) or a minimum ($c>0$).
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
+$\Large y = a + b \times x + c \times x^2 + d \times x^3$
 
-
-$$
-\Large y = a + b \times x + c \times x^2 + d \times x^3
-$$
-
+For instance:
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
 
@@ -250,6 +246,7 @@ falcon_res <- nimbleMCMC(code = falcon_mod,
                      samplesAsCodaMCMC = TRUE
                       )
 ```
+
 
 
 However, sometimes (when you get more advanced), you'll want to be able to customize your Nimble runs a little bit more. It's also much easier to error check your initial values on models that take a very long time to run if you run it step by step. Here's what that would look like with one chain:
