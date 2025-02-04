@@ -8,6 +8,8 @@ vignette: >
   %\VignetteIndexEntry{Lab4_glms}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+template:
+  math-rendering: katex
 ---
 
 

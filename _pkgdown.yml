@@ -3,6 +3,7 @@ url: http://rushinglab.github.io/WILD8370
 template:
   bootstrap: 5
   bootswatch: spacelab
+  math-rendering: katex
 
 authors:
 footer:

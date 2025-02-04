@@ -6,11 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Lab1: Mathematical Notation • WILD8370</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab1: Mathematical Notation">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab1: Mathematical Notation">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -118,74 +119,44 @@ code.</p>
 <div class="section level2">
 <h2 id="some-useful-notation">Some Useful Notation<a class="anchor" aria-label="anchor" href="#some-useful-notation"></a>
 </h2>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">E(x)</annotation></semantics></math></p>
-<p>The expected value of something. For instance, if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-is the number of frogs in a pond,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">E(x)</annotation></semantics></math>
-is the expected number of frogs in that pond.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math></p>
+<p><span class="math inline">E(x)</span></p>
+<p>The expected value of something. For instance, if <span class="math inline">x</span> is the number of frogs in a pond, <span class="math inline">E(x)</span> is the expected number of frogs in that
+pond.</p>
+<p><span class="math inline">\phi</span></p>
 <p>Phi, usually used to indicate survival probability (but can also be
 used willy-nilly)</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>μ</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Norm( \mu, \sigma^2)</annotation></semantics></math></p>
-<p>The normal distribution with a mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
-and a standard deviation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mi>o</mi><mi>i</mi><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Pois(\lambda)</annotation></semantics></math></p>
-<p>The poisson distribution with a mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>.
-The poisson only accepts and produces zero or positive values</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mi>i</mi><mi>n</mi><mi>o</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>,</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Binom(N, p)</annotation></semantics></math></p>
-<p>The binomial distribution with size
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
-and probability of success
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>w</mi></msubsup><msub><mi>K</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\sum^w_{j=1} K_j</annotation></semantics></math></p>
-<p>The sum of value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mi>j</mi></msub><annotation encoding="application/x-tex">K_j</annotation></semantics></math>
-for values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
-from 1 to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>.
-For instance, if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mi>j</mi></msub><annotation encoding="application/x-tex">K_j</annotation></semantics></math>
-represents the number of personalized mugs in Dr. Rushing’s office in
-year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
-, the sum of all of them from year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">j = 3</annotation></semantics></math>
-to year 10 would be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>3</mn></mrow><mn>10</mn></msubsup><msub><mi>K</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\sum^{10}_{j=3} K_j</annotation></semantics></math></p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><mi>ϵ</mi><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta_0 + \epsilon \sim Norm(0, \sigma^2)</annotation></semantics></math></p>
+<p><span class="math inline">Norm( \mu, \sigma^2)</span></p>
+<p>The normal distribution with a mean of <span class="math inline">\mu</span> and a standard deviation of <span class="math inline">\sigma</span>.</p>
+<p><span class="math inline">Pois(\lambda)</span></p>
+<p>The poisson distribution with a mean of <span class="math inline">\lambda</span>. The poisson only accepts and
+produces zero or positive values</p>
+<p><span class="math inline">Binom(N, p)</span></p>
+<p>The binomial distribution with size <span class="math inline">N</span> and probability of success <span class="math inline">p</span>.</p>
+<p><span class="math inline">\sum^w_{j=1} K_j</span></p>
+<p>The sum of value <span class="math inline">K_j</span> for values of
+<span class="math inline">j</span> from 1 to <span class="math inline">w</span>. For instance, if <span class="math inline">K_j</span> represents the number of personalized
+mugs in Dr. Rushing’s office in year <span class="math inline">j</span>
+, the sum of all of them from year <span class="math inline">j =
+3</span> to year 10 would be <span class="math inline">\sum^{10}_{j=3}
+K_j</span></p>
+<p><span class="math inline">\beta_0 + \epsilon \sim Norm(0,
+\sigma^2)</span></p>
 <p>A shorthand way of saying that the residuals from an equation are
 normally distributed. This is the assumption for most linear models and
 it can be quicker to write it out this way rather than as a line for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">E(x)</annotation></semantics></math>
-and then a line for the residuals.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>q</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\beta_0 + \beta_1[q]</annotation></semantics></math></p>
-<p>The value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\beta_1</annotation></semantics></math>
-depends on the value of some integer
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>.
-If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>q</mi><annotation encoding="application/x-tex">q</annotation></semantics></math>
-can take on 3 values (1, 2, 3), then we know there are three possible
-values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\beta_1</annotation></semantics></math>.
-This is most commonly used for categorical variables.</p>
-<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">logit(x) = \beta_0</annotation></semantics></math></p>
-<p>This tells us
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-is on the probability scale (between 0 and 1) but
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
-is on the logit scale (all real numbers). In R, if you knew
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
-and wanted to get
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
-you would type: plogis(
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
-)</p>
+<span class="math inline">E(x)</span> and then a line for the
+residuals.</p>
+<p><span class="math inline">\beta_0 + \beta_1[q]</span></p>
+<p>The value of <span class="math inline">\beta_1</span> depends on the
+value of some integer <span class="math inline">q</span>. If <span class="math inline">q</span> can take on 3 values (1, 2, 3), then we
+know there are three possible values of <span class="math inline">\beta_1</span>. This is most commonly used for
+categorical variables.</p>
+<p><span class="math inline">logit(x) = \beta_0</span></p>
+<p>This tells us <span class="math inline">x</span> is on the
+probability scale (between 0 and 1) but <span class="math inline">\beta_0</span> is on the logit scale (all real
+numbers). In R, if you knew <span class="math inline">\beta_0</span> and
+wanted to get <span class="math inline">x</span>, you would type:
+plogis( <span class="math inline">\beta_0</span> )</p>
 </div>
 <div class="section level2">
 <h2 id="math-to-english">Math to English<a class="anchor" aria-label="anchor" href="#math-to-english"></a>
@@ -239,24 +210,24 @@ think the system works, even if we can’t observe it directly.</p>
 </table>
 <p>Let’s say I come up with the following equation. What does this mean
 in English?</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2 * sex_i </annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_{it} \sim Normal(E(weight_{it}), \sigma^2)</annotation></semantics></math></p>
-<p>Answer: The expected weight of an individual bear at some time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-is a function of the percent forest in the bear’s county and the sex of
-the bear. The observed bear weight is a normal distribution centered
-around with the expected weight with a standard deviation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
-<p>What if the equation were the following?</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>c</mi><mi>o</mi><mi>v</mi><mi>e</mi><msub><mi>r</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i </annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_{it} \sim Normal(E(weight_{it}), \sigma^2)</annotation></semantics></math>
-Answer: The expected weight of an individual bear at some time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-is a function of the categorical landcover, the percent forest in the
+<p><span class="math display">E(weight_{it}) = \beta_0 +
+\beta_1*percentforest_{it} + \beta_2 * sex_i </span></p>
+<p><span class="math display">y_{it} \sim Normal(E(weight_{it}),
+\sigma^2)</span></p>
+<p>Answer: The expected weight of an individual bear at some time <span class="math inline">t</span> is a function of the percent forest in the
 bear’s county and the sex of the bear. The observed bear weight is a
 normal distribution centered around with the expected weight with a
-standard deviation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
+standard deviation of <span class="math inline">\sigma</span>.</p>
+<p>What if the equation were the following?</p>
+<p><span class="math display">E(weight_{it}) = \beta_0[landcover_{it}] +
+\beta_1*percentforest_{it} + \beta_2 * sex_i </span></p>
+<p><span class="math display">y_{it} \sim Normal(E(weight_{it}),
+\sigma^2)</span> Answer: The expected weight of an individual bear at
+some time <span class="math inline">t</span> is a function of the
+categorical landcover, the percent forest in the bear’s county and the
+sex of the bear. The observed bear weight is a normal distribution
+centered around with the expected weight with a standard deviation of
+<span class="math inline">\sigma</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="example-turtles">Example: Turtles<a class="anchor" aria-label="anchor" href="#example-turtles"></a>
@@ -265,16 +236,15 @@ standard deviation of
 Northeastern United States. All turtles were sexed before release. They
 were released into the wild in 3 different age groupings (juvenile,
 subadult, adult). I come up with the following potential model to
-explain the probability that each turtle
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-survived the 6 week study:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>ϕ</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>r</mi><mi>e</mi><mi>l</mi><mi>e</mi><mi>a</mi><mi>s</mi><mi>e</mi><mi>a</mi><mi>g</mi><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>ϕ</mi><mn>1</mn></msub><mo>*</mo><mi>b</mi><mi>i</mi><mi>r</mi><mi>t</mi><mi>h</mi><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">logit(\phi_{i}) = \phi_0[releaseage_i] + \phi_1*birthweight_i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∼</mo><mi>B</mi><mi>e</mi><mi>r</mi><mi>n</mi><mi>o</mi><mi>u</mi><mi>l</mi><mi>l</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">y_i \sim Bernoulli(\phi_i)</annotation></semantics></math></p>
+explain the probability that each turtle <span class="math inline">i</span> survived the 6 week study:</p>
+<p><span class="math display">logit(\phi_{i}) = \phi_0[releaseage_i] +
+\phi_1*birthweight_i</span> <span class="math display">y_i \sim
+Bernoulli(\phi_i)</span></p>
 <p>What does this mean in English?</p>
 <p>Answer: The probability that a turtle survived the study is a
 function of the age group at release and the turtle’s birthweight.</p>
-<p>Note that here
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-is going to be binary (0 = didn’t make it, 1 = survived).</p>
+<p>Note that here <span class="math inline">y_i</span> is going to be
+binary (0 = didn’t make it, 1 = survived).</p>
 </div>
 </div>
 <div class="section level2">
@@ -285,25 +255,21 @@ is going to be binary (0 = didn’t make it, 1 = survived).</p>
 information:</li>
 </ol>
 <blockquote>
-<p>The expected weight of an individual bear at some time
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-is a function of the categorical landcover, the sex of the bear, and the
-time since fire. The relationship for time since fire is different for
-males and females. The observed bear weight is a normal distribution
-centered around with the expected weight with a standard deviation of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
+<p>The expected weight of an individual bear at some time <span class="math inline">t</span> is a function of the categorical landcover,
+the sex of the bear, and the time since fire. The relationship for time
+since fire is different for males and females. The observed bear weight
+is a normal distribution centered around with the expected weight with a
+standard deviation of <span class="math inline">\sigma</span>.</p>
 </blockquote>
 <p>Note: There are multiple ways to write this, so just choose which one
 makes sense to you</p>
 <ol start="2" style="list-style-type: decimal">
 <li>Looking at the following bear equation, how would you interpret (in
-english) if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\beta_1</annotation></semantics></math>
-were negative? How about if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\beta_2</annotation></semantics></math>
-were negative?</li>
+english) if <span class="math inline">\beta_1</span> were negative? How
+about if <span class="math inline">\beta_2</span> were negative?</li>
 </ol>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>c</mi><mi>o</mi><mi>v</mi><mi>e</mi><msub><mi>r</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>*</mo><mi>p</mi><mi>e</mi><mi>r</mi><mi>c</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>t</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>s</mi><mi>e</mi><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i </annotation></semantics></math></p>
+<p><span class="math display">E(weight_{it}) = \beta_0[landcover_{it}] +
+\beta_1*percentforest_{it} + \beta_2 * sex_i </span></p>
 <ol start="3" style="list-style-type: decimal">
 <li><p>Looking at my data again (Example 2 in Lab), I notice that we
 also recorded each turtle’s sex before release. Sex was recorded as
@@ -326,7 +292,7 @@ questions/confusion about the lecture or lab do you still have?</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>

@@ -6,11 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Lab6: Missing Data • WILD8370</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab6: Missing Data">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab6: Missing Data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -149,22 +150,19 @@ choice for the process model is a poisson with a log link.</p>
 (<code>area</code>) and the landuse type (<code>landuse</code>) and
 detection probability is different between different sites
 (<code>site1</code>).</p>
-<p>Let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-be a site (<code>site1</code>) in the study area that was surveyed in
-year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.Then:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>u</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><mi>a</mi><mi>r</mi><mi>e</mi><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex"> log(\lambda_{i,t}) = \beta_0 + \beta_1[landuse_i] + \beta_2*area_{i} </annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>∼</mo><mi>P</mi><mi>o</mi><mi>i</mi><mi>s</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> N_{i,t} \sim Pois(\lambda_{i,t}) </annotation></semantics></math>
-Further, let
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
-represent the number of hares observed during survey
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
-in a given year:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>∼</mo><mi>B</mi><mi>i</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> y_{i,t,k} \sim Binomial(N_{i,t}, p_{i}) </annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><mi>l</mi><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>α</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>s</mi><mi>i</mi><mi>t</mi><mi>e</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mrow><mo stretchy="true" form="prefix">[</mo><mi>s</mi><mi>i</mi><mi>t</mi><mi>e</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> p_i = ln(\frac{\alpha[site]}{1-\alpha[site]})</annotation></semantics></math></p>
-<p>(Remember that writing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>−</mo><mi>x</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">ln(\frac{x}{1-x})</annotation></semantics></math>
-is the same as logit(f(x)). )</p>
+<p>Let <span class="math inline">i</span> be a site (<code>site1</code>)
+in the study area that was surveyed in year <span class="math inline">t</span>.Then:</p>
+<p><span class="math display"> log(\lambda_{i,t}) = \beta_0 +
+\beta_1[landuse_i] + \beta_2*area_{i} </span> <span class="math display"> N_{i,t} \sim Pois(\lambda_{i,t}) </span> Further,
+let <span class="math inline">y</span> represent the number of hares
+observed during survey <span class="math inline">k</span> in a given
+year:</p>
+<p><span class="math display"> y_{i,t,k} \sim Binomial(N_{i,t}, p_{i})
+</span></p>
+<p><span class="math display"> p_i =
+ln(\frac{\alpha[site]}{1-\alpha[site]})</span></p>
+<p>(Remember that writing <span class="math inline">ln(\frac{x}{1-x})</span> is the same as logit(f(x)).
+)</p>
 </div>
 <div class="section level2">
 <h2 id="building-the-nimble-model">Building the Nimble model<a class="anchor" aria-label="anchor" href="#building-the-nimble-model"></a>
@@ -658,7 +656,7 @@ questions/confusion about the lecture or lab do you still have?</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>

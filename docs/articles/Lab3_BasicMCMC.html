@@ -6,11 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Lab 3: Basic MCMC • WILD8370</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab 3: Basic MCMC">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Lab 3: Basic MCMC">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -111,26 +112,14 @@ linear regression model</p></li>
 </h2>
 <p>The basic steps of the Metropolis sampler are:</p>
 <ol start="0" style="list-style-type: decimal">
-<li><p>Choose an initial value for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
-(call it
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mn>1</mn></msup><annotation encoding="application/x-tex">\theta^1</annotation></semantics></math>)</p></li>
-<li><p>Propose a new value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\theta^*</annotation></semantics></math>
+<li><p>Choose an initial value for <span class="math inline">\theta</span> (call it <span class="math inline">\theta^1</span>)</p></li>
+<li><p>Propose a new value <span class="math inline">\theta^*</span>
 from a proposal distribution</p></li>
-<li><p>Compute the probability of accepting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\theta^*</annotation></semantics></math>
-using the joint distributions evaluated at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\theta^*</annotation></semantics></math>
-and the previous value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup><annotation encoding="application/x-tex">\theta^{k-1}</annotation></semantics></math></p></li>
-<li><p>Accept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>*</mo></mrow><annotation encoding="application/x-tex">\theta*</annotation></semantics></math>
-(i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mi>k</mi></msup><mo>=</mo><msup><mi>θ</mi><mo>*</mo></msup></mrow><annotation encoding="application/x-tex">\theta^{k} = \theta^*</annotation></semantics></math>)
-with the probability estimated in step 2, otherwise retain the previous
-value (i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>θ</mi><mi>k</mi></msup><mo>=</mo><msup><mi>θ</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\theta^{k} = \theta^{k-1}</annotation></semantics></math></p></li>
+<li><p>Compute the probability of accepting <span class="math inline">\theta^*</span> using the joint distributions
+evaluated at <span class="math inline">\theta^*</span> and the previous
+value <span class="math inline">\theta^{k-1}</span></p></li>
+<li><p>Accept <span class="math inline">\theta*</span> (i.e., <span class="math inline">\theta^{k} = \theta^*</span>) with the probability
+estimated in step 2, otherwise retain the previous value (i.e., <span class="math inline">\theta^{k} = \theta^{k-1}</span></p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -159,8 +148,7 @@ of 0.5.</p>
 density function of a binomial distribution to tell us if we were close
 to the correct value. Here’s how that might look:</p>
 <p>We know that the equation for a binomial distribution with size 20
-is:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mn>20</mn><mi>!</mi></mrow><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>20</mn><mo>−</mo><mi>X</mi><mi>!</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>X</mi><mi>!</mi></mrow></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>p</mi><mi>X</mi></msup><mo stretchy="true" form="postfix">)</mo></mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mn>20</mn><mo>−</mo><mi>X</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\frac{20!}{(20-X!)X!}(p^X)(1-p)^{20-X}</annotation></semantics></math></p>
+is: <span class="math inline">\frac{20!}{(20-X!)X!}(p^X)(1-p)^{20-X}</span></p>
 <p>So how do we go about finding p? Well, to start, what’s the
 probability density of 4 successes if p = .1?</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -211,57 +199,37 @@ methods much faster.</p>
 </h2>
 <p>When we generated the seed count data, we did so assuming a linear
 model that linked pollination visits to seed counts:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>*</mo><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">y_i = \alpha + \beta * x_i + \epsilon_i</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ϵ</mi><mi>i</mi></msub><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\epsilon_i \sim Normal(0, \sigma^2)</annotation></semantics></math></p>
+<p><span class="math display">y_i = \alpha + \beta * x_i +
+\epsilon_i</span> <span class="math display">\epsilon_i \sim Normal(0,
+\sigma^2)</span></p>
 <p>This model includes 3 random variables that we want to estimate
-posterior distributions for:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>
-(remember that the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>i</mi></msub><annotation encoding="application/x-tex">x_i</annotation></semantics></math>
+posterior distributions for: <span class="math inline">\alpha</span>,
+<span class="math inline">\beta</span>, and <span class="math inline">\sigma^2</span> (remember that the <span class="math inline">y_i</span> and <span class="math inline">x_i</span>
 are <em>observed</em> and therefore treated as <em>fixed</em> and
 <em>known</em> rather than random variables governed by probability
 distributions). So:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false" form="prefix">|</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>∝</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>α</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>β</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">[\alpha, \beta, \sigma^2|y_i] \propto [y_i|\alpha, \beta, \sigma^2][\alpha][\beta][\sigma^2] \tag{1}</annotation></semantics></math></p>
+<p><span class="math display">[\alpha, \beta, \sigma^2|y_i] \propto
+[y_i|\alpha, \beta, \sigma^2][\alpha][\beta][\sigma^2]
+\tag{1}</span></p>
 <p>Sticking with the data generating model, we can define the likelihood
-of our model using a Normal distribution. For given values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>,
-we estimate the likelihood as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>×</mo><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[y_i|\alpha, \beta, \sigma] = \prod_{i=1}^N Normal(y_i|\alpha + \beta \times x_i, \sigma^2)</annotation></semantics></math></p>
-<p>Because
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>
-are random variables, we must define prior distributions for them.
-Because
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
-can be positive or negative real numbers (we’ll ignore for now that we
-know the sign of each in our data generating model), we can use normal
-priors:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>α</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>α</mi><mo stretchy="false" form="prefix">|</mo><mn>0</mn><mo>,</mo><mn>50</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[\alpha] = Normal(\alpha|0, 50)</annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>β</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>β</mi><mo stretchy="false" form="prefix">|</mo><mn>0</mn><mo>,</mo><mn>50</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[\beta] = Normal(\beta|0, 50)</annotation></semantics></math></p>
+of our model using a Normal distribution. For given values of <span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, and <span class="math inline">\sigma^2</span>, we estimate the likelihood as:</p>
+<p><span class="math display">[y_i|\alpha, \beta, \sigma] =
+\prod_{i=1}^N Normal(y_i|\alpha + \beta \times x_i, \sigma^2)</span></p>
+<p>Because <span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, and <span class="math inline">\sigma^2</span> are random variables, we must define
+prior distributions for them. Because <span class="math inline">\alpha</span> and <span class="math inline">\beta</span> can be positive or negative real
+numbers (we’ll ignore for now that we know the sign of each in our data
+generating model), we can use normal priors:</p>
+<p><span class="math display">[\alpha] = Normal(\alpha|0, 50)</span></p>
+<p><span class="math display">[\beta] = Normal(\beta|0, 50)</span></p>
 <p>These are relatively non-informative priors for the intercept and
 slope coefficients.</p>
-<p>We also need a model for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.</p>
+<p>We also need a model for <span class="math inline">\sigma</span>.</p>
 <p>Side note: A lot of MCMC codes (such as the BUGS language) model a
-normal distribution as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mi>e</mi><mi>a</mi><mi>n</mi><mo>,</mo><mi>p</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>i</mi><mi>s</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Normal(mean, precision)</annotation></semantics></math>
-where precision =
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">1/\sigma^2</annotation></semantics></math>).</p>
-<p>For
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>,
-we will use a relatively diffuse gamma prior:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mi>G</mi><mi>a</mi><mi>m</mi><mi>m</mi><mi>a</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>σ</mi><mo stretchy="false" form="prefix">|</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">[\sigma] = Gamma(\sigma|1, 1)</annotation></semantics></math></p>
+normal distribution as <span class="math inline">Normal(mean,
+precision)</span> where precision = (<span class="math inline">1/\sigma^2</span>).</p>
+<p>For <span class="math inline">\sigma</span>, we will use a relatively
+diffuse gamma prior:</p>
+<p><span class="math display">[\sigma] = Gamma(\sigma|1, 1)</span></p>
 </div>
 <div class="section level2">
 <h2 id="custom-functions">Custom functions<a class="anchor" aria-label="anchor" href="#custom-functions"></a>
@@ -277,15 +245,10 @@ here.</p>
 <div class="section level3">
 <h3 id="function-for-calculating-likelihood">Function for calculating likelihood<a class="anchor" aria-label="anchor" href="#function-for-calculating-likelihood"></a>
 </h3>
-<p>Given values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>,
-we can estimate the likelihood in <code>R</code> using the
-<code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm()</a></code> function (note that we will take the sum of the log
-likelihoods rather than the product of the likelihoods to avoid
-numerical issues):</p>
+<p>Given values of <span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, and <span class="math inline">\sigma</span>, we can estimate the likelihood in
+<code>R</code> using the <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm()</a></code> function (note that we
+will take the sum of the log likelihoods rather than the product of the
+likelihoods to avoid numerical issues):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the predicted count for each flower</span></span>
 <span>  <span class="va">lp</span> <span class="op">&lt;-</span> <span class="va">alpha</span> <span class="op">+</span> <span class="va">beta</span> <span class="op">*</span> <span class="va">x</span>  </span>
@@ -303,27 +266,20 @@ code is:</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">ll</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>This allows us to put in the data (<code>y</code>), covariate values
-(<code>x</code>), and values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
-as arguments and the function will return the log likelihood.</p>
+(<code>x</code>), and values of <span class="math inline">\alpha</span>,
+<span class="math inline">\beta</span>, and <span class="math inline">\sigma</span> as arguments and the function will
+return the log likelihood.</p>
 <p>Save this code in the script and then close the script.</p>
 </div>
 <div class="section level3">
 <h3 id="functions-for-calculating-prior-probabilities">Functions for calculating prior probabilities<a class="anchor" aria-label="anchor" href="#functions-for-calculating-prior-probabilities"></a>
 </h3>
 <p>We also need functions to estimate the prior probabilities for
-specific values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.
-Create a new script titled <code>priors.R</code> and save it to the
-<code>R/</code> sub-directory. The following functions will take values
-of each parameter and estimate the prior probability given the prior
-distributions we defined above:</p>
+specific values of <span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, and <span class="math inline">\sigma</span>. Create a new script titled
+<code>priors.R</code> and save it to the <code>R/</code> sub-directory.
+The following functions will take values of each parameter and estimate
+the prior probability given the prior distributions we defined
+above:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priorAlpha</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">alpha</span>, <span class="va">mu</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">sigma</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">prob</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">alpha</span>, <span class="va">mu</span>, <span class="va">sigma</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -347,10 +303,12 @@ distributions we defined above:</p>
 multiple parameters, we need to define the full conditionals. For each
 random variable in the model, we define the full conditional by
 including any element on the right hand side of eq. 1 that contains the
-parameter (note the change to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>α</mi><mo stretchy="false" form="prefix">|</mo><mi>.</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>α</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">[\alpha|.] = [y_i|\alpha, \beta, \sigma][\alpha]</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>β</mi><mo stretchy="false" form="prefix">|</mo><mi>.</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>β</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">[\beta|.] = [y_i|\alpha, \beta, \sigma][\beta]</annotation></semantics></math></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>σ</mi><mo stretchy="false" form="prefix">|</mo><mi>.</mi><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>α</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mi>σ</mi><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">[\sigma|.] = [y_i|\alpha, \beta, \sigma][\sigma]</annotation></semantics></math></p>
+parameter (note the change to <span class="math inline">\sigma</span>):</p>
+<p><span class="math display">[\alpha|.] = [y_i|\alpha, \beta,
+\sigma][\alpha]</span> <span class="math display">[\beta|.] =
+[y_i|\alpha, \beta, \sigma][\beta]</span></p>
+<p><span class="math display">[\sigma|.] = [y_i|\alpha, \beta,
+\sigma][\sigma]</span></p>
 <p>In the sampler, we loop over each parameter, going through the
 Metropolis steps for each and treating the other parameters as known
 (based on their current value in the chain). If this in not clear,
@@ -396,9 +354,8 @@ given these initial values. To do this, we use the
 <p>Now we create the actual sampler. Below, we will create a loop that
 implements these steps for each iteration of the chains. Here, we will
 simply go through each step to make sure you understand what it’s doing.
-We’ll start by going through the Metropolis steps for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-(though remember the order doesn’t matter):</p>
+We’ll start by going through the Metropolis steps for <span class="math inline">\alpha</span> (though remember the order doesn’t
+matter):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">########################</span></span>
 <span><span class="co">#### 1. Update alpha</span></span>
@@ -425,68 +382,38 @@ We’ll start by going through the Metropolis steps for
 <span>      <span class="va">mcmc_df</span><span class="op">$</span><span class="va">alpha</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">mcmc_df</span><span class="op">$</span><span class="va">alpha</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span>  <span class="op">}</span></span></code></pre></div>
 <p>Let’s go through this line by line. In <code>step 1a</code>, we
-generate a new value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-from a normal distribution centered on the previous value. Remember that
-the tuning parameter we set earlier determines how big the jumps are
-between the current and proposed values.</p>
+generate a new value of <span class="math inline">\alpha</span> from a
+normal distribution centered on the previous value. Remember that the
+tuning parameter we set earlier determines how big the jumps are between
+the current and proposed values.</p>
 <p>In <code>step 1b</code>, we use the <code>calc_like()</code> function
-to estimate the likelihood of our data given the new value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-and the previous values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>.
-This is what we mean when we say that we treat the other parameters as
-<em>fixed</em> and <em>known</em>.</p>
+to estimate the likelihood of our data given the new value of <span class="math inline">\alpha</span> and the previous values of <span class="math inline">\beta</span> and <span class="math inline">\sigma</span>. This is what we mean when we say that
+we treat the other parameters as <em>fixed</em> and <em>known</em>.</p>
 <p>In <code>step 1c</code>, we estimate the joint probability of both
 the current and proposed values by adding the log likelihood to the log
 prior probability (note that sum of the log values is the same as the
 product of the probabilities).</p>
 <p>In <code>step 1d</code>, we estimate the probability of accepting the
 new value. Note that if the proposed value is more likely than the
-current value
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">R &gt; 1</annotation></semantics></math>),
-this function will return 1. Otherwise, it returns the ratio. The closer
-the joint probabilities are, the closer
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
-will be to 1. The less likely the proposed value is relative to the
-current value, the smaller
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
-will be. This means that we will be much less likely to accept new
-values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-that are a lot less probable than the current value (though not
-impossible).</p>
+current value (<span class="math inline">R &gt; 1</span>), this function
+will return 1. Otherwise, it returns the ratio. The closer the joint
+probabilities are, the closer <span class="math inline">R</span> will be
+to 1. The less likely the proposed value is relative to the current
+value, the smaller <span class="math inline">R</span> will be. This
+means that we will be much less likely to accept new values of <span class="math inline">\alpha</span> that are a lot less probable than the
+current value (though not impossible).</p>
 <p>Finally, in <code>step 1e</code> we accept or reject the proposed
-value. Note that we compare
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
-to a random value generated from a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Uniform(0,1)</annotation></semantics></math>
-distribution. If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">R=1</annotation></semantics></math>,
-it will always be greater than this value so we will always accept the
-proposed value (<code>mcmc_df$alpha[i] &lt;- cand</code>) and we update
-the current likelihood to match the current value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>.
-If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">R&lt;1</annotation></semantics></math>,
-it turns out testing whether
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
-is less than our randomly generated value from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Uniform(0,1)</annotation></semantics></math>
-ensures that we accept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-with probability
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
-(I’ll leave it to you to prove this based on the properties of the
-uniform distribution).</p>
-<p>Next we do the same thing for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
-using the new value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>l</mi><mi>p</mi><mi>h</mi><mi>a</mi></mrow><annotation encoding="application/x-tex">alpha</annotation></semantics></math>
-(<code>mcmc_df$alpha[i]</code>) and the previous value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
+value. Note that we compare <span class="math inline">R</span> to a
+random value generated from a <span class="math inline">Uniform(0,1)</span> distribution. If <span class="math inline">R=1</span>, it will always be greater than this
+value so we will always accept the proposed value
+(<code>mcmc_df$alpha[i] &lt;- cand</code>) and we update the current
+likelihood to match the current value of <span class="math inline">\alpha</span>. If <span class="math inline">R&lt;1</span>, it turns out testing whether <span class="math inline">R</span> is less than our randomly generated value
+from <span class="math inline">Uniform(0,1)</span> ensures that we
+accept <span class="math inline">\alpha</span> with probability <span class="math inline">R</span> (I’ll leave it to you to prove this based
+on the properties of the uniform distribution).</p>
+<p>Next we do the same thing for <span class="math inline">\beta</span>,
+using the new value of <span class="math inline">alpha</span>
+(<code>mcmc_df$alpha[i]</code>) and the previous value of <span class="math inline">\sigma</span>
 (<code>mcmc_df$sigma[i - 1]</code>):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">########################</span></span>
@@ -514,33 +441,18 @@ using the new value of
 <span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>      <span class="va">mcmc_df</span><span class="op">$</span><span class="va">beta</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">mcmc_df</span><span class="op">$</span><span class="va">beta</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span>    <span class="op">}</span></span></code></pre></div>
-<p>Finally, we update
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
-using the new values of both
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
-The only difference here is that because
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
-has to be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">&gt;0</annotation></semantics></math>,
-the normal proposal distribution we used for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
-will not work (it could create negative values). As we learned in
-lecture, you could create a proposal distribution that generates
-positive value (e.g., gamma) and use moment matching to estimate the
-parameters with regards to the current
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
-and the tuning parameter. We’ll use a slightly less efficient approach
-here to demonstrate there are different ways to enforcing the behavior
-we want in the sampler. In this cases, will simply add a small value to
-the current
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
-and automatically reject the proposed value if it’s less than 0. The
-small value can be negative or positive to allow us to explore the
-posterior.</p>
+<p>Finally, we update <span class="math inline">\sigma</span> using the
+new values of both <span class="math inline">\alpha</span> and <span class="math inline">\beta</span>. The only difference here is that
+because <span class="math inline">\sigma</span> has to be <span class="math inline">&gt;0</span>, the normal proposal distribution we
+used for <span class="math inline">\alpha</span> and <span class="math inline">\beta</span> will not work (it could create negative
+values). As we learned in lecture, you could create a proposal
+distribution that generates positive value (e.g., gamma) and use moment
+matching to estimate the parameters with regards to the current <span class="math inline">\sigma</span> and the tuning parameter. We’ll use a
+slightly less efficient approach here to demonstrate there are different
+ways to enforcing the behavior we want in the sampler. In this cases,
+will simply add a small value to the current <span class="math inline">\sigma</span> and automatically reject the proposed
+value if it’s less than 0. The small value can be negative or positive
+to allow us to explore the posterior.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">########################</span></span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="do">#### 3. Update sigma</span></span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="do">########################</span></span>
@@ -721,12 +633,11 @@ chains, a good first diagnostic is usually checking the trace plots:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">mcmc_df</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">alpha</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>The chain for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-moved rapidly from the initial value to the stationary posterior
-distribution but those first few samples will obviously bias our
-parameter estimates if we include them in the posterior. Let’s remove
-them by using the <code>dplyr</code> function <code>slice()</code>:</p>
+<p>The chain for <span class="math inline">\alpha</span> moved rapidly
+from the initial value to the stationary posterior distribution but
+those first few samples will obviously bias our parameter estimates if
+we include them in the posterior. Let’s remove them by using the
+<code>dplyr</code> function <code>slice()</code>:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="va">mcmc_df</span>, <span class="fl">1000</span><span class="op">:</span><span class="va">nIter</span><span class="op">)</span></span>
 <span></span>
@@ -741,7 +652,7 @@ interval of the posterior:</p>
 <span><span class="co">#&gt;  2.5% 97.5% </span></span>
 <span><span class="co">#&gt; 250.2 252.4</span></span></code></pre></div>
 <p>Pretty close to the data generating value of 250. Now let’s check
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>:</p>
+<span class="math inline">\beta</span>:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">mcmc_df</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">beta</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;"></p>
@@ -752,8 +663,7 @@ interval of the posterior:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">mcmc_df</span><span class="op">$</span><span class="va">beta</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  2.5% 97.5% </span></span>
 <span><span class="co">#&gt; 48.02 50.17</span></span></code></pre></div>
-<p>Also pretty close to the data generating value of 50. Finally,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math></p>
+<p>Also pretty close to the data generating value of 50. Finally, <span class="math inline">\sigma</span></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">mcmc_df</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_path</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Lab3_BasicMCMC_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;"></p>
@@ -770,20 +680,16 @@ interval of the posterior:</p>
 <h2 id="homework">Homework<a class="anchor" aria-label="anchor" href="#homework"></a>
 </h2>
 <ol style="list-style-type: decimal">
-<li>In simulation, we set
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
-= 250, and we provided a reasonable, diffuse prior in the example above.
-But what happens if we give a restrictive (and wrong) prior for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>?
-Change your <code>priorAlpha</code> function to instead match
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∼</mo><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>150</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \sim Uniform(0, 150)</annotation></semantics></math>.
-Make sure to also change this line to match the new prior:</li>
+<li>In simulation, we set <span class="math inline">\alpha</span> = 250,
+and we provided a reasonable, diffuse prior in the example above. But
+what happens if we give a restrictive (and wrong) prior for <span class="math inline">\alpha</span>? Change your <code>priorAlpha</code>
+function to instead match <span class="math inline">\alpha \sim
+Uniform(0, 150)</span>. Make sure to also change this line to match the
+new prior:</li>
 </ol>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_df</span><span class="op">$</span><span class="va">alpha</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">200</span>, <span class="fl">300</span><span class="op">)</span> <span class="co">#change this to something reasonable</span></span></code></pre></div>
-<p>Run your sampler again and print out the chain for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>.
-What do you see?</p>
+<p>Run your sampler again and print out the chain for <span class="math inline">\alpha</span>. What do you see?</p>
 <ol start="2" style="list-style-type: decimal">
 <li>Go back to the original prior for alpha. We didn’t discuss it much
 in lab, but the tuning parameter affects how fast the sampler will
@@ -801,16 +707,14 @@ for each of the 3 parameters. What do you notice?</li>
 </h2>
 <ol start="3" style="list-style-type: decimal">
 <li>When we generated the seed count data, we did so assuming a linear
-model that linked pollination visits to seed counts:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>*</mo><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">y_i = \alpha + \beta * x_i + \epsilon_i</annotation></semantics></math>.
+model that linked pollination visits to seed counts: <span class="math inline">y_i = \alpha + \beta * x_i + \epsilon_i</span>.
 Because we used simulated data, we know this model ahead of time.
 However in real life, we wouldn’t know the true model ahead of time and
 might try to fit a different model to the data. Adding on to what we
 already have, create an MCMC that also includes a second beta term that
-looks at visits squared:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>=</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>*</mo><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>*</mo><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup><mo>+</mo><msub><mi>ϵ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">y_i = \alpha + \beta * x_i + \beta_2 * x_i^2 + \epsilon_i</annotation></semantics></math>.
-Run the MCMC and look at the output. What does the MCMC estimate for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\beta_2</annotation></semantics></math>?</li>
+looks at visits squared: <span class="math inline">y_i = \alpha + \beta
+* x_i + \beta_2 * x_i^2 + \epsilon_i</span>. Run the MCMC and look at
+the output. What does the MCMC estimate for <span class="math inline">\beta_2</span>?</li>
 </ol>
 <blockquote>
 <p>Hint: Approach this problem one step at a time.</p>
@@ -844,7 +748,7 @@ questions/confusion about the lecture or lab do you still have?</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>
