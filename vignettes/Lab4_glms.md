@@ -124,7 +124,7 @@ How can we model the non-linear change in abundance if, by definition, linear mo
 
 Remember the equation for a curved line with a single peak (or bottom):
 
-$$\Large y = a + b \times x + c \times x^2$$
+$\Large y = a + b \times x + c \times x^2$
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
 
