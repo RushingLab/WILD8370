@@ -90,7 +90,9 @@ How can we model the non-linear change in abundance if, by definition, linear mo
 
 Remember the equation for a curved line with a single peak (or bottom):
 
-$$\Large y = a + b \times x + c \times x^2$$
+$$
+\Large y = a + b \times x + c \times x^2
+$$
 
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
