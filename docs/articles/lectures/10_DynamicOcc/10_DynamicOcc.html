@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 10</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/htmltools-fill/fill.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/viz/viz.js"></script>
+    <link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding/grViz.js"></script>
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 10
+]
+.subtitle[
+## Dynamic Occupancy Models
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# Readings: 
+&lt;br/&gt;
+&gt; Kéry &amp; Schaub 383-411
+
+
+
+---
+## Closed Occupancy models
+&lt;br/&gt;
+
+$$\Large logit(\psi_j) = \beta_0 + \beta_1*x_j $$ 
+
+&lt;br/&gt;
+
+$$ \Large z_j \sim Bernoulli(\psi_j) $$ 
+
+&lt;br/&gt;
+
+
+$$ \Large y_{j,k} \sim Bernoulli(z_j, p_k)$$
+---
+
+## Assumptions of closed occupancy models
+&lt;br/&gt;
+
+1) Binomial distribution is a true description of state/observation processes
+
+&lt;br/&gt;
+
+2) Occupancy at each site is random and independent of occupancy at all other sites
+
+&lt;br/&gt;
+
+3) Population is closed between surveys
+
+&lt;br/&gt;
+
+4) Observers do not produce false positives
+
+---
+## Estimating `\(\LARGE p\)`
+
+#### Imagine a single site surveyed 3 times:
+
+- Assume site is closed across samples
+
+- Assume constant `\(\large p\)`
+
+`$$\LARGE y_i = [111]$$`
+
+--
+#### What is the likelihood of this observation?
+
+--
+P(occupied) x P(observed 3 times)
+
+&lt;br/&gt;
+
+`$$\LARGE \psi p^3$$`
+
+
+
+---
+## Estimating `\(\LARGE p\)`
+
+#### What about?
+
+`$$\LARGE y_i = [011]$$`
+
+--
+P(occupied) x P(not observed 1 time) x P(observed 2 times)
+
+&lt;br/&gt;
+`$$\LARGE \psi (1-p)p^2$$`
+
+
+---
+## Estimating `\(\LARGE p\)`
+
+#### What about?
+
+`$$\LARGE y_i = [000]$$`
+
+--
+&lt;br/&gt;
+Three 0's can arise from two different scenarios - the site is not occupied, or the site is occupied but we missed it 3 times. 
+
+--
+
+&lt;br/&gt;
+P(not occupied) + P(occupied) x P(not observed 3 times)
+
+&lt;br/&gt;
+
+`$$\LARGE (1 - \psi) + \psi (1-p)^3$$`
+
+---
+## Multi-season (dynamic) occupancy model
+
+#### What if occupancy can change over time? 
+
+- Data collection using the *robust design*
+    + Population open between primary periods (e.g., years)
+    + Population closed within secondary periods (e.g., occasions)
+
+&lt;br/&gt;
+
+`$$\Large y_i = [\underbrace{101}_{Year\;1}\;\;\;\;\; \underbrace{000}_{Year\;2}\;\;\;\;\;\underbrace{110}_{Year\;3}\;\;\;\;\;\underbrace{100}_{Year\;4}]$$`
+
+&lt;br/&gt;
+- We need a model to explain *why* occupancy can change
+
+---
+## Occupancy Dynamics
+
+#### What causes changes in occupancy?
+
+Assume some site is occupied in year 1:
+&lt;img src="10_DynamicOcc_files/figure-html/unnamed-chunk-1-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+<div class="grViz html-widget html-fill-item" id="htmlwidget-0c4dc08773ff4befa39a" style="width:252px;height:504px;"></div>
+<script type="application/json" data-for="htmlwidget-0c4dc08773ff4befa39a">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [color = \"steelblue\", fillcolor = \"#ADD8E6\", fontcolor = \"gray35\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+---
+#### What causes changes in occupancy?
+
+In year 2, it can either stay occupied (survive) or no longer be occupied:
+
+<div class="grViz html-widget html-fill-item" id="htmlwidget-be0c6ea6223056a22709" style="width:252px;height:504px;"></div>
+<script type="application/json" data-for="htmlwidget-be0c6ea6223056a22709">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [color = \"steelblue\", fillcolor = \"#ADD8E6\", fontcolor = \"gray35\"] \n  \"2\" [color = \"gray70\", fillcolor = \"#F0F8FF\", fontcolor = \"gray50\"] \n  \"1\"->\"2\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+---
+
+---
+## Multi-season (dynamic) occupancy model
+
+- In year 1:
+`$$\Large z_{i,1} \sim Bernoulli(\psi)$$`
+
+- In years 2+:
+`$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1}(1-\epsilon)+(1-z_{i,t-1}\gamma))$$`
+
+- `\(\Large z_{i,t}\)` Binary occupancy state
+- 
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

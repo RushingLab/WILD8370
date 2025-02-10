@@ -254,7 +254,7 @@ $$\LARGE y_i \sim Bernoulli(p_i)$$
 
 #### 2) Link function
 
-$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_i}\bigg) = linear\;\;predictor$$
 
 --
 
@@ -277,7 +277,7 @@ $$\LARGE y_i \sim Bernoulli(p_i)$$
 
 #### 2) Link function
 
-$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_i}\bigg) = linear\;\;predictor$$
 
 #### 3) Linear predictor
 
@@ -292,7 +292,7 @@ $$\LARGE y_i \sim binomial(N, p_i)$$
 
 #### 2) Link function
 
-$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = linear\;\;predictor$$
+$$\LARGE logit(p_i) = log \bigg(\frac{p_i}{1-p_i}\bigg) = linear\;\;predictor$$
 
 #### 3) Linear predictor
 
@@ -347,7 +347,7 @@ nimbleCode({
 
 $$y_i \sim binomial(N, p_i)$$
 
-$$logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = \beta_0 + \beta_1 \times x_i$$
+$$logit(p_i) = log \bigg(\frac{p_i}{1-p_i}\bigg) = \beta_0 + \beta_1 \times x_i$$
 
 ```{r binomial, eval=F, echo = T}
 nimbleCode({

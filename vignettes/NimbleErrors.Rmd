@@ -18,3 +18,8 @@ This error is caused by using an = instead of a \<-
 > Warning: R object of different size than NimArrDouble. R obj has size 1 but NimArrDbl has size 10.
 
 Caused by giving an initial value that has the wrong array dimensions. Oops!
+
+> Error in processLinks() : Error, unknown link function: expError in processLinks() : Error, unknown link function: exp
+
+This is caused by using exp(f) = a + bx instead of log(f) = a + bx or f = exp(a+bx)
+

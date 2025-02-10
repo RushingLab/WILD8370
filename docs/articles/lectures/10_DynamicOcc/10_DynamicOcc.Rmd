@@ -1,0 +1,222 @@
+---
+title: "Lecture 10"
+subtitle: "Dynamic Occupancy Models"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+source(here::here("R/zzz.R"))
+# library(gganimate)
+```
+
+# Readings: 
+<br/>
+> Kéry & Schaub 383-411
+
+
+
+---
+## Closed Occupancy models
+<br/>
+
+$$\Large logit(\psi_j) = \beta_0 + \beta_1*x_j $$ 
+
+<br/>
+
+$$ \Large z_j \sim Bernoulli(\psi_j) $$ 
+
+<br/>
+
+
+$$ \Large y_{j,k} \sim Bernoulli(z_j, p_k)$$
+---
+
+## Assumptions of closed occupancy models
+<br/>
+
+1) Binomial distribution is a true description of state/observation processes
+
+<br/>
+
+2) Occupancy at each site is random and independent of occupancy at all other sites
+
+<br/>
+
+3) Population is closed between surveys
+
+<br/>
+
+4) Observers do not produce false positives
+
+---
+## Estimating $\LARGE p$
+
+#### Imagine a single site surveyed 3 times:
+
+- Assume site is closed across samples
+
+- Assume constant $\large p$
+
+$$\LARGE y_i = [111]$$
+
+--
+#### What is the likelihood of this observation?
+
+--
+P(occupied) x P(observed 3 times)
+
+<br/>
+
+$$\LARGE \psi p^3$$
+
+
+
+---
+## Estimating $\LARGE p$
+
+#### What about?
+
+$$\LARGE y_i = [011]$$
+
+--
+P(occupied) x P(not observed 1 time) x P(observed 2 times)
+
+<br/>
+$$\LARGE \psi (1-p)p^2$$
+
+
+---
+## Estimating $\LARGE p$
+
+#### What about?
+
+$$\LARGE y_i = [000]$$
+
+--
+<br/>
+Three 0's can arise from two different scenarios - the site is not occupied, or the site is occupied but we missed it 3 times. 
+
+--
+
+<br/>
+P(not occupied) + P(occupied) x P(not observed 3 times)
+
+<br/>
+
+$$\LARGE (1 - \psi) + \psi (1-p)^3$$
+
+---
+## Multi-season (dynamic) occupancy model
+
+#### What if occupancy can change over time? 
+
+- Data collection using the *robust design*
+    + Population open between primary periods (e.g., years)
+    + Population closed within secondary periods (e.g., occasions)
+
+<br/>
+
+$$\Large y_i = [\underbrace{101}_{Year\;1}\;\;\;\;\; \underbrace{000}_{Year\;2}\;\;\;\;\;\underbrace{110}_{Year\;3}\;\;\;\;\;\underbrace{100}_{Year\;4}]$$
+
+<br/>
+- We need a model to explain *why* occupancy can change
+
+---
+## Occupancy Dynamics
+
+#### What causes changes in occupancy?
+
+Assume some site is occupied in year 1:
+```{r, warning = F, message=FALSE}
+library(ggplot2)
+
+g <- data.frame(x = c(0,1, -1),
+                y = c(1,1,1))
+
+g <- graph_from_data_frame(
+  d = data.frame(from = c(1, 1), to = c(2, 3), label = c('1-\U03C6', '\U03C6')), 
+  directed = TRUE,
+  vertices = data.frame(name = c(1, 2, 3), label = c('1', '0', '1'))
+)
+
+```
+
+```{r, eval = F, echo = F}
+library(DiagrammeR)
+node_list <- data.frame(id = 1:3, label = c(1,0,1))
+edge_list <- data.frame(from = c(1,1), to = c(2,3), label = c('1-\\U03C6', '<$\\phi$>'))
+igraph1 <- create_graph() %>% 
+  add_nodes_from_table(
+    table = node_list,
+    label_col = label
+  ) %>%
+  add_edges_from_table(
+    table = edge_list,
+    from_col = from,
+    to_col = to,
+    from_to_map = id_external
+  ) %>%
+  select_nodes(conditions = label == 1) %>%
+  set_node_attrs_ws(node_attr = fillcolor, value = "orange") %>%
+  clear_selection()
+render_graph(igraph1, layout = 'tree', node_attrs = 'labelloc = t')
+```
+```{r, eval = T, echo = F, fig.width= 3.5}
+
+a_graph <-
+   create_graph() %>%
+   add_node(node_aes = node_aes(
+       color = "steelblue",
+       fillcolor = "lightblue",
+       fontcolor = "gray35"
+     ))
+render_graph(a_graph)
+```
+---
+#### What causes changes in occupancy?
+
+In year 2, it can either stay occupied (survive) or no longer be occupied:
+
+```{r, eval = T, echo = F, fig.width= 3.5}
+library(DiagrammeR)
+a_graph <-
+   create_graph() %>%
+   add_node(node_aes = node_aes(
+       color = "steelblue",
+       fillcolor = "lightblue",
+       fontcolor = "gray35"
+     ))%>%
+  add_node() %>%
+  add_edge(from = 1, to = 2)
+render_graph(a_graph)
+```
+---
+
+---
+## Multi-season (dynamic) occupancy model
+
+- In year 1:
+$$\Large z_{i,1} \sim Bernoulli(\psi)$$
+
+- In years 2+:
+$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1}(1-\epsilon)+(1-z_{i,t-1}\gamma))$$
+
+- $\Large z_{i,t}$ Binary occupancy state
+- 
+
+
