@@ -390,7 +390,7 @@ That's a nice graph, but what about if we wanted to include confidence intervals
 
 --
 
-You might instinctively want to calculate this but using the 95% CIs from the beta parameters themselves. 
+You might instinctively want to calculate this using the 95% CIs from the beta parameters themselves. 
 ```{r, eval = F, include = T, echo = T}
 birds_df$pred_low <- plogis(outputs[1,1] + outputs[2,1]*birds_df$elev 
                             + outputs[3,1]*birds_df$elev*birds_df$elev)

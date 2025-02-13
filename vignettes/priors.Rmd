@@ -76,7 +76,7 @@ We learned in lecture how to turn the mean and variance of a random variable int
 $$\alpha = \bigg(\frac{1-\mu}{\sigma^2}- \frac{1}{\mu} \bigg)\mu^2 \tag{1}$$\
 $$\beta = \alpha \bigg(\frac{1}{\mu}-1\bigg) \tag{2}$$ Given our domain expertise, a reasonable choice for the mean and variance of the prior might be $\mu=0.9$ and $\sigma^2=0.005$ (this may seem like a small variance but as you'll see below, it actually produces a relatively diffuse prior. Figuring out an appropriate variance for probabilities is not easy so the best option is usually to play with a few values and then explore the properties of the resulting distribution to make sure it seems reasonable). Plugging those values into equations 1 and 2 gives:
 
-$$\alpha = \bigg(\frac{1-0.9}{0.005}- \frac{1}{0.9} \bigg)0.9^2 = 15.3$$ $$\beta = 3.6 \bigg(\frac{1}{0.9}-1\bigg) = 1.7$$
+$$\alpha = \bigg(\frac{1-0.9}{0.005}- \frac{1}{0.9} \bigg)0.9^2 = 15.3$$ $$\beta = 15.3 \bigg(\frac{1}{0.9}-1\bigg) = 1.7$$
 
 As always, we should visualize this distribution to make sure it matches what we think it should look like:
 

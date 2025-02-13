@@ -48,6 +48,7 @@
     <li><a class="dropdown-item" href="../articles/lectures/07_random_effects/07_random_effects.html">Lecture 7: Random vs. Fixed Effects</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/08_occupancy/08_occupancy.html">Lecture 8: State Space Models</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/09_NMix/09_NMix.html">Lecture 9: N-Mixture and Occupancy</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/10_DynamicOcc/10_DynamicOcc.html">Lecture 10: Dynamic Occupancy Models</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -615,6 +616,15 @@ smaller for the second model.</p>
 <h2 id="homework">Homework<a class="anchor" aria-label="anchor" href="#homework"></a>
 </h2>
 <ol style="list-style-type: decimal">
+<li>Last week we talked about prior predictive checks. Try running the
+model we just ran in lab (detection is a random effect of site) and
+running a prior predictive check. Plot out a few of the posteriors for
+lambda and y.</li>
+</ol>
+<p>Hint: Instead of putting your data in the “data” object, put it in as
+an initial value. Other than your data, all other information
+(constants, params, etc.) is still the same.</p>
+<ol start="2" style="list-style-type: decimal">
 <li><p>In the lab example, we just looked at hares in the central
 region. Using the entire dataset, fit the two working model we ran above
 - one where detection is a random effect of site and one where it is a

@@ -371,7 +371,7 @@ NC_bears <- WILD8370::NC_bears
 #Rmarkdown being cranky 
 ```
 
-```{r, eval = F, include = T}
+```{r, eval = F, echo = T, include = T}
 data('NC_bears')
 ```
 
