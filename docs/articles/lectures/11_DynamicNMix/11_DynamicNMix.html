@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 11</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 11
+]
+.subtitle[
+## Dynamic N-Mixture Models
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# Readings: 
+&lt;br/&gt;
+&gt; 
+
+
+
+---
+## Review of Closed N-mixture models
+
+
+- `\(\large \mathbf J\)` sites surveyed
+
+    + Each site has an expected abundance `\(\large \lambda\)`
+    + Often expressed as a linear model: `\(log(\lambda_j) = \beta0 + \beta1*x_j\)`
+
+    + State model:  
+    
+`$$\Large N_j \sim Poisson(\lambda)$$`
+
+
+- Each site is surveyed `\(\large \mathbf K\)` times
+
+    + During each visit, probability `\(\large p\)` of detecting each individual
+
+
+- Observation model:  
+    
+`$$\Large y_{j,k} \sim Binomial(N_j, p)$$`
+
+---
+## Assumptions of the Closed N-mixture model
+
+1) Poisson and binomial distributions are true descriptions of state/observation processes
+
+2) Abundance at each site is random and independent of abundance at all other sites
+
+3) Population is closed between surveys
+
+4) Observers do not double count individuals
+
+5) All `\(\large N\)` individuals have the same detection probability `\(\large p\)`
+
+
+---
+## Dynamic N-Mixtures 
+
+The simplest dynamic model is a series of closed population models:
+
+
+`$$\Large log(\lambda_{i,t}) =  \beta_0 + \beta_1 x_{i,t} + \cdots$$`
+`$$\Large N_{j,t} \sim Poisson(\lambda_{i,t})$$`
+
+--
+However, this implies that abundance at site `\(j\)` in time `\(t\)` is *independent* of abundance in time `\(t+1\)`
+
+&lt;br/&gt;
+This is rarely true in a wildlife context. 
+
+---
+## Simple Growth Rate
+
+A quick adaptation allows us to consider a simple growth model for abundance: 
+
+&lt;br/&gt;
+
+###For t = 1
+
+`$$\Large N_{j,1} \sim Poisson(\lambda_{i,1})$$`
+`$$\Large log(\lambda_{i,1}) =  \beta_0 + \beta_1 x_{i,1} + \cdots$$`
+###For t &gt; 1
+
+`$$\Large N_{j,t} \sim Poisson(\lambda_{i,t} \times \delta_{i,t})$$`
+`$$\Large log(\delta_{i,t}) = \alpha_1 + \alpha_2x_{i,t} + \cdots$$`
+---
+## Simple Growth Rate
+
+Advantages: 
+&lt;br/&gt;
+
++ Conceptually simple 
+&lt;br/&gt;
+
++ Easy way to incorporate auto-correlation between years 
+&lt;br/&gt;
+
+Disadvantages: 
+&lt;br/&gt;
+
++ Not mechanistic 
+&lt;br/&gt;
+
++ Poisson implies that variance and mean are equal. Therefore when the population gets very large, so does the variance around the expected populations. This allows populations to fluctuate wildly. 
+
+
+---
+## Simple Growth Rate
+
+
+
+&lt;img src="11_DynamicNMix_files/figure-html/unnamed-chunk-2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Autoregressive Dail-Madsen Model
+
+What can we do to minimize the variance? 
+&lt;br/&gt;
+
+Think back to the classic *B*.*I*.*D*.*E* model in ecology. Local populations increase due to births (B) or immigration (I) and decrease due to death (D) or emmigration (E).  
+&lt;br/&gt;
+--
+Rearranging that, we can say apparent survival `\(\phi\)` is just `\(1- P(D \cup E)\)`. Similarly, apparent recruitment `\(\gamma\)` is just `\(P(B \cup I)\)`. 
+
+&lt;br/&gt;
+--
+The expected number of survivors and recruits is just:
+
+`$$\Large E(S_{i,t}) = N_{i,t-1}*\phi$$`
+`$$\Large E(R_{i,t}) = N_{i,t-1}*\gamma$$`
+
+`$$\Large E(N_{i,t}) = E(S_{i,t}) + E(R_{i,t})$$`
+
+---
+## Autoregressive Dail-Madsen Model
+
+Now we can treat survival and recruits as separate processes to give our model a better variance structure. This is the 'autoregressive' formulation of the Dail-Madsen model. 
+
+### Survivors
+`$$\Large S_{i,t} \sim Binomial(N_{i,t-1}, \phi)$$`
+### Recruits
+`$$\Large R_{i,t} \sim Poisson(N_{i,t-1}*\gamma)$$`
+### Total Population
+`$$\Large N_{i,t} = S_{i,t} + R_{i,t}$$`
+
+---
+## Autoregressive Dail-Madsen Model
+&lt;img src="11_DynamicNMix_files/figure-html/unnamed-chunk-3-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Autoregressive Dail-Madsen Model
+
+One small problem remains. 
+&lt;br/&gt;
+
+What if *occupancy* changes over time?  
+&lt;br/&gt;
+
+--
+Imagine you're monitoring a species at 5 sites and estimates indicate that 4 sites have at least 1 individual in year 1. 
+
+&lt;br/&gt; 
+What's the probability that the 5th site will have at least 1 individual in year 2? 
+--
+
+`$$P(N_{i,t+1} &gt; 0) = \\P((N_{i,t-1}*\phi + N_{i,t-1}*\gamma) &gt; 0) = \\P((0*\phi + 0*\gamma) &gt; 0  =\\ 0$$`
+
+&lt;br/&gt; 
+
+This model does not allow an extinct local population to be rescued through apparent recruitment. 
+
+---
+## Constant Dail-Madsen
+
+An alternative is to simply model recruitment as independent of abundance. This is referred to as the 'constant' paramaterization of the Dail-Madsen model. 
+
+`$$\Large R_{i,t} \sim Poisson(\gamma)$$`
+
+While this may seem unsatisfying biologically, remember that we are working with unmarked individuals. The goal here is simply to account for the variance structure in our overall counts. 
+
+&lt;br/&gt;
+--
+A general downside to the Dail-Madsen model is interpretability - what do `\(\gamma\)` and `\(\phi\)` really mean from an ecological perspective? 
+
+---
+## Example - Coyote Howl Surveys
+
+&lt;img src="coyote.jpg" width="45%" style="display: block; margin: auto;" /&gt;
+
+One common method of monitoring coyote populations is howl surveys.
+
+&lt;br/&gt; 
+
+Observers stand at a location and play coyote howl sounds from a loudspeaker for 1 minute, listen for coyotes responding for 2 minutes, and then repeat the process. 
+
+---
+## Example - Coyote Howl Surveys
+Coyotes were surveyed this way 5 times each winter at the Savannah River Site in South Carolina from 2007-2018 and then again in 2024. 
+
+We can find this data in the WILD8370 package. 
+
+
+``` r
+data(coyote_surveys)
+```
+
+```
+##   Occ Station R1_tot R2_tot wind moon Year2 Station_f
+## 1   1       1      0      0   15  NaN  2007         1
+## 2   1       1      0      0    0 0.75  2008         1
+## 3   1       1      0      0    7 0.50  2009         1
+```
+
+&lt;br/&gt;
+For each evening (`occasion`) a point (`Station`) was surveyed, observers recorded how many coyotes were heard in period 1 (`R1_tot`) and period 2 (`R2_tot`), the wind speed during the survey (`wind`), the stage of the moon (`moon`) and what year the data was taken (`Year2`). 
+
+---
+## Example - Coyote Howl Surveys
+
+The number of nights each point was surveyed varied by year:
+
+``` r
+table(howl_group$Station, howl_group$Year2)[1,]
+```
+
+```
+## 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2020 2021 2022 
+##    3    6    6    5    6    6    6    4    5    5    6    4    0    0    0    0 
+## 2023 2024 
+##    0    3
+```
+Previous work on this coyote population suggests that detection probabiltiy is probably somewhere around 60-80%. 
+
+--
+We also know that coyote populations are largely undisturbed (not hunted) on the SRS, with the exception of a removal study conducted from 2009 – 2011. 
+&lt;br/&gt;
+
+We would therefore expect `\(\phi\)` and `\(\gamma\)` to be different in pre-coyote removal years (pre Summer 2009), during coyote-removal (Jan 2009 – Jan 2011), and after post-removals (Summer 2011 – Jan 2024). 
+
+&lt;br/&gt;
+
+Let's fit the constant parameterization of the Dail-Madsen model to these surveys to estimate abundance across time and space. 
+
+---
+## Example - Coyote Howl Surveys
+
+Remember:
+
+`$$S_{i,t} \sim Binomial(N_{i,t-1}, \phi)$$`
+`$$R_{i,t} \sim Poisson(\gamma)$$`
+`$$N_{i,t} = S_{i,t} + R_{i,t}$$`
+
+---
+## Example - Coyote Howl Surveys
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 75% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+coyotes &lt;- nimbleCode({
+  for(i in 1:nstations){
+    N[i,1] ~ dpois(lambda) #initial abund
+    for(t in 2:nyears){
+      S[i,t] ~ dbinom(size = N[i,t-1], p= phi[group[t]])
+      R[i,t] ~ dpois(gamma[group[t]])
+      N[i,t] &lt;- S[i,t] + R[i,t]
+    } #end t
+    for(t in 1:nyears){
+      for(q in 1:max.surveys){ #survey number changes per year
+        for(j in 1:2){ #2 samples per evening
+          y[i,j,q,t] ~ dbinom(size = N[i,t], p = p.det*effort[i,q,t])
+        } #end j
+      } #end q
+    } #end t
+  } #end i
+for(t in 1:nyears){
+  N.tot[t] &lt;- sum(N[1:nstations,t])
+}
+p.det ~ dbeta(12,6) #detection
+for(m in 1:3){ #pre, during, and post-removal
+  gamma[m] ~ dgamma(1, 1)
+  phi[m] ~ dbeta(1,1)
+}
+lambda ~ dgamma(7,.5) #mean roughly 20
+})
+```
+]
+
+---
+## Example - Coyote Howl Surveys
+
+More often then not, 90% of the work in wildlife analysis is cleaning up the data. Our next task is trying to put the observation data (`y[i,j,q,t]`) and effort data (`effort[i,q,t]`) into the right format. 
+
+
+``` r
+howl_group$Year2 &lt;- factor(howl_group$Year2, levels = 2007:2024)
+nstations &lt;- length(unique(howl_group$Station))
+nyears &lt;- length(2007:2024)
+max.surveys &lt;- 6 
+howl_group$Station_f &lt;- as.factor(howl_group$Station)
+```
+
+``` r
+y &lt;- array(0, c(nstations, 2, max.surveys, nyears)) #y[i,j,q,t]
+effort &lt;- array(0, c(nstations, max.surveys, nyears))
+for(k in 1:nrow(howl_group)){
+  i &lt;- as.numeric(howl_group$Station_f[k])
+  q &lt;- howl_group$Occ[k]
+  t &lt;- as.numeric(howl_group$Year2[k])
+  y[i,,q,t] &lt;- c(howl_group$R1_tot[k], howl_group$R2_tot[k])
+  effort[i,q,t] &lt;- 1
+}
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Initial values can be a little tricky when you're working with highly correlated data (such as yearly abundance). We know we'll need to initialize `N[,1]`, `S`, `R`, `p.det`, `gamma`, `phi` and `lambda`. 
+
+Let's choose some values of gamma, phi, and lambda and simulate some possible starting values of S, R, and N. 
+
+.smaller[
+
+``` r
+set.seed(1)
+N &lt;- S &lt;- R &lt;- array(0, c(nstations, nyears))
+gamma.init &lt;- rgamma(3, 1, 1)
+phi.init &lt;- rbeta(3,1,1)
+lam.init &lt;- rgamma(1, 3.3,6.1)
+group = c(1,1,rep(2, 3),rep(3, 13))
+
+for(i in 1:nstations){
+    N[i,1] &lt;- rpois(1,lam.init) #initial abund
+    for(t in 2:nyears){
+      S[i,t] &lt;- rbinom(1, size = N[i,t-1], p= phi.init[group[t]])
+      R[i,t] &lt;- rpois(1, gamma.init[group[t]])
+      N[i,t] &lt;- S[i,t] + R[i,t]
+    }
+}
+N[,2:nyears] &lt;- NA
+```
+]
+
+---
+## Example - Coyote Howl Surveys
+
+Constants
+
+``` r
+nc &lt;- list(nyears = nyears, nstations = nstations,
+           max.surveys = max.surveys, effort = effort, group = group)
+```
+
+Data
+
+``` r
+nd &lt;- list(y = y)
+```
+
+Initial values
+
+``` r
+ni &lt;- list(gamma = gamma.init, phi = phi.init,
+  lambda = lam.init, N = N, S = S, R = R,
+  p.det = rbeta(1,12,6))
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Parameters of interest
+
+``` r
+params &lt;- c('p.det', 'gamma', 'phi', 'lambda', 'N','N.tot')
+```
+
+Run the model step by step to make sure everything is working:
+
+``` r
+prepnim &lt;- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+```
+
+```
+## Defining model
+```
+
+```
+## Building model
+```
+
+```
+## Setting data and initial values
+```
+
+```
+## Running calculate on model
+##   [Note] Any error reports that follow may simply reflect missing values in model variables.
+```
+
+```
+## Checking model sizes and dimensions
+```
+
+---
+## Example - Coyote Howl Surveys
+
+``` r
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+```
+
+```
+##   [Note] All model variables are initialized.
+```
+
+--
+
+``` r
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -Inf
+```
+
+Uh oh! What went wrong? 
+
+---
+## Example - Coyote Howl Surveys
+
+We can inspect our object `prepnim` for clues. The most likely problem is something with our observation data, `y`. Let's see what nimble says the log-likehood is of our initial values. 
+We'll start with the first year. Any issues?
+
+
+``` r
+sum(prepnim$logProb_y[,,,1])
+```
+
+```
+## [1] -Inf
+```
+--
+There it is. Something in year 1 isn't valid according to our model. Let's dig deeper.
+
+
+``` r
+head(prepnim$logProb_y[,,1,1]) #all sites, occasion 1, year 1
+```
+
+```
+##        [,1]    [,2]
+## [1,] -1.635 -1.6354
+## [2,] -1.635 -0.2167
+## [3,]  0.000  0.0000
+## [4,] -1.635 -0.2167
+## [5,]   -Inf    -Inf
+## [6,]  0.000  0.0000
+```
+Something isn't working for our 5th site in occasion 1, year 1. How many coyotes did we hear at that site?
+
+---
+## Example - Coyote Howl Surveys
+
+
+``` r
+prepnim$y[5,,1,1]
+```
+
+```
+## [1] 3 1
+```
+
+--
+
+Okay, we heard 3 coyotes and then 1 coyote. What were our initial values of S, R, and N for that time frame?
+
+``` r
+prepnim$S[5,1]; prepnim$R[5,1]; prepnim$N[5,1]
+```
+
+```
+## [1] 0
+```
+
+```
+## [1] 0
+```
+
+```
+## [1] 0
+```
+
+Oops! We told the model we saw 3 coyotes, but 0 coyote were present at that site! Let's go back and start our initial abundance a little higher to avoid these sorts of issues. 
+
+---
+## Example - Coyote Howl Surveys
+
+
+``` r
+set.seed(1)
+N &lt;- S &lt;- R &lt;- array(0, c(nstations, nyears))
+gamma.init &lt;- runif(3, 1, 2) #start gamma as always increasing the population
+phi.init &lt;- runif(3, .8, .9) #start phi high as well
+for(i in 1:nstations){
+    N[i,1] &lt;- round(runif(1, 50, 60)) #make year 1 much higher
+    for(t in 2:nyears){
+      S[i,t] &lt;- rbinom(1, size = N[i,t-1], p= phi.init[group[t]])
+      R[i,t] &lt;- rpois(1, gamma.init[group[t]])
+      N[i,t] &lt;- S[i,t] + R[i,t]
+    }
+}
+N[,2:nyears] &lt;- NA
+
+ni &lt;- list(gamma = gamma.init, phi = phi.init, lambda = lam.init,
+                      N = N, S = S, R = R, p.det = rbeta(1,1,1))
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Take 2
+
+``` r
+prepnim &lt;- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+```
+
+``` r
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -85419
+```
+
+Good! Now that we know the model is initialized properly, we can run the model in parallel. 
+---
+## Example - Coyote Howl Surveys
+.smaller[
+
+``` r
+library(parallel)
+cl &lt;- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "coyotes", 'params'))
+coyotes.out &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 100000, nburnin = 50000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+coyotes.out &lt;- as.mcmc.list(coyotes.out)
+stopCluster(cl)
+```
+]
+
+
+
+---
+## Example - Coyote Howl Surveys
+
+Let's check convergence. In practice we would also want to check the chains visually. 
+
+``` r
+library(coda)
+gelman.diag(coyotes.out[,-grep('N', colnames(coyotes.out[[1]])),], multivariate = F)
+```
+
+```
+## Potential scale reduction factors:
+## 
+##          Point est. Upper C.I.
+## gamma[1]       1.01       1.04
+## gamma[2]       1.01       1.03
+## gamma[3]       1.03       1.10
+## lambda         1.01       1.04
+## p.det          1.02       1.06
+## phi[1]         1.01       1.04
+## phi[2]         1.01       1.03
+## phi[3]         1.01       1.05
+```
+
+---
+## Example - Coyote Howl Surveys
+
+
+
+``` r
+Ns &lt;- summary(coyotes.out[,grep('N.tot', colnames(coyotes.out[[1]])),])$quantiles
+ab_df &lt;- data.frame(year = 2007:2024,
+                     median = Ns[,3],
+                     LCI = Ns[,1],
+                     UCI = Ns[,5],
+                    group  = as.character(group))
+```
+
+
+``` r
+library(ggplot2)
+ggplot(ab_df, aes(x = year, y = median)+
+  geom_line()+
+  geom_pointrange(aes(ymin = LCI, ymax = UCI, col = group))+
+  geom_vline(xintercept = 2008.5, lty = 2)+ #removals start
+  geom_vline(xintercept = 2011.5, lty = 2)+ #removals end
+  xlab('Year')+
+  ylab('Abundance')+
+  theme_bw()+
+    theme(legend.position  = 'none')
+```
+---
+## Example - Coyote Howl Surveys
+
+&lt;img src="11_DynamicNMix_files/figure-html/unnamed-chunk-32-1.png" width="504" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
