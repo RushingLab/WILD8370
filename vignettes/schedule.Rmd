@@ -50,7 +50,7 @@ schedule <- data.frame(WK = c("1", "", "",
       "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #5
       "Informative Priors", "Random Effects", "", #6
       "State Space Models", "N-mixture and occupancy Models", "", #7
-      "Dynamic N-Mixture", "Different types of observation processes", "", #8 
+      "Dynamic Occupancy", "Dynamic N-mixture", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
       "Known Fate", "Simple Movement Models", "", #10
       "Closed-population mark-recapture", "Closed-population mark-recapture", "", #11

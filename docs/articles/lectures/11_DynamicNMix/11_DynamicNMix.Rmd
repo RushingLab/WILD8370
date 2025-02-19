@@ -287,16 +287,12 @@ The number of nights each point was surveyed varied by year:
 table(howl_group$Station, howl_group$Year2)[1,]
 ```
 Previous work on this coyote population suggests that detection probabiltiy is probably somewhere around 60-80%. 
-
+<br/>
 --
 We also know that coyote populations are largely undisturbed (not hunted) on the SRS, with the exception of a removal study conducted from 2009 – 2011. 
-<br/>
 
+<br/> 
 We would therefore expect $\phi$ and $\gamma$ to be different in pre-coyote removal years (pre Summer 2009), during coyote-removal (Jan 2009 – Jan 2011), and after post-removals (Summer 2011 – Jan 2024). 
-
-<br/>
-
-Let's fit the constant parameterization of the Dail-Madsen model to these surveys to estimate abundance across time and space. 
 
 ---
 ## Example - Coyote Howl Surveys
@@ -311,7 +307,7 @@ $$N_{i,t} = S_{i,t} + R_{i,t}$$
 ## Example - Coyote Howl Surveys
 ```{css, echo = F}
 .smaller .remark-code { 
-font-size: 75% !important;
+font-size: 65% !important;
 }
 ```
 
