@@ -228,9 +228,6 @@ For convenience, all the data cleanup we did in lecture is saved as an object in
 ```{r, eval = F}
 data(Lab7hares)
 ```
-```{r, echo = F}
-load("~/Desktop/U_Georgia/WILD8370/data/Lab7hares.rda")
-```
 
 We just need to monitor the parameters of interest (`p.val1` and `p.val2`), add in initial values for y.new and we're good to go. 
 
