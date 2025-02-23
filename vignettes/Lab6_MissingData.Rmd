@@ -45,7 +45,7 @@ Over the past few weeks, we've covered a lot of the foundational concepts that y
 
 ## European Hares 
 
-Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland.Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
+Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland. Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
 
 ```{r out.width="50%", echo = FALSE}
 knitr::include_graphics('Hare.webp')

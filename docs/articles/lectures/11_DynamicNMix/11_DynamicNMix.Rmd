@@ -268,11 +268,10 @@ Coyotes were surveyed this way 5 times each winter at the Savannah River Site in
 
 We can find this data in the WILD8370 package. 
 
-```{r, echo = T, eval = F}
+```{r, echo = T, eval = T}
 data(coyote_surveys)
 ```
 ```{r}
-load("~/Desktop/U_Georgia/WILD8370/data/coyote_surveys.rda")
 head(as.data.frame(howl_group), n = 3)
 ```
 
