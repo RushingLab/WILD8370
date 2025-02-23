@@ -10,6 +10,7 @@ articles:
   Lab3_BasicMCMC: Lab3_BasicMCMC.html
   Lab4_glms: Lab4_glms.html
   Lab6_MissingData: Lab6_MissingData.html
+  Lab7_GOF: Lab7_GOF.html
   moment_matching: moment_matching.html
   NimbleErrors: NimbleErrors.html
   priors: priors.html
@@ -17,7 +18,7 @@ articles:
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2025-02-19T18:40Z
+last_built: 2025-02-23T21:40Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles
