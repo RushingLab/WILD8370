@@ -46,10 +46,14 @@ navbar:
           href: articles/lectures/08_occupancy/08_occupancy.html
         - text: "Lecture 9: N-Mixture and Occupancy"
           href: articles/lectures/09_NMix/09_NMix.html
-        - text: "Lecture 10: Dynamic Occupancy Models"
-          href: articles/lectures/10_DynamicOcc/10_DynamicOcc.html
         - text: "Lecture 11: Dynamic N-Mixture Models"
           href: articles/lectures/11_DynamicNMix/11_DynamicNMix.html
+        - text: "Lecture 9b: Static Occupancy Models"
+          href: articles/lectures/9b_ExtraOcc/9b_ExtraOcc.html
+        - text: "Lecture 10: Dynamic Occupancy Models"
+          href: articles/lectures/10_DynamicOcc/10_DynamicOcc.html
+        - text: "Lecture 12: Dynamic Occupancy Models"
+          href: articles/lectures/12_MovementModels/12_MovementModels.html
           
     - text: "Labs"
       icon: fas fa-laptop-code

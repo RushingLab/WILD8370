@@ -181,8 +181,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Feb. 19 </td>
-   <td style="text-align:center;"> N-mixture and occupancy Models </td>
-   <td style="text-align:center;"> Missing Data </td>
+   <td style="text-align:center;"> More State Space Models </td>
+   <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -197,7 +197,7 @@ vignette: >
    <td style="text-align:center;"> 8 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Feb. 24 </td>
-   <td style="text-align:center;"> Dynamic Occupancy </td>
+   <td style="text-align:center;"> N-mixture Models </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -206,7 +206,7 @@ vignette: >
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Feb. 26 </td>
    <td style="text-align:center;"> Dynamic N-mixture </td>
-   <td style="text-align:center;"> Goodness of Fit tests </td>
+   <td style="text-align:center;"> Missing Data </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -245,7 +245,7 @@ vignette: >
    <td style="text-align:center;"> 10 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Mar. 10 </td>
-   <td style="text-align:center;"> Known Fate </td>
+   <td style="text-align:center;"> Occupancy Models </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -253,8 +253,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Mar. 12 </td>
-   <td style="text-align:center;"> Simple Movement Models </td>
-   <td style="text-align:center;"> Week 9 </td>
+   <td style="text-align:center;"> Dynamic Occupancy Models </td>
+   <td style="text-align:center;"> Goodness of Fit tests </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -269,7 +269,7 @@ vignette: >
    <td style="text-align:center;"> 11 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Mar. 17 </td>
-   <td style="text-align:center;"> Closed-population mark-recapture </td>
+   <td style="text-align:center;"> Simple Movement Models </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -277,8 +277,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Mar. 19 </td>
-   <td style="text-align:center;"> Closed-population mark-recapture </td>
-   <td style="text-align:center;"> Simple Model Selection and CMR </td>
+   <td style="text-align:center;"> More Movement Models </td>
+   <td style="text-align:center;"> Lab 8 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -293,7 +293,7 @@ vignette: >
    <td style="text-align:center;"> 12 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Mar. 24 </td>
-   <td style="text-align:center;"> Open-population capture-recapture </td>
+   <td style="text-align:center;"> Known Fate Models </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -301,8 +301,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Mar. 26 </td>
-   <td style="text-align:center;"> Spatial capture-recapture </td>
-   <td style="text-align:center;"> Survival Models with Detection Error </td>
+   <td style="text-align:center;"> Simple CMR </td>
+   <td style="text-align:center;"> Lab 9 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -317,7 +317,7 @@ vignette: >
    <td style="text-align:center;"> 13 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Mar. 31 </td>
-   <td style="text-align:center;"> Multi-state CMR </td>
+   <td style="text-align:center;"> More CMR </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -326,7 +326,7 @@ vignette: >
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Apr. 2 </td>
    <td style="text-align:center;"> Multi-state CMR </td>
-   <td style="text-align:center;"> NimbleSCR package </td>
+   <td style="text-align:center;"> Lab 10 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -341,7 +341,7 @@ vignette: >
    <td style="text-align:center;"> 14 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Apr. 7 </td>
-   <td style="text-align:center;"> Two-stage models </td>
+   <td style="text-align:center;"> Spatial Capture Recapture </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -349,8 +349,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Apr. 9 </td>
-   <td style="text-align:center;"> Two-stage models </td>
-   <td style="text-align:center;"> Lab 13 </td>
+   <td style="text-align:center;"> Spatial Capture Recapture </td>
+   <td style="text-align:center;"> Lab 11 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -365,7 +365,7 @@ vignette: >
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> M </td>
    <td style="text-align:center;"> Apr. 14 </td>
-   <td style="text-align:center;"> TBD </td>
+   <td style="text-align:center;"> Two-stage models </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -373,8 +373,8 @@ vignette: >
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Apr. 16 </td>
-   <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> Lab 14 </td>
+   <td style="text-align:center;"> Two-stage models </td>
+   <td style="text-align:center;"> Lab 12 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -398,7 +398,7 @@ vignette: >
    <td style="text-align:center;"> W </td>
    <td style="text-align:center;"> Apr. 23 </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> Lab 15 </td>
+   <td style="text-align:center;"> Lab 13 </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>

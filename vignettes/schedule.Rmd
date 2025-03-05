@@ -49,15 +49,15 @@ schedule <- data.frame(WK = c("1", "", "",
       "Principles of Bayesian Inference (Part 1)", "Principles of Bayesian Inference (Part 2)" , "", #4
       "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #5
       "Informative Priors", "Random Effects", "", #6
-      "State Space Models", "N-mixture and occupancy Models", "", #7
-      "Dynamic Occupancy", "Dynamic N-mixture", "", #8 
+      "State Space Models", "More State Space Models", "", #7
+      "N-mixture Models", "Dynamic N-mixture", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
-      "Known Fate", "Simple Movement Models", "", #10
-      "Closed-population mark-recapture", "Closed-population mark-recapture", "", #11
-      "Open-population capture-recapture", "Spatial capture-recapture", "", #12
-      "Multi-state CMR", "Multi-state CMR", "", #13
-      "Two-stage models", "Two-stage models", "", #14 
-      "TBD", "", "", #15
+      "Occupancy Models", "Dynamic Occupancy Models", "", #10
+      "Simple Movement Models", "More Movement Models", "", #11
+      "Known Fate Models", "Simple CMR", "", #12
+      "More CMR", "Multi-state CMR", "", #13
+      "Spatial Capture Recapture", "Spatial Capture Recapture", "", #14
+      "Two-stage models", "Two-stage models", "", #15 
       "TBD", "", "", #16
       ""), 
                        Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
@@ -66,16 +66,16 @@ schedule <- data.frame(WK = c("1", "", "",
                                "", "Basic MCMC", "",
                                "", "Regression analysis using Nimble", "", 
                                "", "Choosing Priors", "", #be sure to include something about transformed priors
-                               "", "Missing Data", "", 
-                               "", "Goodness of Fit tests", "",
+                               "", "", "", 
+                               "", "Missing Data", "",
                                "", "", "", # Spring break
-                               "", "Week 9", "",
-                               "", "Simple Model Selection and CMR", "", 
-                               "", "Survival Models with Detection Error", "", 
-                               "", "NimbleSCR package", "",
-                               "", "Lab 13", "", 
-                               "", "Lab 14", "", 
-                               "", "Lab 15", "",
+                               "", "Goodness of Fit tests", "",
+                               "", "Lab 8", "", 
+                               "", "Lab 9", "", 
+                               "", "Lab 10", "",
+                               "", "Lab 11", "", 
+                               "", "Lab 12", "", 
+                               "", "Lab 13", "",
                                ""),
                        Notes = c("", "", "",
                                "", "", "", 

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 12</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 12
+]
+.subtitle[
+## Simple Movement Models
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# Readings: 
+&lt;br/&gt;
+
+McClintock, B. T., B. Abrahms, R. B. Chandler, P. B. Conn, S. J. Converse, R. L. Emmet, B. Gardner, N. J. Hostetter, and D. S. Johnson. 2022. An integrated path for spatial capture–recapture and animal movement modeling. Ecology 103(10): e3473. 10.1002/ecy.3473
+
+
+
+---
+## Individual-Level Models
+
+&lt;br/&gt;
+
+So far in this class we've discussed models that group individuals together to model population-level processes. 
+
+&lt;br/&gt;
+
+But not all individuals are created equal. 
+
+--
+
+&lt;br/&gt; 
+
+Individual-level models are often more informative about population *mechanisms* because population dynamics ultimately occur at the individual level.  
+
+---
+## Individual-Level Models
+
+Central to the study of population dynamics is an argument over the importance of individual-level complexity in model structure. 
+
+Does individual variation:
+
+a) create noise that blocks the identification of universal ecological patterns 
+
+ + John H. Lawton. Are There General Laws in Ecology?  *Oikos*, Vol. 84, No. 2. (Feb., 1999), pp. 177-192.
+
+  + To discover general patterns, ecology may need to pay less attention to the 'middle ground' of community ecology and rely less on reductionism and experimental manipulation
+
+---
+## Individual-Level Models
+
+Central to the study of population dynamics is an argument over the importance of individual-level complexity in model structure. 
+
+Does individual variation:
+
+a) create noise that blocks the identification of universal ecological patterns 
+
+  +  Hubbell, S.P. (2005), Neutral theory in community ecology and the hypothesis of functional equivalence. Functional Ecology, 19: 166-172.
+
+    + All individual level patterns are caused by chance. Population patterns are caused by niche requirements and interactions with other species at the ecosystem level 
+
+---
+## Individual-Level Models
+
+Central to the study of population dynamics is an argument over the importance of individual-level complexity in model structure. 
+
+Does individual variation:
+
+a) create noise that blocks the identification of universal ecological patterns 
+
+b) individual-level behaviors and demographic differences fundamentally important in their own right
+
++ Michael Huston, Donald DeAngelis, Wilfred Post, New Computer Models Unify Ecological Theory: Computer simulations show that many ecological patterns can be explained by interactions among individual organisms, BioScience, Volume 38, Issue 10, November 1988, Pages 682–691
+
+  + Individuals are the reason population patterns exist. We can't truly understand the reason for the patterns if we ignore the individual 
+
+
+---
+## Individual-Level Models
+
+Central to the study of population dynamics is an argument over the importance of individual-level complexity in model structure. 
+
+Does individual variation:
+
+a) create noise that blocks the identification of universal ecological patterns 
+
+b) individual-level behaviors and demographic differences fundamentally important in their own right
+
++ DeAngelis, D. L. 1996. Individual-based models and approaches in ecology: Populations, communities and ecosystems,Chapman &amp; Hall, New York.
+
+  + Most experimental data is initially collected at the individual level. It becomes harder to test models for validity if we have to transform our data to fit the model 
+
+---
+## Individual-Level Models
+
+Central to the study of population dynamics is an argument over the importance of individual-level complexity in model structure. 
+
+Does individual variation:
+
+a) create noise that blocks the identification of universal ecological patterns 
+
+b) individual-level behaviors and demographic differences fundamentally important in their own right
+
+&lt;br/&gt;
+
+This argument has been flourishing since the mid-1950s with both sides bemoaning the failure of mathematical models to realistically reproduce complex dynamics in ecology. This issue remains hotly contested to this day.
+
+---
+## Movement Models
+
+As noted by DeAngelis (1996), we often collect data at the individual-level, so it makes sense to analyse it that way. 
+
+&lt;br/&gt; 
+
+A great example of this is movement data. 
+
+&lt;br/&gt; 
+
+One of the simplest movement models we can use is a random walk model, also called Brownian Bridge movement. 
+
+`$$s_{i,x,t=1} \sim Uniform(x_1, x_2)$$`
+
+`$$s_{i,y,t=1} \sim Uniform(y_1, y_2)$$`
+
+`$$s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )$$`
+
+`$$s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )$$`
+
+---
+## Movement Models
+
+Under this model, animals move entirely randomly. The only parameter of interest is `\(\sigma\)`, which controls the average distance between points.  
+
+`$$\Large s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )$$`
+
+`$$\Large s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )$$`
+
+
+You will often see these models written in the literature as:
+
+`$$\Large \mu_t = Normal(\mu_{t-1}, \sigma^2)$$`
+or:
+
+`$$\Large \mu_t = \mu_{t-1} + \epsilon_{t} \sim Normal(0, \sigma^2)$$`
+These are all equivalent
+
+
+---
+## Random Walk Movement Models
+
+
+Here's a simple simulation of a random walk we used long, long ago in Lab 2. 
+
+
+``` r
+sim_move &lt;- function(sigma, n, nocc){
+s &lt;- array(NA, c(n,2,nocc))
+for(i in 1:n){ #each individual
+  s[i,, 1] &lt;- runif(2, 0, 1) #coords time 1 
+  for(t in 2:nocc){
+   s[i,, t] &lt;- rnorm(2, s[i,, t-1], sd = sigma)
+  }
+}
+return(s)
+}
+```
+
+---
+## Random Walk Movement Models
+
+If `\(\sigma\)` is very small, the animals don't move that much:
+
+
+
+``` r
+nocc &lt;- 50
+s &lt;- sim_move(sigma = .02, n = 1, nocc = nocc)
+plot(s[1,1,],s[1,2,], asp=1, , xlim = c(-2, 2), ylim = c(-2, 2), type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-2-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+---
+## Random Walk Movement Models
+
+If `\(\sigma\)` is large the animals make larger movements:
+
+
+
+``` r
+nocc &lt;- 50
+s &lt;- sim_move(sigma = .5, n = 1, nocc = nocc)
+plot(s[1,1,],s[1,2,], asp=1, xlim = c(-2, 2), ylim = c(-2, 2), type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-4-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+---
+## Correlated Random Walk
+
+As with all simple models, they are useful if you don't have any idea about movement, but it is unlikely to fully capture the true movement patterns of animals in nature. 
+
+&lt;br/&gt;
+
+For one thing, animals don't just wander around the world aimlessly (usually). 
+
+&lt;br/&gt; 
+
+What would our model look like if we accounted for correlation ('short-term directional persistence')?
+
+
+---
+## Correlated Random Walk
+
+Consider this model:
+
+
+`$$\Large \mu_t = \mu_{t-1} + \epsilon_{t} \sim Normal(0, \sigma^2)$$`
+
+--
+&lt;br/&gt;
+
+Under this formulation, each location is only dependent on the location one time step before it. To change that, we can calculate something like this:
+
+
+`$$\Large\mu_t = \mu_{t-1} + \gamma(\mu_{t-1} - \mu_{t-2}) + \epsilon_{t} \sim Normal(0, \sigma^2)$$`
+&lt;br/&gt;
+where `\(\gamma \in [0, 1]\)` is a 'damping parameter' that impacts how strongly the past locations affect the current location. 
+---
+## Correlated Random Walk
+
+Let's simulate how that looks:
+
+
+``` r
+sim_move2 &lt;- function(sigma, n, nocc, gamma){
+s &lt;- array(NA, c(n,2,nocc))
+for(i in 1:n){
+  s[i,, 1] &lt;- runif(2, 0, 1) #coords time 1 
+  s[i,, 2] &lt;- rnorm(2, s[i,, 1], sd = sigma) #coords time 2 
+  for(t in 3:nocc){
+   s[i,, t] &lt;- rnorm(2, s[i,, t-1] + gamma*(s[i,, t-1] - s[i,, t-2]), sd = sigma)
+  }
+}
+return(s)
+}
+```
+
+---
+## Correlated Random Walk
+
+When `\(\gamma\)` is high, movement is highly correlated. The animal walks in a path:
+
+
+``` r
+s &lt;- sim_move2(sigma = .5, n = 1, nocc = 50, gamma = 1)
+plot(s[1,1,],s[1,2,], asp=1, type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-6-1.png" width="288" style="display: block; margin: auto;" /&gt;
+---
+## Correlated Random Walk
+
+When `\(\gamma\)` is close to 0, movement reverts to a random walk.
+
+
+``` r
+s &lt;- sim_move2(sigma = .5, n = 1, nocc = 50, gamma = .01)
+plot(s[1,1,],s[1,2,], asp=1, type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-7-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+---
+## Correlated Random Walk with Rotation
+
+What if want to include things like turn angles? 
+
+&lt;br/&gt;
+
+--
+We can easily accommodate this by adding in a 'rotational component' parameter, `\(R\)`. 
+
+`$$R = \gamma
+\begin{bmatrix}
+cos(\beta) &amp; -sin(\beta)\\
+sin(\beta) &amp; cos(\beta)
+\end{bmatrix}$$`
+
+
+- `\(\gamma\)` represents the strength of the correlation between past movements and the current position. 
+
+- `\(\beta \in [-\pi, \pi)\)` is the turn angle of the individual 
+
+--
+
+&lt;br/&gt;
+If `\(R = 0\)`, we have a random walk model 
+
+&lt;br/&gt; 
+
+If `\(\beta = 0\)` we have a tendancy to walk in a straight line 
+
+---
+## Correlated Random Walk  with Rotation
+
+This is all well and good, but how do we code this? This requires a little bit of matrix math.
+
+`$$\Large \gamma
+\begin{bmatrix}
+cos(\beta) &amp; -sin(\beta)\\
+sin(\beta) &amp; cos(\beta)
+\end{bmatrix} * (\mu_{t-1} - \mu_{t-2}) =$$`
+
+`$$\Large\begin{bmatrix}
+\gamma*cos(\beta) &amp; \gamma*-sin(\beta)\\
+\gamma*sin(\beta) &amp; \gamma*cos(\beta)
+\end{bmatrix}*\begin{bmatrix} s_{i, x, t-1} - s_{i, x, t-2} \\ s_{i, y, t-1} - s_{i, y, t-2}\end{bmatrix} =$$`
+
+`$$\Large\begin{bmatrix}
+\gamma*cos(\beta)*(s_{i, x, t-1} - s_{i, x, t-2}) + \gamma*-sin(\beta)*(s_{i, y, t-1} - s_{i, y, t-2})\\
+\gamma*sin(\beta)*(s_{i, x, t-1} - s_{i, x, t-2}) + \gamma*cos(\beta)*(s_{i, y, t-1} - s_{i, y, t-2})\end{bmatrix}$$`
+---
+## Correlated Random Walk with Rotation
+
+Luckily for us, we don't have to worry about this math! We can just use the `%*%` function in R and it will figure out the matrix math. 
+
+Here's what that looks like in code: 
+
+
+``` r
+sim_move3 &lt;- function(sigma, n, nocc, gamma, beta){
+s &lt;- array(NA, c(n,2,nocc))
+R &lt;- gamma*matrix(c(cos(beta), sin(beta),
+                    -sin(beta), cos(beta)),
+                  2, 2) #rotational matrix
+for(i in 1:n){
+  s[i,, 1] &lt;- runif(2, 0, 1) #coords time 1 
+  s[i,, 2] &lt;- rnorm(2, s[i,, 1], sd = sigma) #coords time 2 
+  for(t in 3:nocc){
+   s[i,, t] &lt;- rnorm(2, s[i,, t-1] + R %*% (s[i,, t-1] - s[i,, t-2]), sd = sigma)
+  }
+}
+return(s)
+}
+```
+
+---
+## Correlated Random Walk with Rotation
+
+Beta is the turning angle in radians, so we can make some fun patterns if we chose specific betas. Here's some 90° turns to the left:
+
+
+
+
+``` r
+s &lt;- sim_move3(sigma = .5, n = 1, nocc = 50, gamma = 1, beta = 3.14/2) #90° turns
+plot(s[1,1,],s[1,2,], asp=1, type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-10-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+---
+## Correlated Random Walk with Rotation
+
+Beta is the turning angle in radians, so we can make some fun patterns if we chose specific betas. Here's some 30° left turns when the correlation between locations is weaker:
+
+
+``` r
+s &lt;- sim_move3(sigma = .5, n = 1, nocc = 50, gamma = .5, beta = 3.14/6) #30° turns
+plot(s[1,1,],s[1,2,], asp=1, type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-11-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+
+---
+## In Class Exercise
+
+Simulate an individual across 100 time steps with the following constraints:
+
+- `set.seed(10)`
+
+- `\(\gamma\)` = .85
+
+- `\(\sigma\)` = .1
+
+- The individual only makes right turns at 45 degree angles (it has a deformed right wing, it's very sad)
+
+
+---
+## In Class Exercise
+
+
+``` r
+sim_move3 &lt;- function(sigma, n, nocc, gamma, beta){
+s &lt;- array(NA, c(n,2,nocc))
+R &lt;- gamma*matrix(c(cos(beta), sin(beta),
+                    -sin(beta), cos(beta)),
+                  2, 2) #rotational matrix
+for(i in 1:n){
+  s[i,, 1] &lt;- runif(2, 0, 1) #coords time 1 
+  s[i,, 2] &lt;- rnorm(2, s[i,, 1], sd = sigma) #coords time 2 
+  for(t in 3:nocc){
+   s[i,, t] &lt;- rnorm(2, s[i,, t-1] + R %*% (s[i,, t-1] - s[i,, t-2]), sd = sigma)
+  }
+}
+return(s)
+}
+```
+
+---
+## In Class Exercise
+
+
+``` r
+set.seed(10)
+nocc &lt;- 100
+s &lt;- sim_move3(sigma = .1, n = 1, nocc = nocc, gamma = .85, beta = 3.14*7/4)
+plot(s[1,1,],s[1,2,], asp=1, type = 'b')
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-13-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+Simulate an individual across 100 time steps with the following constraints:
+
+- `set.seed(10)`
+
+- `\(\gamma\)` = .8 
+
+- The individual only makes left turns at 45 degree angles (it has a deformed right wing, it's very sad)
+
+
+
+---
+## Biased Random Walks
+
+Movement ecologists, are often interested in home ranges - where does the animal spend most of its time? How much space does that take up? Where is the home range center? 
+
+&lt;br/&gt; 
+
+Right now we have some sense of how
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
