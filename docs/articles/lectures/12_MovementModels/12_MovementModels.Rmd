@@ -295,7 +295,7 @@ What if want to include things like turn angles?
 --
 We can easily accommodate this by adding in a 'rotational component' parameter, $R$. 
 
-$$R = \gamma
+$$\mathbf{R} = \gamma
 \begin{bmatrix}
 cos(\beta) & -sin(\beta)\\
 sin(\beta) & cos(\beta)
@@ -309,7 +309,7 @@ sin(\beta) & cos(\beta)
 --
 
 <br/>
-If $R = 0$, we have a random walk model 
+If $\mathbf{R} = 0$, we have a random walk model 
 
 <br/> 
 
@@ -452,9 +452,66 @@ Movement ecologists, are often interested in home ranges - where does the animal
 <br/> 
 
 Right now we have some sense of parameters that might control movement direction and correlation, but we haven't written anything into our model that encourages the individual to stay in one general area. 
-
 --
 
+<br/>
+
+Similar to what we have done before, we can add an attraction parameter $\zeta \in [0, 1]$ that controls attraction to some specific location,  $\mathbf{a}$
+
+<br/>
+
+$$\Large\mu_t = \mu_{t-1} + \zeta(\mathbf{a} - \mu_{t-1}) + \epsilon_{t} \sim Normal(0, \sigma^2)$$
+
+---
+## Biased Random Walks
+
+```{r, echo = T}
+sim_move4 <- function(sigma, n, nocc, zeta){
+a <- runif(2) #attraction point
+s <- array(NA, c(n,2,nocc))
+for(i in 1:n){
+  s[i,, 1] <- a #coords time 1 
+  for(t in 2:nocc){
+   s[i,, t] <- rnorm(2, s[i,, t-1] + zeta*(a - s[i,, t-1]), sd = sigma)
+  }
+}
+return(s)
+}
+```
+
+---
+## Biased Random Walks
+
+When $\zeta$ is large, we see more obvious central tendency.
+
+```{r}
+set.seed(10)
+```
+```{r,fig.height=4.5, fig.width=4, eval = T, echo = T}
+set.seed(10)
+nocc <- 250
+s <- sim_move4(sigma = .5, n = 1, nocc = nocc, zeta = .97)
+plot(s[1,1,],s[1,2,], asp=1, type = 'b', ylim = c(-4, 4))
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
+
+---
+## Biased Random Walks
+
+When $\zeta$ is small, we see get behavior closer to the random walk.
+
+```{r}
+set.seed(10)
+```
+```{r,fig.height=4.5, fig.width=4, eval = T, echo = T}
+set.seed(10)
+nocc <- 250
+s <- sim_move4(sigma = .5, n = 1, nocc = nocc, zeta = .005)
+plot(s[1,1,],s[1,2,], asp=1, type = 'b', ylim = c(-4, 4))
+arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
+       s[1,1, 2:nocc], s[1,2, 2:nocc], length=0.1, col="blue")
+```
 
 
 
