@@ -65,6 +65,7 @@
     <li><a class="dropdown-item" href="../articles/priors.html">Lab 5: Priors</a></li>
     <li><a class="dropdown-item" href="../articles/Lab6_MissingData.html">Lab 6: Missing Data</a></li>
     <li><a class="dropdown-item" href="../articles/Lab7_GOF.html">Lab 7: Goodness of Fit</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab8_Movement.html">Lab 8: Resource Selection Functions</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -348,7 +349,7 @@ for <em>italics</em> (<code>*italics*</code>)</p>
 </h3>
 <p>To highlight code (note, this does not actually insert functioning
 code, just formats text to show that it is code rather than plain text),
-surround the text with back ticks: <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code></p>
+surround the text with back ticks: <code><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean()</a></code></p>
 <p>You can include multiple lines of code by including three back ticks
 on the line before the code and then three back ticks on the line after
 the code:</p>
@@ -576,7 +577,7 @@ in the document.</p>
 the <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable()</a></code> function:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>, caption<span class="op">=</span> <span class="st">'Table 1: Automobile data from 1974 *Motor Trends US*.'</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>, caption<span class="op">=</span> <span class="st">'Table 1: Automobile data from 1974 *Motor Trends US*.'</span>,</span>
 <span>      align <span class="op">=</span> <span class="st">'l'</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <caption>Table 1: Automobile data from 1974 <em>Motor Trends
@@ -707,7 +708,7 @@ for an overview of options provided by this package.</p>
 Here, we have a simple demonstration but we will produce many better
 looking figures throughout the semester.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">hp</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">hp</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="RMarkdown_files/figure-html/unnamed-chunk-2-1.png" alt="Figure 1: Automobile mpg as a function of horsepower." width="700"><p class="caption">
 Figure 1: Automobile mpg as a function of horsepower.
