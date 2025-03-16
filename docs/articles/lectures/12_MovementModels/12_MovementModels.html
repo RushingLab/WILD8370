@@ -536,6 +536,299 @@ arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
 
 &lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-18-1.png" width="288" style="display: block; margin: auto;" /&gt;
 
+
+---
+## Random Walks in Nimble
+
+Let's see how we might use these models to analyze actual data. 
+
+&lt;br/&gt;
+
+In the WILD8370 package, you'll find some location data from 6 collared white tailed deer in Arkansas. Note that in practice you would want a larger sample size. 
+
+
+``` r
+data(collars)
+colnames(collars)
+```
+
+```
+##  [1] "Collar.ID"        "SCTS..UTC."       "Acq..Time..UTC."  "Origin"          
+##  [5] "Latitude.deg."    "Longitude.deg."   "Altitude.m."      "DOP"             
+##  [9] "Fix.Type"         "Mortality.Status" "Temp..C."         "Main.V."         
+## [13] "Beacon..V."       "x"                "y"                "date1"           
+## [17] "year"
+```
+
+---
+## Random Walks in Nimble
+
+Let's start by plotting out the deer, just to see what our data looks like. 
+
+
+``` r
+ggplot(collars, aes(x = x/1e6, y= y/1e6))+
+    geom_line()+
+    facet_wrap(~Collar.ID, scales = 'free')+
+    theme_bw()
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Random Walks in Nimble
+
+We'll first fit the most basic movement model we can to this data - the random walk. 
+
+&lt;br/&gt;
+
+`$$s_{i,x,t=1} \sim Uniform(x_1, x_2)$$`
+
+`$$s_{i,y,t=1} \sim Uniform(y_1, y_2)$$`
+
+`$$s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )$$`
+
+`$$s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )$$`
+---
+## Random Walks in Nimble
+
+We'll first fit the most basic movement model we can to this data - the random walk. The only complicated part of this model is that not all animals have the same number of locations, so we have to make sure our `t` loops accounts for this:
+
+
+``` r
+r_walk &lt;- nimbleCode({
+  for(i in 1:nind){
+    s[i,1,1] ~ dunif(xmin, xmax)
+    s[i,2,1] ~ dunif(ymin, ymax)
+    for(t in 2:nTelemetry[i]){
+      s[i,1,t] ~ dnorm(s[i,1,t-1], sd = sigma)
+      s[i,2,t] ~ dnorm(s[i,2,t-1], sd= sigma)
+    }
+  }
+  sigma ~ dgamma(1,1)
+})
+```
+
+---
+## Random Walks in Nimble
+
+We need to clean up the data. We need the coordinates to be in meters (UTMs) and I find it easier to use small numbers, so I divide the UTMS by 1e6. 
+
+
+``` r
+collars$Collar.ID_f &lt;- as.numeric(as.factor(collars$Collar.ID))
+nind &lt;- length(unique(collars$Collar.ID_f))
+nTelemetry &lt;- as.vector(table(collars$Collar.ID_f))
+s &lt;- array(NA, c(nind, 2, max(nTelemetry)))
+for(i in 1:nind){
+  me &lt;- collars[collars$Collar.ID_f == i,]
+  s[i,1,1:nTelemetry[i]] &lt;- me$x/1e6
+  s[i,2,1:nTelemetry[i]] &lt;- me$y/1e6
+}
+xmin &lt;- min(s[,1,], na.rm = T)-1 #add some space around locations
+xmax &lt;- max(s[,1,], na.rm = T)+1 #add some space around locations
+ymin &lt;- min(s[,2,], na.rm = T)-1 #add some space around locations
+ymax &lt;- max(s[,2,], na.rm = T)+1 #add some space around locations
+```
+
+---
+## Random Walks in Nimble
+
+
+``` r
+consts &lt;- list(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, nind = nind, nTelemetry = nTelemetry)
+dat &lt;- list(s = s)
+inits &lt;- function(){list(sigma = rgamma(1,1,1))}
+params &lt;- 'sigma'
+```
+
+
+``` r
+rw_out &lt;- nimbleMCMC(code = r_walk,
+                     data = dat,
+                     constants = consts,
+                     inits = inits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+MCMCvis::MCMCtrace(rw_out, pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+## Random Walks in Nimble
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Random Walks in Nimble
+
+What have we learned? 
+
+
+``` r
+2*summary(rw_out)$quantiles*1e6
+```
+
+```
+##  2.5%   25%   50%   75% 97.5% 
+## 489.9 493.8 495.5 497.5 500.6
+```
+
+Our model tells us that on average, the deer moved around 495 meters from its previous location (remember these are locations taken every 4 hours). 
+
+--
+&lt;br/&gt;
+This model is fine, but not especially useful. 
+
+
+---
+## Home Range Estimation
+
+Let's try to fit a different type of movement model so we can learn about the approximate home range of the individual. In this case, we are interested in determining 2 latent parameters - the 'activity center' of the individual, and the average distance an individual might be at any given time from that central point.  This model ignores any temporal correlation between locations. 
+
+Note that this model looks very similar to the random walk model, but we really aren't explicitly modeling 'movement.' 
+
+
+``` r
+central_walk &lt;- nimbleCode({
+  for(i in 1:nind){
+    mu[i,1] ~ dunif(xmin, xmax)
+    mu[i,2] ~ dunif(ymin, ymax)
+    for(t in 1:nTelemetry[i]){
+      s[i,1,t] ~ dnorm(mu[i,1], sd = sigma[i])
+      s[i,2,t] ~ dnorm(mu[i,2], sd= sigma[i])
+    }
+     sigma[i] ~ dgamma(1,1)
+  }
+})
+```
+
+---
+## Home Range Estimation
+
+
+``` r
+consts &lt;- list(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, nind = nind, nTelemetry = nTelemetry)
+dat &lt;- list(s = s)
+```
+
+We will need to give initial values for mu and sigma
+
+
+``` r
+mu.init &lt;- apply(s, c(1,2), function(x) mean(x, na.rm= T))
+inits &lt;- function(){list(sigma = rgamma(6,1,1), mu = mu.init)}
+params &lt;- c('mu', 'sigma')
+```
+
+---
+## Home Range Estimation
+
+Here's a quick visual of our initial value for `\(mu\)` for the first individual relative to the recorded locations. 
+
+
+``` r
+plot(s[1,1,], s[1,2,], type = 'b', pch = 19, cex= .5)
+points(mu.init[1,1], mu.init[1,2], col = 'red', pch= 19)
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Home Range Estimation
+
+
+``` r
+central_out &lt;- nimbleMCMC(code = central_walk,
+                     data = dat,
+                     constants = consts,
+                     inits = inits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+MCMCvis::MCMCtrace(central_out, params = c('sigma'), pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+## Home Range Estimation
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-32-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Home Range Estimation
+
+A fun fact, that you do not need to memorize, is that home range size can be estimated from this model as a circle with radius `\(2.45*\sigma\)`. 
+
+Let's see what that says about our deer and then compare the estimate home range with the raw data. 
+
+--
+
+
+``` r
+sigma &lt;- MCMCvis::MCMCsummary(central_out, params = 'sigma', Rhat =  F, n.eff = F)
+2.45*sigma*1e3 #radius in km
+```
+
+```
+##            mean       sd   2.5%    50%  97.5%
+## sigma[1] 0.6767 0.009373 0.6579 0.6764 0.6952
+## sigma[2] 0.6971 0.010118 0.6769 0.6972 0.7180
+## sigma[3] 0.9731 0.012304 0.9493 0.9729 0.9987
+## sigma[4] 0.7703 0.010488 0.7499 0.7702 0.7912
+## sigma[5] 1.1073 0.013913 1.0802 1.1067 1.1352
+## sigma[6] 1.8658 0.023238 1.8223 1.8660 1.9120
+```
+
+``` r
+pi*(2.45*sigma$mean*1e3)^2 #~home range in km^2
+```
+
+```
+## [1]  1.439  1.527  2.975  1.864  3.852 10.937
+```
+
+Remember that our data is a combination of deer of multiple ages/sexes (and CWD statuses), so the variation here is not entirely unexpected. 
+
+---
+## Home Range Estimation - Graph
+
+
+``` r
+library(ggforce) #lets us draw circles
+mux &lt;- MCMCsummary(central_out, params = 'mu')$`50%`[1:6] 
+muy &lt;- MCMCsummary(central_out, params = 'mu')$`50%`[7:12] 
+mus &lt;- cbind(mux, muy)
+
+collars$Collar.ID &lt;- as.character(collars$Collar.ID)
+ggplot(collars)+
+  geom_line(dat = collars, aes(x = x/1e6, y= y/1e6, group = Collar.ID, col = Collar.ID))+
+  geom_point(dat =mus, aes(x = mux, y =muy), cex = .5)+
+  geom_circle(dat = mus, aes(x0 = mux, y0 = muy, r = 2.45*sigma$mean))+
+  scale_color_manual(values = rainbow(6))+
+  theme_bw()+
+  coord_equal()+
+  xlab('UTM W (km)')+
+  ylab('UTM N (km)')+
+  theme(axis.title = element_text(size = 15))
+```
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-35-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Home Range Estimation - Graph
+
+Clearly our model is not suuuuuuper accurate, but it's a good starting point. 
+
+&lt;img src="12_MovementModels_files/figure-html/unnamed-chunk-36-1.png" width="504" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

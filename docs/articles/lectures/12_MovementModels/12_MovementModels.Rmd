@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message
 library(WILD8370)
 library(nimble)
 library(MCMCvis)
+library(ggforce)
 source(here::here("R/zzz.R"))
 # library(gganimate)
 ```
@@ -514,4 +515,265 @@ arrows(s[1,1,1:(nocc-1)], s[1,2, 1:(nocc-1)],
 ```
 
 
+---
+## Random Walks in Nimble
 
+Let's see how we might use these models to analyze actual data. 
+
+<br/>
+
+In the WILD8370 package, you'll find some location data from 6 collared white tailed deer in Arkansas. Note that in practice you would want a larger sample size. 
+
+```{r, echo = T}
+data(collars)
+colnames(collars)
+```
+
+---
+## Random Walks in Nimble
+
+Let's start by plotting out the deer, just to see what our data looks like. 
+
+```{r, echo = T,fig.height=4.5, fig.width=7}
+ggplot(collars, aes(x = x/1e6, y= y/1e6))+
+    geom_line()+
+    facet_wrap(~Collar.ID, scales = 'free')+
+    theme_bw()
+```
+
+---
+## Random Walks in Nimble
+
+We'll first fit the most basic movement model we can to this data - the random walk. 
+
+<br/>
+
+$$s_{i,x,t=1} \sim Uniform(x_1, x_2)$$
+
+$$s_{i,y,t=1} \sim Uniform(y_1, y_2)$$
+
+$$s_{i, x, t+1} \sim Normal(s_{i, x, t}, \sigma ^2 )$$
+
+$$s_{i, y, t+1} \sim Normal(s_{i, y, t}, \sigma^2 )$$
+---
+## Random Walks in Nimble
+
+We'll first fit the most basic movement model we can to this data - the random walk. The only complicated part of this model is that not all animals have the same number of locations, so we have to make sure our `t` loops accounts for this:
+
+```{r, echo = T}
+r_walk <- nimbleCode({
+  for(i in 1:nind){
+    s[i,1,1] ~ dunif(xmin, xmax)
+    s[i,2,1] ~ dunif(ymin, ymax)
+    for(t in 2:nTelemetry[i]){
+      s[i,1,t] ~ dnorm(s[i,1,t-1], sd = sigma)
+      s[i,2,t] ~ dnorm(s[i,2,t-1], sd= sigma)
+    }
+  }
+  sigma ~ dgamma(1,1)
+})
+```
+
+---
+## Random Walks in Nimble
+
+We need to clean up the data. We need the coordinates to be in meters (UTMs) and I find it easier to use small numbers, so I divide the UTMS by 1e6. 
+
+```{r,echo=TRUE}
+collars$Collar.ID_f <- as.numeric(as.factor(collars$Collar.ID))
+nind <- length(unique(collars$Collar.ID_f))
+nTelemetry <- as.vector(table(collars$Collar.ID_f))
+s <- array(NA, c(nind, 2, max(nTelemetry)))
+for(i in 1:nind){
+  me <- collars[collars$Collar.ID_f == i,]
+  s[i,1,1:nTelemetry[i]] <- me$x/1e6
+  s[i,2,1:nTelemetry[i]] <- me$y/1e6
+}
+xmin <- min(s[,1,], na.rm = T)-1 #add some space around locations
+xmax <- max(s[,1,], na.rm = T)+1 #add some space around locations
+ymin <- min(s[,2,], na.rm = T)-1 #add some space around locations
+ymax <- max(s[,2,], na.rm = T)+1 #add some space around locations
+```
+
+---
+## Random Walks in Nimble
+
+```{r, echo = T}
+consts <- list(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, nind = nind, nTelemetry = nTelemetry)
+dat <- list(s = s)
+inits <- function(){list(sigma = rgamma(1,1,1))}
+params <- 'sigma'
+```
+
+```{r, echo = T, eval = F}
+rw_out <- nimbleMCMC(code = r_walk,
+                     data = dat,
+                     constants = consts,
+                     inits = inits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+MCMCvis::MCMCtrace(rw_out, pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+## Random Walks in Nimble
+
+```{r,fig.height=4.5, fig.width=7}
+rw_out <- readRDS('rw_out1.rds')
+MCMCvis::MCMCtrace(rw_out, pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+## Random Walks in Nimble
+
+What have we learned? 
+
+```{r, echo = T}
+2*summary(rw_out)$quantiles*1e6
+```
+
+Our model tells us that on average, the deer moved around 495 meters from its previous location (remember these are locations taken every 4 hours). 
+
+--
+<br/>
+This model is fine, but not especially useful. 
+
+
+---
+## Home Range Estimation
+
+Let's try to fit a different type of movement model so we can learn about the approximate home range of the individual. In this case, we are interested in determining 2 latent parameters - the 'activity center' of the individual, and the average distance an individual might be at any given time from that central point.  This model ignores any temporal correlation between locations. 
+
+Note that this model looks very similar to the random walk model, but we really aren't explicitly modeling 'movement.' 
+
+```{r, echo = T}
+central_walk <- nimbleCode({
+  for(i in 1:nind){
+    mu[i,1] ~ dunif(xmin, xmax)
+    mu[i,2] ~ dunif(ymin, ymax)
+    for(t in 1:nTelemetry[i]){
+      s[i,1,t] ~ dnorm(mu[i,1], sd = sigma[i])
+      s[i,2,t] ~ dnorm(mu[i,2], sd= sigma[i])
+    }
+     sigma[i] ~ dgamma(1,1)
+  }
+})
+```
+
+---
+## Home Range Estimation
+
+```{r, echo = T}
+consts <- list(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, nind = nind, nTelemetry = nTelemetry)
+dat <- list(s = s)
+```
+
+We will need to give initial values for mu and sigma
+
+```{r, echo  = T}
+mu.init <- apply(s, c(1,2), function(x) mean(x, na.rm= T))
+inits <- function(){list(sigma = rgamma(6,1,1), mu = mu.init)}
+params <- c('mu', 'sigma')
+```
+
+---
+## Home Range Estimation
+
+Here's a quick visual of our initial value for $mu$ for the first individual relative to the recorded locations. 
+
+```{r, echo = T,fig.height=4.5, fig.width=7}
+plot(s[1,1,], s[1,2,], type = 'b', pch = 19, cex= .5)
+points(mu.init[1,1], mu.init[1,2], col = 'red', pch= 19)
+```
+
+---
+## Home Range Estimation
+
+```{r, echo = T, eval = F}
+central_out <- nimbleMCMC(code = central_walk,
+                     data = dat,
+                     constants = consts,
+                     inits = inits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+MCMCvis::MCMCtrace(central_out, params = c('sigma'), pdf = F, Rhat = T, n.eff = T)
+```
+
+---
+## Home Range Estimation
+
+```{r,fig.height=4.5, fig.width=7}
+central_out <- readRDS('rw_out2.rds')
+MCMCvis::MCMCtrace(central_out[,13:15,], params = 'sigma', pdf = F, Rhat = T, n.eff = T)
+```
+
+
+---
+## Home Range Estimation
+
+A fun fact, that you do not need to memorize, is that home range size can be estimated from this model as a circle with radius $2.45*\sigma$. 
+
+Let's see what that says about our deer and then compare the estimate home range with the raw data. 
+
+--
+
+```{r, echo = T}
+sigma <- MCMCvis::MCMCsummary(central_out, params = 'sigma', Rhat =  F, n.eff = F)
+2.45*sigma*1e3 #radius in km
+```
+```{r, echo = T}
+pi*(2.45*sigma$mean*1e3)^2 #~home range in km^2
+```
+
+Remember that our data is a combination of deer of multiple ages/sexes (and CWD statuses), so the variation here is not entirely unexpected. 
+
+---
+## Home Range Estimation - Graph
+
+```{r, echo = T,fig.height=4.5, fig.width=7}
+library(ggforce) #lets us draw circles
+mux <- MCMCsummary(central_out, params = 'mu')$`50%`[1:6] 
+muy <- MCMCsummary(central_out, params = 'mu')$`50%`[7:12] 
+mus <- cbind(mux, muy)
+
+collars$Collar.ID <- as.character(collars$Collar.ID)
+ggplot(collars)+
+  geom_line(dat = collars, aes(x = x/1e6, y= y/1e6, group = Collar.ID, col = Collar.ID))+
+  geom_point(dat =mus, aes(x = mux, y =muy), cex = .5)+
+  geom_circle(dat = mus, aes(x0 = mux, y0 = muy, r = 2.45*sigma$mean))+
+  scale_color_manual(values = rainbow(6))+
+  theme_bw()+
+  coord_equal()+
+  xlab('UTM W (km)')+
+  ylab('UTM N (km)')+
+  theme(axis.title = element_text(size = 15))
+```
+
+---
+## Home Range Estimation - Graph
+
+Clearly our model is not suuuuuuper accurate, but it's a good starting point. 
+
+```{r, fig.height=6}
+ggplot(collars)+
+  geom_line(dat = collars, aes(x = x/1e6, y= y/1e6, group = Collar.ID, col = Collar.ID))+
+  geom_point(dat =mus, aes(x = mux, y =muy), cex = 2)+
+  geom_circle(dat = mus, aes(x0 = mux, y0 = muy, r = 2.45*sigma$mean))+
+  scale_color_manual(values = rainbow(6))+
+  theme_bw()+
+  xlab('UTM W (km)')+
+  ylab('UTM N (km)')+
+  theme(axis.title = element_text(size = 15), axis.text = element_text(size = 15),
+  legend.position = 'none')
+
+```
