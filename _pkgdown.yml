@@ -74,6 +74,8 @@ navbar:
           href: articles/Lab6_MissingData.html
         - text: "Lab 7: Goodness of Fit"
           href: articles/Lab7_GOF.html
+        - text: "Lab 8: Resource Selection Functions"
+          href: articles/Lab8_Movement.html
     - icon: far fa-bookmark
       text: "References"
       menu:
