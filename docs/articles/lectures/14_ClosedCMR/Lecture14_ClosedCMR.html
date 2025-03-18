@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 14</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 14
+]
+.subtitle[
+## Closed Population Mark Recapture
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+## Readings
+
+&gt; ### Kéry &amp; Schaub 134-170
+
+
+&gt; ### [Powell &amp; Gale chp. 8](https://docs.wixstatic.com/ugd/95e73b_6d832c61405d4b3cbd9d99bbb4530f7b.pdf)
+
+---
+## Estimating abundance
+
+#### Unbiased estimates of `\(\large N\)` require estimating `\(\large p\)`
+
+#### *Many* methods available:
+
+- Mark-recapture  
+
+- Removal sampling  
+
+- Distance sampling  
+
+- Double observer  
+
+- N-mixture models
+
+---
+## Estimating abundance
+
+#### Unbiased estimates of `\(\large N\)` require estimating `\(\large p\)`
+
+#### *Many* methods available:
+
+- **Mark-recapture**  
+
+- Removal sampling  
+
+- Distance sampling  
+
+- Double observer  
+
+- N-mixture models
+
+
+---
+class: inverse, middle, center
+
+# Capture-mark-recapture
+
+---
+## Capture-mark-recapture (CMR)
+
+#### CMR includes a **wide** variety of related techniques and models  
+
+--
+#### Traditionally, CMR referred to methods of capturing, marking, and then recapturing individuals at some point in the future  
+
+--
+#### This results in a **capture-history** for each individual:  
+
+##### Individual 1: `\(101101\)`  
+##### Individual 2: `\(011001\)`  
+
+???
+
+Individual 1 was captured on occasions 1, 3, 4, and 6  
+
+Individual 2 was captured on occasions 2,3, and 6. 
+
+--
+#### From the capture-histories, possible to estimate `\(\large p\)`
+
+--
+#### With `\(\large p\)`, possible to estimate `\(\large N\)`
+
+`$$\large N = \frac{C}{p}$$`
+
+---
+## Capture-mark-recapture
+
+#### From capture-histories, we can estimate:  
+
+--
+- abundance  
+
+--
+- detection probability  
+
+--
+- survival  
+
+--
+- movement  
+
+--
+- recruitment  
+
+--
+- individual growth  
+
+--
+- populations trends   
+
+---
+## Capture-mark-recapture
+
+#### CMR methods are not restricted to physical captures and recaptures
+
+- "natural marks", e.g. genetic markers, antler patterns, spots
+
+
+- Resighting marks that can be seen from a distance
+
+
+- Automated systems that record ID's, like PIT tags
+
+---
+## Capture-mark-recapture
+
+
+#### CMR methods are not restricted to physical captures and recaptures  
+
+#### *What ties all of these methods together is that we have individual-level capture-histories*
+
+---
+## Capture-mark-recapture
+
+#### Key to closed CMR is that because individuals do not enter or leave the population, we assume any 0 in the capture history is non-detection `\(\large (1-p)\)`
+
+- in simplest model, easy to translate capture history into probabilistic statements based only on `\(p\)`:
+
+.pull-left[
+##### Individual 1: `\(\large 101101\)`  
+##### Individual 2: `\(\large 011001\)`  
+]
+
+.pull-right[
+#### `\(\large p(1-p)pp(1-p)p\)`  
+#### `\(\large (1-p)pp(1-p)(1-p)p\)`
+]
+
+&lt;br/&gt;
+--
+
+#### In the CMR literature, the constant `\(\large p\)` model is known at the `\(M_0\)` model ([Otis et al. (1978)](https://www.jstor.org/stable/pdf/3830650.pdf?casa_token=Dr4Y3XD5DJAAAAAA:IQA7BkqTFg7_0h2kqbrn20CGZLBbTBBbuAsCWsvdRWD-muQDenn-UVYfpdL3q09ZTmiGGxQBm5vnFV9RomNxOdtBq2c98vOSELdt6-hRyoY52ipEYj4))
+
+---
+## The `\(\large M_0\)` model in JAGS
+
+#### In all closed CMR models, `\(\large N\)` is unknown
+
+- we know `\(n\)` but how many individuals were not detected at all?
+
+--
+- data augmentation!
+
+---
+class: inverse, middle, center
+
+# Data augmentation
+
+---
+## Data augmentation
+
+### Imagine an occupancy study:
+
+- `\(\large M\)` sites are surveyed  
+    + `\(\large N\)` sites are occupied `\(\large (z = 1)\)`
+    + `\(\large M - N\)` sites are unoccupied `\(\large (z = 0)\)`  
+
+--
+- species is detected `\((y_i=1)\)` at `\(n\)` sites
+    + species is not detected `\((y_i=0)\)` at `\(M-n\)` sites  
+    
+--
+`$$\Large y_i \sim Bernoulli(z_i p)$$`
+
+---
+## Data augmentation
+
+### Imagine an occupancy study:
+
+#### How many sites are actually occupied `\(\large (N)\)`?  
+
+- if `\(\large \psi\)` is the probability of occupancy
+
+`$$\Large z_i \sim Bernoulli(\psi)$$`
+
+--
+- and
+
+`$$\Large N = \sum_{i=1}^M z_i$$`
+
+---
+## Data augmentation
+
+#### These ideas can be applied to CMR studies
+
+#### Imagine a CMR study: 
+
+- `\(\large n\)` individuals were detected during the study
+
+--
+- `\(\large N-n\)` individuals were not detected
+    + how do we know how many individuals were not detected?  
+
+--
+- Add `\(\large M-n\)` individuals to the data
+    + Choose `\(M \gt \gt N\)`
+    + All of these "augmented" individuals have `\(\large y=0\)`
+
+--
+`$$\large z_i \sim Bernoulli(\psi)$$`
+
+`$$\large N = \sum_{i = 1}^M z_i$$`
+---
+## The `\(\large M_0\)` model in JAGS
+
+#### In all closed CMR models, `\(\large N\)` is unknown
+
+- We know `\(n\)` but how many individuals were not detected at all?
+
+- Data augmentation!
+
+--
+`$$\Large z_i \sim Bernoulli(\psi)$$`
+
+--
+`$$\Large y_{ik} \sim Bernoulli(z_ip)$$`
+
+--
+`$$\Large \psi \sim beta(1,1)$$`
+
+`$$\Large p \sim beta(1,1)$$`
+
+--
+`$$\Large N = \sum_{i=1}^M z_i$$`
+---
+## The `\(\large M_0\)` model in Nimble
+
+
+``` r
+nimbleCode({
+  psi ~ dbeta(1, 1)
+  p ~ dbeta(1, 1)
+  
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    
+    for(t in 1:T){
+      y[i, t] ~ dbern(p * z[i])
+    } # end t
+  } # end i
+  
+  N &lt;- sum(z[1:M])
+})
+```
+
+---
+## Capture-mark-recapture
+
+####  In addition to the `\(\large M_0\)` model, Otis et al. 1978 outlined 3 other basic *closed* CMR "models":
+
+--
+- `\(\large M_t\)`: variation in `\(p\)` among occasions
+
+`$$\large p_1(1-p_2)p_3p_4(1-p_5)p_6$$`
+
+--
+- `\(\large M_h\)`: variation in `\(p\)` among individuals
+
+`$$\large p_i(1-p_i)p_ip_i(1-p_i)p_i$$`
+
+--
+- `\(\large M_b\)`: behavioral responses (trap happiness/shyness)
+
+`$$\large p(1-c)cc(1-c)c$$`
+
+.footnote[
+[1] David Otis was a post-doc at USU in the Coop Unit when he wrote this seminal paper
+]
+
+
+---
+## Capture-mark-recapture
+
+#### Otis et al. 1978 was seminal because it clarified ways that `\(\large p\)` might vary
+
+--
+However, `\(\large M_0\)`, `\(\large M_t\)`, `\(\large M_h\)`, `\(\large M_b\)` are not single models but instead families of models that allow `\(p\)` to vary for different reasons
+
+--
+#### In modern Bayesian analysis of closed CMR models, we can use the tools you learned so far in this course to model complex variation in `\(\large p\)`
+
+- group effects
+
+- hierarchical structure
+
+- continuous covariates (via GLM)
+
+---
+## The `\(\large M_t\)` model
+
+#### How do we model `\(\large p\)` as a function of occassion?
+
+
+``` r
+nimbleCode({
+  psi ~ dbeta(1, 1)
+  for(t in 1:T){
+    p[t] ~ dbeta(1, 1)
+  }
+  
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    
+    for(t in 1:T){
+      y[i, t] ~ dbern(p[t] * z[i])
+    } # end t
+  } # end i
+  
+  N &lt;- sum(z[1:M])
+}
+```
+
+---
+## The `\(\large M_t\)` model 
+
+
+``` r
+model{
+  psi ~ dbeta(1, 1)
+  for(t in 1:T){
+    lp[t] ~ dnorm(mu.p, tau.p)
+    logit(p[t]) &lt;- lp[t]
+  }
+  mu.p ~ dnorm(0, 0.1)
+  tau.p ~ dgamma(0.25, 0.25)
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    
+    for(t in 1:T){
+      y[i, t] ~ dbern(p[t] * z[i])
+    } # end t
+  } # end i
+}
+```
+
+- What is the difference between this model and the previous? How will this change influence estimates of `\(p_t\)`?
+
+---
+## Model `\(\large M_b\)`
+
+#### Behavioral responses are common in studies that require phyisical captures
+
+- probability of capture `\(\large \neq\)` probability of recapture `\((\large c)\)`
+
+- individuals learn to avoid traps (trap shy; `\(\large p &gt; c\)`)
+
+- individuals learn to seek out traps (trap happy; `\(\large c &gt; p\)`)
+
+
+--
+#### In the `\(\large M_b\)` models, `\(\large p\)` depends on whether an individual has previously been captured
+
+- response can be permanent or ephemeral 
+
+---
+## Model `\(\large M_b\)`
+
+
+``` r
+nimbleCode({
+  psi ~ dbeta(1, 1)
+  p ~ dbeta(1, 1)
+  c ~ dbeta(1, 1)
+  
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    
+    y[i, 1] ~ dbern(p * z[i])
+    
+    for(t in 2:T){
+      y[i, t] ~ dbern(z[i] * ((1 - y[i, t-1]) * p + y[i, t-1] * c))
+    } # end t
+  } # end i
+  
+  N &lt;- sum(z[1:M])
+  trap.response &lt;- c - p
+}
+```
+
+
+---
+## Model `\(\large M_h\)`
+
+#### Individual heterogeniety not captured by covariates 
+
+- treat individuals as random effect
+
+`$$\large logit(p_i) \sim normal(logit(\mu_p), \sigma_p)$$`
+
+--
+- models with heterogeneity are not always identifiable 
+    + different assumptions about `\(p_i\)` will give different estimates of `\(N\)` but model selection does not differentiate between models 
+    
+--
+- however, *not* modeling individual heterogeneity leads to known bias
+    + assuming constant `\(p\)` underestimates `\(N\)`
+
+
+---
+## Model `\(\large M_h\)`
+
+
+``` r
+model{
+  psi ~ dbeta(1, 1)
+  mean.p ~ dbeta(1, 1)
+  mean.lp &lt;- log(mean.p) - log(1 - mean.p)
+  tau.p ~ dgamma(0.25, 0.25)
+  
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    lp[i] ~ dnorm(mean.lp, tau.p)
+    logit(p[i]) &lt;- lp[i]
+    
+    y[i] ~ dbin(p[i] * z[i], T)
+  } # end i
+  
+  N &lt;- sum(z[1:M])
+}
+```
+
+---
+## Extensions of the Otis et al. models
+
+#### Many extensions possible
+
+- `\(\large M_{tb}\)`
+
+- `\(\large M_{th}\)`
+
+- `\(\large M_{tbh}\)`
+
+- and many more limited only by your data and your modeling skills
+
+
+--
+#### As additional variation is added, more data is needed to estimate parameters
+
+- All else equal, each new parameter results in lower precision for `\(\large N\)` (no free lunch!)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

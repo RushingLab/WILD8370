@@ -54,6 +54,10 @@ navbar:
           href: articles/lectures/10_DynamicOcc/10_DynamicOcc.html
         - text: "Lecture 12: Movement Models"
           href: articles/lectures/12_MovementModels/12_MovementModels.html
+        # - text: "Lecture 13: Known Fate"
+        #   href: articles/lectures/13_KnownFate/13_KnownFate.html
+        - text: "Lecture 14: Closed CMR"
+          href: articles/lectures/14_ClosedCMR/Lecture14_ClosedCMR.html
           
     - text: "Labs"
       icon: fas fa-laptop-code
