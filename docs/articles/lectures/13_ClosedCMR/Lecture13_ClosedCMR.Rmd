@@ -1,5 +1,5 @@
 ---
-title: "Lecture 14"
+title: "Lecture 13"
 subtitle: "Closed Population Mark Recapture"
 author: "<br/><br/><br/>Spring 2025"
 output:
