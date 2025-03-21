@@ -54,10 +54,10 @@ schedule <- data.frame(WK = c("1", "", "",
       "Spring Break - No Class", "Spring Break - No Class", "", #9
       "Occupancy Models", "Dynamic Occupancy Models", "", #10
       "Simple Movement Models", "More Movement Models", "", #11
-      "Known Fate Models", "Simple CMR", "", #12
-      "More CMR", "Multi-state CMR", "", #13
-      "Spatial Capture Recapture", "Spatial Capture Recapture", "", #14
-      "Two-stage models", "Two-stage models", "", #15 
+      "Simple CMR for Abundance", "Closed SCR", "", #12
+      "Known Fate", "CJS Models", "", #13
+      "Continuous Time CJS", "Multi-state CMR", "", #14
+      "TBD", "TBD", "", #15 
       "TBD", "", "", #16
       ""), 
                        Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
@@ -70,8 +70,8 @@ schedule <- data.frame(WK = c("1", "", "",
                                "", "Missing Data", "",
                                "", "", "", # Spring break
                                "", "Goodness of Fit tests", "",
-                               "", "Lab 8", "", 
-                               "", "Lab 9", "", 
+                               "", "Lab 8: RSFs", "", 
+                               "", "Lab 9: SCR", "", 
                                "", "Lab 10", "",
                                "", "Lab 11", "", 
                                "", "Lab 12", "", 

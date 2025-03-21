@@ -342,7 +342,7 @@ nimbleCode({
   } # end i
   
   N <- sum(z[1:M])
-}
+})
 ```
 
 ---

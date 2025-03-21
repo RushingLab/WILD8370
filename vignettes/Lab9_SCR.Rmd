@@ -47,7 +47,6 @@ Details of the three data sets summarized below. The number of search days witho
 
 + Location: Siitama, Pirkanmaa, Finland (61.6°N, 24.2°E)
 + Year of data collection: 1995
-+ Captured (recaptured) individuals: 555 (298) males, 273 (151) females
 + Coordinator: Niklas Wahlberg
 + Coordinate reference system: Finland Zone 3 (EPSG:2393)
 
@@ -59,11 +58,52 @@ We will work with 3 files to get the information we need:
 
 ## Non-Spatial CMR
 
-Let's begin by analyzing the data in a non-spatial framework. 
+Let's begin by analyzing the data in a non-spatial framework. We know that sometimes not all areas were surveyed, so we'll model detection probability as a function of the number of traps that were open.
+
+```{r}
+nimbleCode({
+  psi ~ dbeta(1, 1) #N/M
+  for(t in 1:nocc){
+    logit(p[t]) = alpha0 + alpha1*effort[t]
+  }
+  
+  for(i in 1:M){
+    z[i] ~ dbern(psi)
+    
+    for(t in 1:nocc){
+      y[i, t] ~ dbern(p[t] * z[i])
+    } # end t
+  } # end i
+  
+  N <- sum(z[1:M])
+})
+```
 
 
+Let's grab the data to get it into the format we need:
 
+```{r}
+effort <- Finnish_butterflies$effort
+head(effort)
+```
+There appear to be 14 trap occasions and 112 traps. 
 
+```{r}
+data('butterflies')
+caps <- as.data.frame(Finnish_butterflies$cap_hist)
+head(caps)
+```
+The data gives us one row per capture. Now we need to put this into one row per individual, one column per occasion. 
+
+```{r}
+nind <- length(unique(caps$Individual))
+nocc <- 14
+y <- array(0, c(nind, nocc))
+for(i in 1:nrow(caps)){
+  y[caps$Individual[i],caps$Day[i]] <- 1
+}
+head(y)
+```
 
 
 
