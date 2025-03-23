@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 )
 library(dplyr)
 library(knitr)
+library(ggplot2)
 source(here::here("R/zzz.R"))
 ```
 
@@ -41,6 +42,8 @@ Fabritius, H., Rönkä, K. & Ovaskainen, O. The dual role of rivers in facilitat
 
 The full study uses three datasets but today we will be only using the data from 1995. 
 
+**In case the authors read this and wonder what the heck we are teaching American students, I have modified the habitat information to be simpler than the original study. So the results will be slightly off from the original study.
+
 From the authors:
 
 Details of the three data sets summarized below. The number of search days without (with) parenthesis indicates the length of study period (versus the number of effective search days with search activity).
@@ -50,21 +53,53 @@ Details of the three data sets summarized below. The number of search days witho
 + Coordinator: Niklas Wahlberg
 + Coordinate reference system: Finland Zone 3 (EPSG:2393)
 
-We will work with 3 files to get the information we need:
+We will work with 4 files to get the information we need:
 
 1. Effort log - a 1/0 matrix indicating if the 'trap' was operational 
 2. Records of each time an individual was captured (and what trap)
 3. Trap locations in Finland Zone 3 units 
+4. Habitat information about the trapping area
+
+
+## Summary Info
+
+Let's see how many individuals we have and what our effort looks like:
+
+```{r, echo = TRUE}
+data('butterflies')
+
+```
+
+
+```{r}
+effort <- Finnish_butterflies$effort
+str(effort)
+```
+There appear to be 14 trap occasions and 112 traps. 
+
+```{r}
+caps <- as.data.frame(Finnish_butterflies$cap_hist)
+head(caps)
+```
+The data gives us one row per capture. The individual ID is given for each capture, as well as the day, and trap of this capture. We also have some indication of sex (as a binary variable). 
+
+
+```{r}
+hist(rowSums(table(caps$Individual, caps$Day)))
+```
+Most individuals were only captured once, but a few individuals were capture up to 8 times!
 
 ## Non-Spatial CMR
 
 Let's begin by analyzing the data in a non-spatial framework. We know that sometimes not all areas were surveyed, so we'll model detection probability as a function of the number of traps that were open.
 
 ```{r}
-nimbleCode({
+cmr_flies <- nimbleCode({
   psi ~ dbeta(1, 1) #N/M
+  alpha0 ~ dnorm(0, 1)
+  alpha1 ~ dnorm(0, 1)
   for(t in 1:nocc){
-    logit(p[t]) = alpha0 + alpha1*effort[t]
+    logit(p[t]) <- alpha0 + alpha1*effort[t]
   }
   
   for(i in 1:M){
@@ -76,42 +111,292 @@ nimbleCode({
   } # end i
   
   N <- sum(z[1:M])
+  EN <- M*psi
 })
 ```
 
+We can start by putting our capture data into a different format. We want one row per individual, one column per occasion. We also need to choose a value of $M$. Our goal is simply to choose a value of M such that $N/M < 1$. Of course, we don't *know* $N$, so this is tricky. 
 
-Let's grab the data to get it into the format we need:
-
-```{r}
-effort <- Finnish_butterflies$effort
-head(effort)
-```
-There appear to be 14 trap occasions and 112 traps. 
-
-```{r}
-data('butterflies')
-caps <- as.data.frame(Finnish_butterflies$cap_hist)
-head(caps)
-```
-The data gives us one row per capture. Now we need to put this into one row per individual, one column per occasion. 
+Let's start by choosing a value that will likely be too small so we can see what happens. I'll choose $M$ = `nind` + 10, which would suggest we only missed 10 butterflies in the entire population when sampling.
 
 ```{r}
 nind <- length(unique(caps$Individual))
 nocc <- 14
-y <- array(0, c(nind, nocc))
+M <- nind + 10 
+y <- array(0, c(M, nocc)) 
+```
+Note that I create an array that has $M$ rows, not $nind$ rows. This is because we need to tell the model the capture history of EVERY individual that could potentially be in the population, including the ones we never saw.
+
+```{r}
 for(i in 1:nrow(caps)){
   y[caps$Individual[i],caps$Day[i]] <- 1
 }
 head(y)
+tail(y)
+```
+Next we can cleanup effort, which will tell the model the number of traps open per occasion. 
+
+```{r}
+head(effort)
+eff <- colSums(effort[,-1]) 
 ```
 
+Above, we're taking the column sums, which will give us a count of how many traps were open. Notice that column 1 is trap ID, so we don't add that one up for our effort vector. 
 
+#### First Try CMR 
+
+Now let's make our objects and run the model!
+```{r}
+nc <- list(effort = eff,nocc = nocc, M = M)
+nd <- list(y = y)
+z.init <- c(rep(1, nind), rep(0, M-nind))
+ni <- list(psi = sum(z.init)/M, alpha0 = rnorm(1), alpha1 = rnorm(1), z = z.init)
+params <- c('alpha0', 'alpha1', 'psi', 'N')
+```
+
+We'll start with the long way of running the model look for problems with initial values:
+```{r, echo = T, eval = T}
+prepnim <- nimbleModel(code = cmr_flies, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+Uh oh! Let's figure out what went wrong. 
+
+```{r}
+sum(prepnim$logProb_z)
+```
+
+Nothing wrong with the z values. Is y the problem?
+
+```{r}
+sum(prepnim$logProb_y)
+```
+
+Yes! The log probability is -Inf. That's not great. 
+
+Individual 1 seems to have issues:
+```{r}
+prepnim$logProb_y[1,]
+```
+
+```{r}
+prepnim$y[1,]
+```
+
+Hmm, it doesn't like when we didn't see it. What did we initialize p as? 
+
+```{r}
+prepnim$p
+```
+
+Oops! We told the model our detection probability was way too high! Let's try again with lower values:
+
+```{r}
+ni <- list(psi = sum(z.init)/M, alpha0 = rnorm(1), 
+           alpha1 = 0, z = z.init)
+```
+
+```{r, echo = T, eval = T}
+prepnim <- nimbleModel(code = cmr_flies, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+Much better. We can now run the model. 
+
+#### Second Try CMR 
+```{r, echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "cmr_flies", 'params'))
+cmr1 <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = cmr_flies, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 50000, nburnin = 25000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+cmr1 <- as.mcmc.list(cmr1)
+stopCluster(cl)
+```
+
+```{r, echo = F}
+cmr1 <- readRDS('cmr1.rds')
+```
+
+Let's see what our model output gives us.
+```{r}
+MCMCvis::MCMCtrace(cmr1, pdf = F, Rhat = T, n.eff = T)
+```
+
+Uh oh! Our value for $M$ is clearly way too low. The posterior for $psi$ is pushing up against 1, which means we've enforced a total population that is lower than the number the data is suggesting. Let's try again with a higher M. 
+
+One way to choose a value of M is to look at the raw detection frequency:
+
+```{r}
+mean(rowSums(table(caps$Individual, caps$Day)))
+```
+
+On average, we saw each butterfly 2.6 times, despite going out for 14 days. That tells us that a good starting M might be about $nind * 14/2.6$ which is ~ $nind*5.4$
+
+```{r}
+M <- nind*6
+y <- array(0, c(M, nocc))
+for(i in 1:nrow(caps)){
+    y[caps$Individual[i],caps$Day[i]] <- 1
+}
+nc <- list(effort = eff,nocc = nocc, M = M)
+nd <- list(y = y)
+z.init <- c(rep(1, nind), rep(0, M-nind))
+ni <- list(psi = sum(z.init)/M, alpha0 = rnorm(1), alpha1 = 0, z = z.init)
+```
+
+#### Third Try CMR 
+
+```{r, echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "cmr_flies", 'params'))
+cmr2 <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = cmr_flies, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 50000, nburnin = 25000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+cmr2 <- as.mcmc.list(cmr2)
+stopCluster(cl)
+```
+
+```{r, echo = F}
+cmr2 <- readRDS('cmr2.RDS')
+```
+
+Let's see what our model output gives us.
+```{r}
+MCMCvis::MCMCtrace(cmr2, pdf = F, Rhat = T, n.eff = T)
+```
+
+Much better! We can see that this time our M was large enough - only about 18% of the M individuals were probably even real. The fact that we chose an M that was too large doesn't matter, but it does slow down our model runs a little bit. Remember that biologically, $psi$ means nothing. If we were to run this again, we could drop the value of M down by a few hundred and still get the same result with less computer time. 
+
+```{r}
+MCMCsummary(cmr2)
+```
+
+### Graphing Detection Probability 
+
+Before we move on, let's graph how detection probability is expected to increase with increasing effort (traps open). 
+
+Remember that our equation for detection is:
+```{r, eval = F, echo = T}
+logit(p[t]) <- alpha0 + alpha1*effort[t]
+```
+
+We can replicate that with R code and our MCMC chains to get a CI for detection over different levels of effort. We'll first create a vector with all the possible values of effort we want to plot along, and then use the equation above to estimate the value of p for each level of effort using each iteration of the MCMC. Then we'll take the quantiles of those estimates to get the CI of the posterior. 
+
+```{r}
+alphas <- as.matrix(cmr2[,c('alpha0', 'alpha1'),])
+effort_seq <- 1:112 
+niter <- nrow(alphas)
+p_out <- array(NA, c(niter, length(effort_seq)))
+for(j in 1:niter){
+  p_out[j,] <- plogis(alphas[j,'alpha0'] + alphas[j,'alpha1']*effort_seq)
+}
+p.CI <- apply(p_out, 2, FUN = function(x){quantile(x, c(0.025, .5, .975))})
+```
+
+Time to graph! 
+
+```{r}
+gg.p <- data.frame(effort = effort_seq,
+                   LCI = p.CI[1,],
+                   UCI = p.CI[3,],
+                   Median = p.CI[2,])
+library(ggplot2)
+ggplot(gg.p, aes(x = effort, y = Median))+
+  geom_line()+
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), alpha = .4, fill = 'lightblue')+
+  theme_bw()+
+  ylim(0, 1)+
+  ylab("Detection Probability")+
+  xlab("Number of Traps Open")+
+  theme(axis.text = element_text(size = 20), axis.title = element_text(size = 25))
+```
+
+## Spatial Capture Recapture 
+
+Now that we've analyzed the data in a non-spatial manner, lets try fitting the data to a spatial model. 
+
+Here's the model we'll use:
+
+```{r, echo = T}
+scr_flies <- nimbleCode({
+beta0 ~ dnorm()
+beta1 ~ dnorm(0, 0.1)
+g0 ~ dunif(0, 1)
+sigma ~ dunif(0, 0.5)
+
+for(g in 1:G) { ## Loop over pixels
+  lambda[g] <- exp(beta1*canopy[g])*pixelArea
+  pi[g] <- lambda[g]/SumLambda
+}
+SumLambda <- sum(lambda)
+
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) 
+  s[i,2] ~ dunif(ylim[1], ylim[2])
+  pixel[i] <- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
+                     round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+  logProb[i] <- log(pi[pixel[i]])
+  zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
+  z[i] ~ dbern(psi)
+  for(j in 1:J) {
+    dist[i,j] <- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
+  }
+}
+for(i in 1:M) {  ## Model for capture histories
+  for(j in 1:J) {
+    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  }
+}
+
+EN <- M*psi
+N <- sum(z)
+})
+```
+
+There are 3 types of habitat designated by the authors:
+- Low quaility matrix (habitat type 1)
+- High quality matrix (habitat type 3)
+- Breeding area (habitat 2)
 
 
 ## Homework
 
-1. 
+1. PP check of CMR model 
 
-2. 
+2. CMR model for model Mb
 
-3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+3. Raster of butterflies by sex
+
+4. Find the error in code someone else gives you.
+
+5.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
