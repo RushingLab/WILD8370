@@ -4,7 +4,7 @@ output:
   rmarkdown::html_vignette:
     keep_md: yes
 vignette: >
-  %\VignetteIndexEntry{Lab8_Movement}
+  %\VignetteIndexEntry{Lab9_SCR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

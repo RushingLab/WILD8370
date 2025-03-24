@@ -80,6 +80,8 @@ navbar:
           href: articles/Lab7_GOF.html
         - text: "Lab 8: Resource Selection Functions"
           href: articles/Lab8_Movement.html
+        - text: "Lab 9: Spatial Capture Recapture"
+          href: articles/Lab9_SCR.html
     - icon: far fa-bookmark
       text: "References"
       menu:
