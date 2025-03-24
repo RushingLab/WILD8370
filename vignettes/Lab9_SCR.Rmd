@@ -13,6 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
    warning = FALSE, message = FALSE,
    fig.align = 'center', fig.retina = 2,
+  fig.height=8, fig.width=8,
   collapse = TRUE,
   comment = "#>"
 )
@@ -84,7 +85,7 @@ head(caps)
 The data gives us one row per capture. The individual ID is given for each capture, as well as the day, and trap of this capture. We also have some indication of sex (as a binary variable). 
 
 
-```{r}
+```{r,fig.height=8, fig.width=8}
 hist(rowSums(table(caps$Individual, caps$Day)))
 ```
 Most individuals were only captured once, but a few individuals were capture up to 8 times!
@@ -342,61 +343,232 @@ ggplot(gg.p, aes(x = effort, y = Median))+
 
 ## Spatial Capture Recapture 
 
-Now that we've analyzed the data in a non-spatial manner, lets try fitting the data to a spatial model. 
+Now that we've analyzed the data in a non-spatial manner, let's try fitting the data to a spatial model.  
 
-Here's the model we'll use:
+There are 3 types of habitat designated by the authors:
+- Low quality matrix (habitat type 1)
+- High quality matrix (habitat type 3)
+- Breeding area (habitat 2)
+
+It's likely that butterfly abundance is different in each of these habitat types. We'll want to include that in our model for lambda. 
 
 ```{r, echo = T}
 scr_flies <- nimbleCode({
-beta0 ~ dnorm()
-beta1 ~ dnorm(0, 0.1)
+for(j in 1:3){
+  beta0[j] ~ dnorm(1, 1) 
+}
 g0 ~ dunif(0, 1)
-sigma ~ dunif(0, 0.5)
+sigma ~ dgamma(1, 1)
 
 for(g in 1:G) { ## Loop over pixels
-  lambda[g] <- exp(beta1*canopy[g])*pixelArea
+  lambda[g] <- exp(beta0[habitat[g]])*pixelArea
   pi[g] <- lambda[g]/SumLambda
 }
-SumLambda <- sum(lambda)
+SumLambda <- sum(lambda[1:G])
+psi <- SumLambda/M #proportion real
 
 for(i in 1:M) {
   s[i,1] ~ dunif(xlim[1], xlim[2]) 
   s[i,2] ~ dunif(ylim[1], ylim[2])
-  pixel[i] <- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
-                     round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+  pixel[i] <- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## raster row
+                     round((s[i,1]-xlim[1])/delta+0.5)]  ## raster column
   logProb[i] <- log(pi[pixel[i]])
   zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
   z[i] ~ dbern(psi)
-  for(j in 1:J) {
+  for(j in 1:ntraps) {
     dist[i,j] <- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
     p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
   }
 }
 for(i in 1:M) {  ## Model for capture histories
-  for(j in 1:J) {
-    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  for(j in 1:ntraps) {
+    for(t in 1:nocc){
+      y[i,j,t] ~ dbern(p[i,j]*z[i]*effort[j,t])
+    }
   }
 }
 
 EN <- M*psi
-N <- sum(z)
+N <- sum(z[1:M])
 })
 ```
 
-There are 3 types of habitat designated by the authors:
-- Low quaility matrix (habitat type 1)
-- High quality matrix (habitat type 3)
-- Breeding area (habitat 2)
+In the spatial model, there's a little more data cleanup than before. One part we haven't dealt with before is the lookup table and the habitat. Let's take a look at our habitat information. 
+
+### Pixel Lookup
+```{r}
+habitat <- Finnish_butterflies$habitat
+habitat_sp <- terra::rast(habitat, type = 'xyz', crs = 'EPSG:2393')
+plot(habitat_sp)
+```
+
+We can see that most of the habitat is low-quality (type 3) with some high quality (type 3) and breeding area (type 2) mixed in here and there. 
+
+If we were to look at the habitat information as a vector, it would look like:
+
+```{r}
+c(habitat$layer)
+```
+
+The order of the pixels goes from the top left pixel to the top right, then down one row starting on the left and going across again, etc. until we end at the bottom right pixel. 
+
+```{r}
+dim(habitat_sp)
+pixel_order <- matrix(1:prod(dim(habitat_sp)), byrow = T, ncol = dim(habitat_sp)[2])
+pixel_order
+```
+
+Therefore making our habitat object for Nimble is really easy:
+```{r}
+hab <- c(habitat$layer)
+```
+
+Let's say I had a point with coordinates c(3237000, 6832000). How do I figure out what pixel I'm in? First I need the pixel resolution of my raster and the minimum and maximum values of my state space. Then I can subtract each point by its the limit value and divide by the width of my pixel to find where I am. 
+
+```{r}
+myx <- 3237000/1e5
+myy <- 6832000/1e5
+res(habitat_sp)/1e5
+lims <- unname(as.vector(ext(habitat_sp)))/1e5
+lims
+```
+
+Our habitat resolution is 500 by 500 m. 
+
+```{r}
+c(round((lims[4] - myy)/.005+.5), round((myx - lims[1])/.005+.5))
+```
+Our point is in the pixel 5th from the left and 3rds from the top. 
+
+```{r}
+pixel_order[3,5]
+```
+Our point is in pixel 27! 
+
+```{r}
+plot(habitat_sp)
+points(3237000, 6832000, pch = 21, col = 'red', cex = 2)
+```
+We will need to implement this sort of system inside our model so it can lookup which pixel any given point is in and use that habitat covariate in the log likelihood. 
+
+### Gathering Information for Nimble
+
+Time to get our information in order for Nimble. 
+
+First constants
+```{r}
+npix = length(hab)
+pixelArea = prod(res(habitat_sp)/1e5)
+M = nind*1.5
+traps <- Finnish_butterflies$traps
+trap_locs <- traps[,c('x', 'y')]/1e5
+nconsts <- list(G = npix, pixelArea = pixelArea, habitat = hab, M = M, xlim = lims[1:2], 
+                ylim = lims[3:4], delta = .005, x = as.matrix(trap_locs), 
+                effort = as.matrix(effort[,-1]), ntraps = nrow(traps),
+                nocc = nocc)
+```
+
+Then data. We have three types of data:
+    + the all 0's to trick the model isn't using the point process to distribute points 
+    + the observations we have of butterflies, which should be in an array of dimension M by ntraps by occasion
+    + The lookup table, which isn't actually data but nimble doesn't like it as a constants for whatever reason
+```{r}
+zeros <- array(0, M)
+y <- array(0, c(M, nrow(traps), nocc))
+for(i in 1:nrow(caps)){
+  me <- caps$Individual[i]
+  day <- caps$Day[i]
+  trap <- caps$Trap[i]
+  y[me, trap, day] <- 1
+
+}
+
+ndat <- list(y = y, zeros = zeros, lookup = pixel_order)
+```
+
+Finally, initial values. 
+
+```{r}
+ninits <- list(beta0 = rnorm(3,1,1), g0 = runif(1), sigma = runif(1, 3, 5)) #give a big sigma
+z.init <- c(rep(1, nind), rep(0, M-nind))
+s.init <- array(NA, c(M, 2))
+for(i in 1:M){
+  mytraps <- which(rowSums(y[i,,]) >0)
+  if(length(mytraps) >0 ){ #guys we saw
+    s.init[i, ] <- colMeans(trap_locs[mytraps, ])
+  } else { #augmented guys
+    s.init[i, 1] <- runif(1, lims[1], lims[2]) #x coord 
+    s.init[i, 2] <- runif(1, lims[3], lims[4]) #y coord
+  }
+}
+ninits$z <- z.init
+ninits$s <- s.init
+```
+
+Also parameters of interest:
+```{r}
+prms <- c('beta0', 'g0', 'sigma', 'N', 'EN', 'psi')
+```
+
+Time to see if the initial values are working! 
+
+### Running the SCR Model
+*Note, this model will take a decent amount of time to run.  
+
+```{r, echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(2) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ninits",  "nconsts", 'ndat', "scr_flies", 'prms'))
+scr1 <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = scr_flies, constants = nconsts,
+                           data = ndat, inits = ninits, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = prms, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 50000, nburnin = 25000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+scr1 <- as.mcmc.list(scr1)
+stopCluster(cl)
+```
+
+```{r, echo = F, eval = T}
+scr1 <- readRDS('scr1.RDS')
+```
+
+Time to plot:
+```{r}
+MCMCvis::MCMCtrace(scr1, pdf = F, Rhat = T, n.eff = T)
+```
+
+Exact estimates can be summarized as well (but remember sigma needs to be multiplied by 1e5)
+
+```{r}
+MCMCsummary(scr1)
+```
+Let's compare with the CMR method:
+
+```{r}
+CMR_est <- MCMCsummary(cmr2, params = 'N')
+SCR_est <- MCMCsummary(scr1, params = 'N')
+rbind(CMR_est, SCR_est)
+```
 
 
 ## Homework
 
-1. PP check of CMR model 
+1. In lab (above), we used the Mt version for our closed CMR model (detection probability changed with time). Perform a prior predictive check on this model. Report out the posterior for p in each occasion. If you notice any are very informative, adjust the alpha values until the posteriors look reasonable. 
 
-2. CMR model for model Mb
+2. Re-write the closed CMR model as an Mb model (trap shyness). Compare the abundance estimates with those we got out of the Mt version of the model by graphing the CIs (and medians) for both models. 
 
-3. Raster of butterflies by sex
+3. In the SCR model, our detection probability predicts that male and female butterflies are equally likely to be captured. Re-write the model to allow for male and female butterflies to have different detection probabilities. You can adjust either g0 or sigma. You do not need to run this model, just write out the code. 
 
-4. Find the error in code someone else gives you.
+4. Using the SCR beta outputs from lab (not the one you just wrote for Q3), make a map showing the expected abundance in each pixel in the study area as well as the trap locations. Notice that the model predicts very high abundance in the poor quality habitat. Why do you think that is? (Note: this is an inaccurate model, clearly but *why*?)
 
 5.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
