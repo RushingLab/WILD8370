@@ -147,6 +147,9 @@ Above, we're taking the column sums, which will give us a count of how many trap
 #### First Try CMR 
 
 Now let's make our objects and run the model!
+```{r, echo  = F}
+set.seed(5)
+```
 ```{r}
 nc <- list(effort = eff,nocc = nocc, M = M)
 nd <- list(y = y)

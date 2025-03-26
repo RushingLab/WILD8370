@@ -4,7 +4,7 @@ output:
   rmarkdown::html_vignette:
     keep_md: yes
 vignette: >
-  %\VignetteIndexEntry{Lab8_Movement}
+  %\VignetteIndexEntry{Lab9_SCR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -190,6 +190,7 @@ Above, we're taking the column sums, which will give us a count of how many trap
 
 Now let's make our objects and run the model!
 
+
 ``` r
 nc <- list(effort = eff,nocc = nocc, M = M)
 nd <- list(y = y)
@@ -229,7 +230,7 @@ Individual 1 seems to have issues:
 
 ``` r
 prepnim$logProb_y[1,]
-#>  [1]  0.000e+00  0.000e+00 -9.359e-09  0.000e+00       -Inf  0.000e+00
+#>  [1]  0.000e+00  0.000e+00 -8.874e-09  0.000e+00       -Inf  0.000e+00
 #>  [7]       -Inf       -Inf       -Inf  0.000e+00       -Inf       -Inf
 #> [13]       -Inf       -Inf
 ```
@@ -262,7 +263,7 @@ prepnim <- nimbleModel(code = cmr_flies, constants = nc,
                            data = nd, inits = ni, calculate = T)
 prepnim$initializeInfo() #will tell you what is or isn't initialized
 prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
-#> [1] -1326
+#> [1] -1070
 ```
 Much better. We can now run the model. 
 
@@ -299,7 +300,7 @@ Let's see what our model output gives us.
 MCMCvis::MCMCtrace(cmr1, pdf = F, Rhat = T, n.eff = T)
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-21-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-21-2.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-22-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-22-2.png" width="768" style="display: block; margin: auto;" />
 
 Uh oh! Our value for $M$ is clearly way too low. The posterior for $psi$ is pushing up against 1, which means we've enforced a total population that is lower than the number the data is suggesting. Let's try again with a higher M. 
 
@@ -360,7 +361,7 @@ Let's see what our model output gives us.
 MCMCvis::MCMCtrace(cmr2, pdf = F, Rhat = T, n.eff = T)
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-26-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-26-2.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-27-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-27-2.png" width="768" style="display: block; margin: auto;" />
 
 Much better! We can see that this time our M was large enough - only about 18% of the M individuals were probably even real. The fact that we chose an M that was too large doesn't matter, but it does slow down our model runs a little bit. Remember that biologically, $psi$ means nothing. If we were to run this again, we could drop the value of M down by a few hundred and still get the same result with less computer time. 
 
@@ -417,7 +418,7 @@ ggplot(gg.p, aes(x = effort, y = Median))+
   theme(axis.text = element_text(size = 20), axis.title = element_text(size = 25))
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-30-1.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-31-1.png" width="768" style="display: block; margin: auto;" />
 
 ## Spatial Capture Recapture 
 
@@ -482,7 +483,7 @@ habitat_sp <- terra::rast(habitat, type = 'xyz', crs = 'EPSG:2393')
 plot(habitat_sp)
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-32-1.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-33-1.png" width="768" style="display: block; margin: auto;" />
 
 We can see that most of the habitat is low-quality (type 3) with some high quality (type 3) and breeding area (type 2) mixed in here and there. 
 
@@ -555,7 +556,7 @@ plot(habitat_sp)
 points(3237000, 6832000, pch = 21, col = 'red', cex = 2)
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-39-1.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-40-1.png" width="768" style="display: block; margin: auto;" />
 We will need to implement this sort of system inside our model so it can lookup which pixel any given point is in and use that habitat covariate in the log likelihood. 
 
 ### Gathering Information for Nimble
@@ -658,7 +659,7 @@ Time to plot:
 MCMCvis::MCMCtrace(scr1, pdf = F, Rhat = T, n.eff = T)
 ```
 
-<img src="Lab9_SCR_files/figure-html/unnamed-chunk-46-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-46-2.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-46-3.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab9_SCR_files/figure-html/unnamed-chunk-47-1.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-47-2.png" width="768" style="display: block; margin: auto;" /><img src="Lab9_SCR_files/figure-html/unnamed-chunk-47-3.png" width="768" style="display: block; margin: auto;" />
 
 Exact estimates can be summarized as well (but remember sigma needs to be multiplied by 1e5)
 

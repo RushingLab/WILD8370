@@ -215,7 +215,7 @@ $$E(N_t) = \lambda_t$$
 
 Then:
 
-$$\psi_t = \frac{M}{E(N_t)} = \frac{M}{\lambda_t}$$
+$$\psi_t = \frac{E(N_t)}{M} = \frac{\lambda_t}{M}$$
 --
 
 If space is homogenous, we can just replace this with:
