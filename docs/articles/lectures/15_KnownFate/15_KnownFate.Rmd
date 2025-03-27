@@ -1,0 +1,339 @@
+---
+title: "Lecture 15"
+subtitle: "Known Fate"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+library(ggforce)
+source(here::here("R/zzz.R"))
+library(ggforce)
+library(terra)
+# library(gganimate)
+```
+## Readings
+
+> https://data.princeton.edu/wws509/notes/c7s1 
+
+> Program MARK - 'A Gentle Introduction' by Evan Cooch
+
+> Chapter 15: Analysis and Management of Animal Populations by Byron Williams, James Nichols and Michael Conroy (UGA! UGA!)
+
+---
+## Survival Models
+
+Broadly speaking, the objective of survival analysis is to understand the factors influencing mortality rates.
+
+<br/>
+
+Known-fate models do not have to involve survival, but often that is the parameter of interest. 
+
+--
+
+In continuous time, we often express this as a `failure time` or `time to event` approach.
+
+<br/>
+
+In discrete time, we often flip this and model `survival` rather than mortality. 
+
+<br/>
+
+Either way, our goal is to estimate when and why animals die (or experience some event) 
+
+---
+## Known-Fate Survival Models
+
+Known-fate survival models require data that has 3 main characteristics:
+
+  + The dependent variable is the waiting time until the occurrence of a well-defined event (death, infection, etc.)
+    
+  + Observations are censored - not every individual dies/gets infected during the study period*
+    
+  + There are predictors or explanatory variables whose effect on the waiting time is of interest to us 
+    
+
+<br/>
+
+*If every individual dies or becomes infected before the study is over, we don't have data to use to understand survival after that point. Also, if nobody dies, you can't use this model either 
+
+---
+## Known-Fate Survival Models
+
+The following data are potentially appropriate for a known-fate model:
+
+  + Animals with GPS collars
+    
+  + Animals with VHF collars that are checked on a consistent schedule (every 3 days, every week, etc.)
+    
+  + Nest survival 
+  
+  + Animals that are repeatedly tested for some disease 
+    
+<br/>
+
+--
+
+But these are not:
+
+  + Animals with ear tags seen by camera traps
+    
+  + Harvest data 
+    
+  + Trapping studies where animals don't receive tracking devices
+    
+<br/>
+
+We will discuss CJS survival models for those types of data in a future lecture.
+
+---
+## A Quick Note
+
+In the literature, you will find the term 'known-fate' is used somewhat sparsely. 
+
+<br/>
+
+This is because this is a very wildlife specific term for a concept that the rest of the world just calls "survival analysis". 
+
+<br/> 
+
+These types of models do not necessarily have to involve death, though in wildlife they are most often used to evaluate mortality. 
+
+<br/>
+
+You can just as easily model infection, reproduction or any other sort of "event" using these same techniques.
+
+---
+## Types of Censoring
+
+An important concept in Known Fate modeling is the idea of `censoring`. 
+
+Data can be censored in 3 ways:
+
+  + Right censoring (most common) - Animals survive to the end of the study or 'start time' was unknown 
+  
+  + Left censoring - true survival is less than or equal to the observed survival time
+  
+  + Interval censoring - Event occurred between two time points, but unclear exactly when 
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The animal survives to the end of the study 
+  
+Example: We collar 30 bears and track their survival for 60 days. At day 60, 15 bears are still alive. These 15 individuals are right censored. 
+  
+<br/>
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,64), c(1, 1), type = 'l', xlim = c(-2, 65), ylim= c(.75, 1.25), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(64,1, pch = 4, col = 'red', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 60, lty = 3, col = 'black', lwd = 2)
+```
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The starting time is unknown
+    
+
+Example: We are studying nest survival. We find a nest that already has eggs in it and start to monitor it. On day 5 of our monitoring, the eggs are predated. We don't know the time interval between lay date and the start of monitoring.
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(-2,5), c(1, 1), type = 'l', xlim = c(-5, 10), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(-2,1, pch = 19, col = 'green', cex = 2)
+ points(5,1, pch = 4, col = 'red', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 8, lty = 3, col = 'black', lwd = 2)
+```
+
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+<br/>
+
+Data can be right censored for several reasons. 
+
+  + The batteries die on the animal's collar or the animal drops the transmitter
+
+
+Example: We are monitoring quail with VHF transmitters. On day 9 we find a quail transmitter on the ground, happily transmitting with no quail in site. From the woods behind you, you hear a quail giggling. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,9), c(1, 1), type = 'l', xlim = c(-5, 20), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+lines(c(9, 12), c(1,1), lty = 2)
+points(0,1, pch = 19, col = 'green', cex = 2)
+points(12,1, pch = 4, col = 'red', cex = 2)
+points(9,1, pch = 21, col = 'purple', bg = 'white', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 15, lty = 3, col = 'black', lwd = 2)
+```
+
+---
+## Left Censoring 
+  
+Left censoring means **true survival ≥ observed survival**
+
+Example: You are studying daily fawn survival. You capture a fawn and tag it. 
+
+After you release it, the fawn is immediately eaten by a coyote and does not survive to the first observation day. Since you cannot use data that has a survival time of 0, this individual is left censored. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,0.15), c(1, 1), type = 'l', xlim = c(-2, 12), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(0.15,1, pch = 4, col = 'red', cex = 2)
+abline(v = c(1,3,5,7,9), lty = 2, col = 'blue')
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 10, lty = 3, col = 'black', lwd = 2)
+```
+
+
+
+---
+## Interval Censoring   
+
+Left and right censoring are really just special cases of interval censoring. 
+
+Example: You are studying CWD in deer. You want to know about infection rate at the monthly level. 
+
+However, you are unable to test every deer every month except at the beginning and end of your study due to budget constraints. You test a doe at time $t$ and she is negative for CWD. 
+
+At time $t+4$ you test her again and she is positive. You know she was infected sometime after $t$ and before $t+4$ but it is unclear exactly when. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,5.5), c(1, 1), type = 'l', xlim = c(-2, 12), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(5.5,1, pch = 4, col = 'red', cex = 2)
+abline(v = c(1,3,5,7,9), lty = 2, col = 'blue')
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 10, lty = 3, col = 'black', lwd = 2)
+```
+  
+---
+## Model Structure
+
+A simple way of modeling survival is to discretize time and use a binary variable to indicate if an individual is dead or alive:
+
+
+$$\Large z_{i,t} \sim \mathrm{Bern}(z_{i,t-1}\times \phi_t)$$
+ 
+ 
+ We can then model $\Large \phi_t$ as the result of various individual or environmental covariates 
+ 
+ 
+ 
+ $$\Large logit(\phi_t) = \beta_0 + \beta_1*x_1 + \cdots$$
+
+---
+## Model Structure in Nimble
+
+If we want to, we can have an incredibly simple model. 
+
+```{r, echo = T, eval = F}
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi)
+  }
+}
+})
+```
+
+*Note that the code above implies you could live again after death, so we restrict our analysis to end at the point of death. 
+
+---
+## Model Structure in Nimble
+Or we can get fancy
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 45% !important;
+}
+```
+
+```{r, echo = T, eval = F}
+known_fate <- nimbleCode({
+phi0[1] ~ dnorm(.316, sd = .018)  #neg F fawns; prior from fawn survival model
+for(ss in 2:12){
+  logit(phi0[ss]) <- phi_int + phi_infect*infected[ss] + phi_age[age[ss]]
+}
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    survive[i,t] ~ dbern(phi0[knownstate_live[i,t-1]])
+  }
+}
+phi_int ~ dnorm(0, 1)
+phi_infect ~ dnorm(0, 1)
+phi_sex ~ dnorm(0, 1)
+phi_age[1] <- 0
+for(jj in 2:3){
+  phi_age[jj] ~ dnorm(0, 1)
+}
+})
+```
+]
+---
+## Model Structure in Nimble
+
+Sometimes we might want to model survival at a time step that's different than the data collection timing. For instance, maybe you want to know daily nest survival, but you can only get to each nest every other day. In that case, you'd want to make sure that $z$ was dependent on both $phi$ and $z_{t-1}$.
+
+Then some of your z's would be `NA` and require initial values:
+
+```{r, echo = T, eval = F}
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi*z[i,t-1])
+  }
+}
+})
+```
+
+---
+## Some Words of Caution
+
+There are a few pitfalls to be aware of with known fate models. 
+
+1. The assumption that censoring is random is essential for accurate survival rate estimates
+
+  + Censoring must be unrelated to the fate of the individual – either survival or mortality
+
+2. You can't back-fill information 
+  
+  + If you look for an animal and cannot find it during a sampling interval but then find it again during a future time period, you have a problem. This is because 
+
+
+
