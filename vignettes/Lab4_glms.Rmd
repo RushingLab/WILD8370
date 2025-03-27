@@ -90,7 +90,7 @@ How can we model the non-linear change in abundance if, by definition, linear mo
 
 Remember the equation for a curved line with a single peak (or bottom):
 
-$$\Large y = a + b \times x + c \times x^2$$
+$$y = a + b \times x + c \times x^2$$
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 25
@@ -111,7 +111,7 @@ Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ wher
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
-$$\Large y = a + b \times x + c \times x^2 + d \times x^3$$
+$$y = a + b \times x + c \times x^2 + d \times x^3$$
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 4
