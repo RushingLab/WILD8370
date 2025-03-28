@@ -58,6 +58,8 @@ navbar:
           href: articles/lectures/13_ClosedCMR/Lecture13_ClosedCMR.html
         - text: "Lecture 14: Closed SCR"
           href: articles/lectures/14_ClosedSCR/Lecture14_ClosedSCR.html
+        - text: "Lecture 15: Known Fate Modeling"
+          href: articles/lectures/15_KnownFate/15_KnownFate.html
           
     - text: "Labs"
       icon: fas fa-laptop-code

@@ -134,7 +134,7 @@ Data can be censored in 3 ways:
 ---
 ## Right Censoring 
 
-Right censoring means *true survival ≥ observed survival*
+Right censoring means **true survival ≥ observed survival**
 
 Data can be right censored for several reasons. 
 
@@ -149,9 +149,7 @@ Example: We collar 30 bears and track their survival for 60 days. At day 60, 15 
 ---
 ## Right Censoring 
 
-Right censoring means *true survival ≥ observed survival*
-
-&lt;br/&gt;
+Right censoring means **true survival ≥ observed survival**
 
 Data can be right censored for several reasons. 
 
@@ -166,7 +164,7 @@ Example: We are studying nest survival. We find a nest that already has eggs in 
 ---
 ## Right Censoring 
 
-Right censoring means *true survival ≥ observed survival*
+Right censoring means **true survival ≥ observed survival**
 
 &lt;br/&gt;
 
@@ -182,7 +180,7 @@ Example: We are monitoring quail with VHF transmitters. On day 9 we find a quail
 ---
 ## Left Censoring 
   
-Left censoring means *true survival ≤ observed survival*
+Left censoring means **true survival ≥ observed survival**
 
 Example: You are studying daily fawn survival. You capture a fawn and tag it. 
 
@@ -289,7 +287,318 @@ for(i in 1:knownInd_Live){
 })
 ```
 
+---
+## Some Words of Caution
 
+There are a few pitfalls to be aware of with known fate models. 
+
+- The assumption that censoring is random is essential for accurate survival rate estimates
+
+  + Censoring must be unrelated to the fate of the individual – either survival or mortality. For example, if the animal's transmitter often stops working during an animal's death, we will end up with censors that are correlated with mortality. This will bias survival high.
+
+--
+
+- You can't back-fill information 
+  
+  + If you look for an animal and cannot find it during a sampling interval but then find it again during a future time period, you have a problem. This is because you are NOT modeling detection and it's much easier to find an animal that wanders off and comes back than it is to detect an animal that wanders off and dies. 
+  
+--
+
+-  Probability of detecting death needs to be equal to the probability of detecting life 
+
+  + If your animal hides underground right before death and this means you can no longer locate the animal, estimates will be biased. 
+
+---
+## In Class Example
+
+As an example, we will use a classic dataset - Female American Black Ducks! This data comes from a 1989 paper by Mike Conroy, Gary Costanzo and Daniel Stotts and shows up in countless examples of how to use Program MARK, WinBUGS, JAGS, etc. It seems fitting to keep subjecting students to this example.  
+
+227 ducks were captured in Virginia and New Jersey from 1983 to 1985 and fitted with radio transmitters. We have access to 48 of these duck records across 8 weeks of 1983.  
+
+This data is conveniently stored in the RMark package. 
+
+
+``` r
+library(RMark)
+data(Blackduck)
+head(Blackduck, n = 3)
+```
+
+```
+##                 ch BirdAge Weight Wing_Len condix
+## 1 1100000000000000       1   1.16     27.7   4.19
+## 2 1011000000000000       0   1.16     26.4   4.39
+## 3 1011000000000000       1   1.08     26.7   4.04
+```
+
+---
+## In Class Example
+
+In the old world of Program MARK, RMark, captures were recorded as two digits. 
+
+  + “00” = censored (not yet in study, or already exited/removed for some reason)
+  + “10” = alive at beginning and end of the interval
+  + “11” = alive at the beginning of the interval, but animal died before the end of the interval
+
+&lt;br/&gt;
+
+In this dataset, weekly survival was of interest and animals were tracked . Thus the '1011' seen in animals 2 and 3 means those animals were alive in week 1 and then died some time in week 2. 
+
+&lt;br/&gt;
+
+We need to convert this format to something more useful for our own modeling. 
+
+---
+## In Class Example
+
+We're going to use a function in R that helps split character strings to do what we want. This will create a list, which we will turn into a vector of all the capture histories, then reformat and stick to our original data frame. 
+
+This type of data cleaning will probably not come up very often in your own work, unless you are using old data sets or trying to get information from other people's RMark files. 
+
+
+``` r
+split_string &lt;- unlist(strsplit(Blackduck$ch, "(?&lt;=.{2})", perl = TRUE))
+head(split_string)
+```
+
+```
+## [1] "11" "00" "00" "00" "00" "00"
+```
+
+``` r
+Blackduck &lt;- cbind(Blackduck, matrix(split_string, ncol =8, byrow = T))
+head(Blackduck, n = 3)
+```
+
+```
+##                 ch BirdAge Weight Wing_Len condix  1  2  3  4  5  6  7  8
+## 1 1100000000000000       1   1.16     27.7   4.19 11 00 00 00 00 00 00 00
+## 2 1011000000000000       0   1.16     26.4   4.39 10 11 00 00 00 00 00 00
+## 3 1011000000000000       1   1.08     26.7   4.04 10 11 00 00 00 00 00 00
+```
+
+---
+## In Class Example
+
+Let's fit a known-fate model to this dataset where survival is a function of the bird's age (HY = 0, AHY= 1) and initial body weight. 
+
+
+``` r
+Ducks &lt;- nimbleCode({
+  
+b1 ~ dnorm(0, 1)
+b2[1] ~ dnorm(0, 1)
+b2[2] ~ dnorm(0, 1)
+
+for(i in 1:nind){
+  logit(phi[i]) &lt;- b1*weight[i] + b2[age[i]]
+  
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi[i])
+  }
+}
+})
+```
+
+
+---
+## In Class Example
+
+We need to calculate the first and last time we saw each animal, as well as the `z` matrix. It's important to note that all individuals have an *extra* occasions when they were tagged, which is not included in our dataframe. All animals were tagged in the same interval (no staggered entry)
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 85% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+z &lt;- array(NA, c(nrow(Blackduck), 9))
+for(i in 1:nrow(Blackduck)){
+  mych &lt;- Blackduck[i,as.character(1:8)]
+  dead &lt;- which(mych == '11') #ded
+  censor &lt;- which(mych == '00') #disappeared or post-dead
+  if(length(dead) &gt; 0){
+    z[i,dead+1] &lt;- 0 #remember that first occasion isn't in data frame
+    z[i,1:dead] &lt;- 1 #alive prior to death
+  } else {
+    if(length(censor) &gt; 0){
+      z[i,1:censor[1]] &lt;- 1 #alive until unknown
+    } else { #not dead not censored
+      z[i,1:9] &lt;- 1
+    } #end else #2
+  } #end else #1
+} #end i
+```
+]
+
+---
+## In Class Example
+
+We can take a look at our finished product for z
+
+
+``` r
+head(z, n = 5)
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+## [1,]    1    0   NA   NA   NA   NA   NA   NA   NA
+## [2,]    1    1    0   NA   NA   NA   NA   NA   NA
+## [3,]    1    1    0   NA   NA   NA   NA   NA   NA
+## [4,]    1    1    1   NA   NA   NA   NA   NA   NA
+## [5,]    1    1    1   NA   NA   NA   NA   NA   NA
+```
+
+Individuals 1-3 died, but 4 and 5 were censored. 
+
+---
+## In Class Example
+
+We also need to calculate the first and last times each animal's fate was known. The first time is easy, since everyone was tagged the same day:
+
+
+``` r
+first &lt;- rep(1, nrow(Blackduck))
+last &lt;- apply(z, 1, function(row) {
+  which(is.na(row))[1]-1  # Returns the index of the first NA in the row
+})
+last[is.na(last)] &lt;- 9 #if it lived beyond study, end at last occ
+head(last)
+```
+
+```
+## [1] 2 3 3 3 3 4
+```
+
+---
+## In Class Example
+
+Prepare for nimble
+
+
+``` r
+nc &lt;- list(weight = (Blackduck$Weight - mean(Blackduck$Weight))/sd(Blackduck$Weight), 
+           age = as.numeric(Blackduck$BirdAge),
+           nind = nrow(Blackduck),
+           first_live = first,
+           last_live = last)
+nd &lt;- list(z = z)
+ni &lt;- list(b1 = rnorm(1), b2 = rnorm(2))
+params &lt;- c('b1', 'b2')
+```
+
+---
+## In Class Example
+
+Check that everything is working properly:
+
+
+``` r
+prepnim &lt;- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -310
+```
+
+---
+## In Class Example
+
+Full model run:
+
+
+``` r
+library(parallel)
+cl &lt;- makeCluster(2) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "Ducks", 'params'))
+ducks1 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 2000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+ducks1 &lt;- as.mcmc.list(ducks1)
+stopCluster(cl)
+```
+
+---
+## In Class Example
+
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-23-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+---
+## In Class Example
+
+
+``` r
+MCMCvis::MCMCsummary(ducks1)
+```
+
+```
+##         mean     sd    2.5%    50%  97.5% Rhat n.eff
+## b1    0.3606 0.2512 -0.1295 0.3627 0.8744 1.01   986
+## b2[1] 2.6916 0.2921  2.1651 2.6750 3.2932 1.00  1112
+## b2[2] 2.1434 0.3548  1.4901 2.1254 2.8914 1.00  1352
+```
+
+
+Younger, fatter ducks had the highest survival, but the effect of weight was fairly slight. 
+
+
+---
+## In Class Example
+
+Let's graph cumulative survival probability over time for young vs. old ducks of an average weight.
+
+
+``` r
+times &lt;- 1:9 #weeks
+betas &lt;- as.matrix(ducks1) #betas
+age_seq &lt;- c(1,2) #ages 
+p_out &lt;- array(NA, c(nrow(betas), length(times), length(age_seq)))
+for(j in 1:nrow(betas)){
+  for(t in 1:length(times)){
+    p_out[j,t,1] &lt;- plogis(betas[j, 'b2[1]'])^t #young ducks
+    p_out[j,t,2] &lt;- plogis(betas[j, 'b2[2]'])^t #old ducks
+    }
+}
+surv_qs &lt;- apply(p_out, c(2,3), function(x){quantile(x, c(0.025, .5, .975))})
+gg_surv &lt;- data.frame(Week= rep(1:9, 2),
+                      LCI = c(surv_qs[1,,]),
+                      UCI = c(surv_qs[3,,]),
+                      Median = c(surv_qs[2,,]),
+                      Age = rep(c("HY", "AHY"), each= 9))
+```
+
+---
+## In Class Example
+
+
+``` r
+ggplot(gg_surv, aes(x = Week, y = Median, group = Age))+
+  geom_ribbon(aes(ymin = LCI, ymax = UCI, fill = Age), alpha= .4)+
+  geom_line(aes(col = Age))+
+  theme_bw()+ scale_fill_viridis_d()+ scale_color_viridis_d()+
+  theme(axis.text = element_text(size  = 15))
+```
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-26-1.png" width="360" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
