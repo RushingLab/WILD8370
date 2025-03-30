@@ -1,0 +1,46 @@
+---
+title: "Lab10: Discrete Survival Models"
+output: 
+  rmarkdown::html_vignette:
+    keep_md: yes
+vignette: >
+  %\VignetteIndexEntry{Lab10_CJS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+   warning = FALSE, message = FALSE,
+   fig.align = 'center', fig.retina = 2,
+  fig.height=8, fig.width=8,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+source(here::here("R/zzz.R"))
+```
+
+```{r setup, echo=FALSE}
+library(WILD8370)
+library(nimble)
+library(coda)
+library(mcmcOutput)
+library(MCMCvis)
+library(terra)
+```
+
+In this exercise, we'll look at how our estimates might change when we fit data with imperfect detection to both a known-fate and a CJS model. 
+
+
+## Homework
+1. 
+
+
+2. Using only the capture records for *Rana draytonii*, write a CJS model that models capture probability as a function of both sex and a random effect of year. Make a ggplot showing detection probability across time, with different colors for the different sexes.
+
+3. Fix someone's bad code
+
+4.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

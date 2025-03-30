@@ -6,6 +6,7 @@ articles:
   homework: homework.html
   lab01_intro_to_R: lab01_intro_to_R.html
   Lab01b_Mathematical_Notation: Lab01b_Mathematical_Notation.html
+  Lab10_CJS: Lab10_CJS.html
   Lab2_simulation: Lab2_simulation.html
   Lab3_BasicMCMC: Lab3_BasicMCMC.html
   Lab4_glms: Lab4_glms.html
@@ -20,7 +21,7 @@ articles:
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2025-03-28T19:34Z
+last_built: 2025-03-30T17:29Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles

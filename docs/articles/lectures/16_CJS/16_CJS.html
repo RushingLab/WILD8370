@@ -457,11 +457,11 @@ CJS models are very similar to known-fate models minus the observation process.
 cjs &lt;- nimbleCode({
 phi ~ dbeta(1, 1)
 p ~ dbeta(1, 1)
-for(i in 1:knownInd_Live){
+for(i in 1:nind){
   z[i,1] &lt;- 1 #obviously, or you wouldn't have captured it
-  for(t in (first_seen[i]+1):nocc){
+  for(t in (first[i]+1):nocc){
     z[i,t] ~ dbern(phi*z[i,t-1])
-    y[i,t] ~ dbern(p)
+    y[i,t] ~ dbern(p*z[i,t])
   }
 }
 })
@@ -470,7 +470,7 @@ for(i in 1:knownInd_Live){
 ---
 ## CJS Models - nimbleEcology
 
-If you think that writing out phi*z is too difficult, you can also use the `nimbleEcology` package to help you out. We won't discuss it in detail, but you can make your OWN distributions as long as you know the likelihood. The nimbleEcology package is essentially a group of distributions that other people have made for you. 
+You can also use the `nimbleEcology` package to help you out. We won't discuss it in this class, but you can make your OWN distributions in Nimble as long as you know the likelihood. The `nimbleEcology` package is essentially a group of distributions that other people have made for you. 
 
 There are 4 options for CJS distributions in this package:
 
@@ -488,13 +488,14 @@ The advantage of using this package is significantly faster computation time.
 ---
 ## CJS Models - nimbleEcology
 
-Here's an example with dCJS_sv. This means survival is constant while the capture probability changes over time. 
+Here's an example with dCJS_sv. This means survival is constant while the capture probability changes over time. Note that `z` is not in the model! 
+
 
 ``` r
 library(nimbleEcology)
 cjs2 &lt;- nimbleCode({
   for(i in 1:nind){
-    y[i, first[i]:nocc] ~ dCJS_vs(probSurvive = phi, 
+    y[i, first[i]:nocc] ~ dCJS_sv(probSurvive = phi, 
                                 probCapture = p[first[i]:nocc])
   }
   
@@ -505,7 +506,233 @@ cjs2 &lt;- nimbleCode({
 })
 ```
 
+---
+## Example - Wyoming Amphibians
 
+Researchers from USGS have been capturing and marking frogs and toads in Wyoming and Montana since 2001 to research survival in response to chytrid fungus (*Batrachochytrium dendrobatidis*). Here's the citation:
+Russell, R.E., Halstead, B.J., Fisher, R.N., Muths, E.L., Adams, M.J., and Hossack, B.R., 2019, Amphibian capture mark-recapture: U.S. Geological Survey data release, https://doi.org/10.5066/P9LNLEDF.
+
+This information is saved in the `WyomingFrogs` dataset. You can also find this dataset online at the citation above.
+
+
+
+``` r
+data('WyomingFrogs')
+head(frog_caps, n = 3)
+```
+
+```
+## # A tibble: 3 × 6
+##   Ind.ID  Survey.Date Project Species  Sex   Bd.presence
+##   &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;      
+## 1 3265127 5/12/16     WY      A.boreas male  &lt;NA&gt;       
+## 2 3265127 5/17/15     WY      A.boreas male  negative   
+## 3 3265127 5/19/14     WY      A.boreas male  negative
+```
+
+---
+## Example - Wyoming Amphibians
+
+For now we will just look at the boreal toad (*Anaxyrus boreas*) in Montana. We'll start by subsetting and then organizing the date column. 
+
+
+``` r
+btoads &lt;- subset(frog_caps, frog_caps$Species == 'A.boreas' &amp; frog_caps$Project == 'MT')
+btoads$id &lt;- as.numeric(as.factor(btoads$Ind.ID))
+nind &lt;- length(unique(btoads$id))
+```
+
+This leaves us with 1672 individuals. 
+
+
+``` r
+btoads$date &lt;- as.Date(btoads$Survey.Date, format = '%m/%d/%y')
+btoads$year &lt;- as.numeric(format(btoads$date, '%y'))
+head(btoads, n = 2)
+```
+
+```
+## # A tibble: 2 × 9
+##   Ind.ID    Survey.Date Project Species Sex   Bd.presence    id date        year
+##   &lt;chr&gt;     &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;
+## 1 45232278… 5/25/04     MT      A.bore… male  &lt;NA&gt;         1445 2004-05-25     4
+## 2 45232468… 5/29/05     MT      A.bore… fema… negative     1446 2005-05-29     5
+```
+
+---
+## Example - Wyoming Amphibians
+Time to organize the capture information. 
+
+
+``` r
+nocc &lt;- 13 #13 years of data
+y &lt;- array(0, c(nind, nocc))
+z &lt;- array(NA, c(nind, nocc))
+for(k in 1:nrow(btoads)){
+  y[btoads$id[k],btoads$year[k]-3] &lt;- 1
+  z[btoads$id[k],btoads$year[k]-3] &lt;- 1
+}
+first &lt;- apply(y, 1, function(row) {
+  which(row &gt; 0)[1]  # Returns the index of the first detection
+})
+```
+
+
+``` r
+range(first)
+```
+
+```
+## [1]  1 13
+```
+
+Uh-oh, we can't have animals where first = the last occasion, since we loop through first+1:last. 
+---
+## Example - Wyoming Amphibians
+
+``` r
+bad &lt;- which(first == nocc)
+y &lt;- y[-c(bad),] #remove bad ones
+z &lt;- z[-c(bad),]
+first &lt;- first[-c(bad)]
+nind2 &lt;- nind-length(bad) #new nind
+```
+
+
+---
+## Example - Wyoming Amphibians
+
+Prepare nimble objects for the time-changing detection CJS model using the normal synatx:
+
+
+``` r
+nd &lt;- list(y = y, z = z)
+nc &lt;- list(first = first, nocc = nocc, nind = nind2)
+z.init &lt;- z
+last &lt;- apply(y, 1, function(row) {
+  max(which(row &gt; 0))  # Returns the index of the last detection
+})
+for(j in 1:nind2){
+  z.init[j, 1:(first[j]-1)] &lt;- 1 #start everyone alive before first capture 
+  z.init[j, (first[j]+1):last[j]]  &lt;- 1#alive entire time it was seen
+  if(last[j] &lt; nocc){
+    z.init[j, (last[j]+1):nocc] &lt;- 0 #kill everyone after last detection
+  }
+}
+z.init[!is.na(z)] &lt;- NA #no inits for known data
+ni &lt;- list(phi = rbeta(1,1,1), p = rbeta(nocc,1,1), z = z.init)
+params &lt;- c('phi', 'p')
+```
+
+---
+## Example - Wyoming Amphibians
+
+This is the model we'll run. Not very informative about detection probability, but we'll see how it goes:
+
+
+``` r
+cjs &lt;- nimbleCode({
+phi ~ dbeta(1, 1)
+for(t in 1:nocc){
+    p[t] ~ dbeta(1, 1)
+}
+for(i in 1:nind){
+  z[i,1] &lt;- 1 #obviously, or you wouldn't have captured it
+  for(t in (first[i]+1):nocc){
+    z[i,t] ~ dbern(phi*z[i,t-1])
+    y[i,t] ~ dbern(p[t]*z[i,t])
+  }
+}
+})
+```
+
+---
+## Example - Wyoming Amphibians
+
+Check model:
+
+``` r
+prepnim &lt;- nimbleModel(code = cjs, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -2130.692
+```
+
+---
+## Example - Wyoming Amphibians
+
+
+``` r
+toads.out &lt;- nimbleMCMC(code = cjs,
+                     data = nd,
+                     constants = nc,
+                     inits = ni,
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+## Example - Wyoming Amphibians
+
+Remember that we cannot use the output from the last occasion's estimate of detection - it is unidentifiable. 
+
+&lt;img src="16_CJS_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Wyoming Amphibians
+
+We can also run the model using the nimbleEcology distributions. 
+
+``` r
+cjs2 &lt;- nimbleCode({
+  for(i in 1:nind){
+    y[i, first[i]:nocc] ~ dCJS_sv(probSurvive = phi, 
+                                probCapture = p[first[i]:nocc])
+  }
+  
+  phi ~ dbeta(1, 1)
+  for(t in 1:nocc){
+    p[t] ~ dbeta(1, 1)
+  }
+})
+```
+
+---
+## Example - Wyoming Amphibians
+
+We don't need the z information in this model, but everything else stays the same.
+
+``` r
+nd$z &lt;- NULL
+ni$z &lt;- NULL
+toads.out2 &lt;- nimbleMCMC(code = cjs2,
+                     data = nd,
+                     constants = nc,
+                     inits = ni,
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+## Example - Wyoming Amphibians
+
+Exactly the same result
+
+&lt;img src="16_CJS_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

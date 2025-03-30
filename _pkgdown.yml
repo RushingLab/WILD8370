@@ -61,7 +61,7 @@ navbar:
         - text: "Lecture 15: Known Fate Modeling"
           href: articles/lectures/15_KnownFate/15_KnownFate.html
         - text: "Lecture 16: CJS Models"
-          href: articles/lectures/15_CJS/15_CJS.html
+          href: articles/lectures/16_CJS/16_CJS.html
           
     - text: "Labs"
       icon: fas fa-laptop-code

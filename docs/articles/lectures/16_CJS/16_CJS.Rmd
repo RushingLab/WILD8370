@@ -22,6 +22,8 @@ library(WILD8370)
 library(kableExtra)
 library(nimble)
 library(ggplot2)
+library(dplyr)
+library(nimbleEcology)
 ```
 
 ## Readings
@@ -374,11 +376,11 @@ CJS models are very similar to known-fate models minus the observation process.
 cjs <- nimbleCode({
 phi ~ dbeta(1, 1)
 p ~ dbeta(1, 1)
-for(i in 1:knownInd_Live){
+for(i in 1:nind){
   z[i,1] <- 1 #obviously, or you wouldn't have captured it
-  for(t in (first_seen[i]+1):nocc){
+  for(t in (first[i]+1):nocc){
     z[i,t] ~ dbern(phi*z[i,t-1])
-    y[i,t] ~ dbern(p)
+    y[i,t] ~ dbern(p*z[i,t])
   }
 }
 })
@@ -407,11 +409,11 @@ The advantage of using this package is significantly faster computation time.
 
 Here's an example with dCJS_sv. This means survival is constant while the capture probability changes over time. Note that `z` is not in the model! 
 
-```{r, echo = T}
+```{r, echo = T, eval =F}
 library(nimbleEcology)
 cjs2 <- nimbleCode({
   for(i in 1:nind){
-    y[i, first[i]:nocc] ~ dCJS_vs(probSurvive = phi, 
+    y[i, first[i]:nocc] ~ dCJS_sv(probSurvive = phi, 
                                 probCapture = p[first[i]:nocc])
   }
   
@@ -423,10 +425,198 @@ cjs2 <- nimbleCode({
 ```
 
 ---
-## CJS Models - Example 
+## Example - Wyoming Amphibians
 
-Researchers from USGS have been capturing and marking frogs and toads in Wyoming and Montana since 2001 to research survival in response to chytrid fungus (*Batrachochytrium dendrobatidis*). 
+Researchers from USGS have been capturing and marking frogs and toads in Wyoming and Montana since 2001 to research survival in response to chytrid fungus (*Batrachochytrium dendrobatidis*). Here's the citation:
+Russell, R.E., Halstead, B.J., Fisher, R.N., Muths, E.L., Adams, M.J., and Hossack, B.R., 2019, Amphibian capture mark-recapture: U.S. Geological Survey data release, https://doi.org/10.5066/P9LNLEDF.
+
+This information is saved in the `WyomingFrogs` dataset. You can also find this dataset online at the citation above.
 
 
+```{r, echo = T}
+data('WyomingFrogs')
+head(frog_caps, n = 3)
+```
+
+---
+## Example - Wyoming Amphibians
+
+For now we will just look at the boreal toad (*Anaxyrus boreas*) in Montana. We'll start by subsetting and then organizing the date column. 
+
+```{r, echo = T}
+btoads <- subset(frog_caps, frog_caps$Species == 'A.boreas' & frog_caps$Project == 'MT')
+btoads$id <- as.numeric(as.factor(btoads$Ind.ID))
+nind <- length(unique(btoads$id))
+```
+
+This leaves us with 1672 individuals. 
+
+```{r, echo = T}
+btoads$date <- as.Date(btoads$Survey.Date, format = '%m/%d/%y')
+btoads$year <- as.numeric(format(btoads$date, '%y'))
+head(btoads, n = 2)
+```
+
+---
+## Example - Wyoming Amphibians
+Time to organize the capture information. 
+
+```{r, echo = T}
+nocc <- 13 #13 years of data
+y <- array(0, c(nind, nocc))
+z <- array(NA, c(nind, nocc))
+for(k in 1:nrow(btoads)){
+  y[btoads$id[k],btoads$year[k]-3] <- 1
+  z[btoads$id[k],btoads$year[k]-3] <- 1
+}
+first <- apply(y, 1, function(row) {
+  which(row > 0)[1]  # Returns the index of the first detection
+})
+```
+
+```{r, echo = T}
+range(first)
+```
+
+Uh-oh, we can't have animals where first = the last occasion, since we loop through first+1:last. 
+---
+## Example - Wyoming Amphibians
+```{r, echo = T}
+bad <- which(first == nocc)
+y <- y[-c(bad),] #remove bad ones
+z <- z[-c(bad),]
+first <- first[-c(bad)]
+nind2 <- nind-length(bad) #new nind
+```
 
 
+---
+## Example - Wyoming Amphibians
+
+Prepare nimble objects for the time-changing detection CJS model using the normal synatx:
+
+```{r, echo = T}
+nd <- list(y = y, z = z)
+nc <- list(first = first, nocc = nocc, nind = nind2)
+z.init <- z
+last <- apply(y, 1, function(row) {
+  max(which(row > 0))  # Returns the index of the last detection
+})
+for(j in 1:nind2){
+  z.init[j, 1:(first[j]-1)] <- 1 #start everyone alive before first capture 
+  z.init[j, (first[j]+1):last[j]]  <- 1#alive entire time it was seen
+  if(last[j] < nocc){
+    z.init[j, (last[j]+1):nocc] <- 0 #kill everyone after last detection
+  }
+}
+z.init[!is.na(z)] <- NA #no inits for known data
+ni <- list(phi = rbeta(1,1,1), p = rbeta(nocc,1,1), z = z.init)
+params <- c('phi', 'p')
+```
+
+---
+## Example - Wyoming Amphibians
+
+This is the model we'll run. Not very informative about detection probability, but we'll see how it goes:
+
+```{r, eval=TRUE, echo = T}
+cjs <- nimbleCode({
+phi ~ dbeta(1, 1)
+for(t in 1:nocc){
+    p[t] ~ dbeta(1, 1)
+}
+for(i in 1:nind){
+  z[i,1] <- 1 #obviously, or you wouldn't have captured it
+  for(t in (first[i]+1):nocc){
+    z[i,t] ~ dbern(phi*z[i,t-1])
+    y[i,t] ~ dbern(p[t]*z[i,t])
+  }
+}
+})
+```
+
+---
+## Example - Wyoming Amphibians
+
+Check model:
+```{r, echo = T, eval = T}
+prepnim <- nimbleModel(code = cjs, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+---
+## Example - Wyoming Amphibians
+
+```{r, echo = T, eval = F}
+toads.out <- nimbleMCMC(code = cjs,
+                     data = nd,
+                     constants = nc,
+                     inits = ni,
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+## Example - Wyoming Amphibians
+
+Remember that we cannot use the output from the last occasion's estimate of detection - it is unidentifiable. 
+
+```{r, echo = F, eval = T}
+toads.out <- readRDS('toads1.RDS')
+MCMCvis::MCMCtrace(toads.out, pdf = F, params = c('p[13]', 'phi'), exact = T, ISB = F)
+```
+
+---
+## Example - Wyoming Amphibians
+
+We can also run the model using the nimbleEcology distributions. 
+```{r, echo = T, eval =T}
+cjs2 <- nimbleCode({
+  for(i in 1:nind){
+    y[i, first[i]:nocc] ~ dCJS_sv(probSurvive = phi, 
+                                probCapture = p[first[i]:nocc])
+  }
+  
+  phi ~ dbeta(1, 1)
+  for(t in 1:nocc){
+    p[t] ~ dbeta(1, 1)
+  }
+})
+```
+
+---
+## Example - Wyoming Amphibians
+
+We don't need the z information in this model, but everything else stays the same.
+```{r, echo = T, eval = F}
+nd$z <- NULL
+ni$z <- NULL
+toads.out2 <- nimbleMCMC(code = cjs2,
+                     data = nd,
+                     constants = nc,
+                     inits = ni,
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+## Example - Wyoming Amphibians
+
+Exactly the same result
+
+```{r, echo = F, eval = T}
+toads.out2<- readRDS('toads.out2.RDS')
+MCMCvis::MCMCtrace(toads.out2, pdf = F, params = c('p[13]', 'phi'), exact = T, ISB = F)
+```
