@@ -86,6 +86,9 @@ navbar:
           href: articles/Lab8_Movement.html
         - text: "Lab 9: Spatial Capture Recapture"
           href: articles/Lab9_SCR.html
+        - text: "Lab 10: CJS"
+          href: articles/Lab10_CJS.html
+          
     - icon: far fa-bookmark
       text: "References"
       menu:
