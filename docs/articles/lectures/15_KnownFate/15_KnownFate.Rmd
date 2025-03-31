@@ -203,7 +203,7 @@ abline(v = 15, lty = 3, col = 'black', lwd = 2)
 ---
 ## Left Censoring 
   
-Left censoring means **true survival ≥ observed survival**
+Left censoring means **true survival <= observed survival**
 
 Example: You are studying daily fawn survival. You capture a fawn and tag it. 
 

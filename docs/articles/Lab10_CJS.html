@@ -150,7 +150,7 @@ on surviving. We will not estimate survival directly. If the animal is
 infected, <span class="math inline">z = 0</span> and we stop monitoring
 the animal in our study.</p>
 <p>Let’s organize the data to fit this simple model. We’ll use the
-boreal toad (<em>Anaxyrus boreas</em>) in Montana for this example. As
+boreal toad (<em>Rana muscosa</em>) in California for this example. As
 in lecture, we will only concern ourselves with the yearly level, not
 the capture-date level. Thus, if an animal ever tested positive during a
 given year, we will mark it as positive for the entire year.</p>
@@ -395,10 +395,34 @@ detection probability across time, with different colors for the
 different sexes. Note: you will need to remove frogs with Ids that start
 with the number 9. These are an error in the dataset (example:
 “9.00043E+14”)</p></li>
-<li><p>Fix someone’s bad code… TBD</p></li>
-<li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
-the best, how would you rate this week’s content? What lingering
-questions/confusion about the lecture or lab do you still have?</p></li>
+<li><p>You are a reviewer for a journal and are trying to run code from
+several manuscripts to make sure the author’s results make sense.
+Unfortunately, with the information you are given, none of the models
+run. Use data(‘bad_data’) to find the information from 3 manuscripts
+(Birds N-mixture, frog CJS, and falcons). Diagnose the problem(s) with
+each dataset. If the problem is in the initial values, determine what
+initial value is needed instead to make the model run. You do not need
+to run the models all the way, just fix the information until you can
+get a non-NA, non-infinite value for calculate().</p></li>
+</ol>
+<p>Here’s an example workflow to get you started for the first
+manuscript (birds):</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">'bad_data'</span><span class="op">)</span></span>
+<span><span class="va">birds</span> <span class="op">&lt;-</span> <span class="va">bad_data</span><span class="op">$</span><span class="va">birds</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va">birds</span><span class="op">$</span><span class="va">model</span></span>
+<span><span class="va">nd</span> <span class="op">&lt;-</span> <span class="va">birds</span><span class="op">$</span><span class="va">dat</span></span>
+<span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="va">birds</span><span class="op">$</span><span class="va">consts</span></span>
+<span><span class="va">ni</span> <span class="op">&lt;-</span> <span class="va">birds</span><span class="op">$</span><span class="va">inits</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">birds</span><span class="op">$</span><span class="va">monitors</span></span>
+<span><span class="va">prepnim</span> <span class="op">&lt;-</span> <span class="fu">nimbleModel</span><span class="op">(</span>code <span class="op">=</span> <span class="va">model</span>, constants <span class="op">=</span> <span class="va">nc</span>,</span>
+<span>                       data <span class="op">=</span> <span class="va">nd</span>, inits <span class="op">=</span> <span class="va">ni</span>, calculate <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">prepnim</span><span class="op">$</span><span class="fu">initializeInfo</span><span class="op">(</span><span class="op">)</span> </span>
+<span><span class="va">prepnim</span><span class="op">$</span><span class="fu">calculate</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>On a 1-10 scale, with 1 being the worst week ever and 10 being the
+best, how would you rate this week’s content? What lingering
+questions/confusion about the lecture or lab do you still have?</li>
 </ol>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

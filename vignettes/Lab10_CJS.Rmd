@@ -64,7 +64,7 @@ KnownFrogs <- nimbleCode({
 
 In this case eta ($\eta$) is not survival but rather the probability of getting the disease, conditional on surviving. We will not estimate survival directly. If the animal is infected, $z = 0$ and we stop monitoring the animal in our study. 
 
-Let's organize the data to fit this simple model. We'll use the boreal toad (*Anaxyrus boreas*) in Montana for this example. As in lecture, we will only concern ourselves with the yearly level, not the capture-date level. Thus, if an animal ever tested positive during a given year, we will mark it as positive for the entire year. 
+Let's organize the data to fit this simple model. We'll use the boreal toad (*Rana muscosa*) in California for this example. As in lecture, we will only concern ourselves with the yearly level, not the capture-date level. Thus, if an animal ever tested positive during a given year, we will mark it as positive for the entire year. 
 
 ```{r}
 data("WyomingFrogs")
@@ -301,6 +301,22 @@ And that is why you should not ignore detection probability.
 
 1. Using only the capture records for *Rana sierrae*, write a CJS model for apparent survival that models capture probability as a function of both sex and a random effect of year. Make a ggplot showing detection probability across time, with different colors for the different sexes. Note: you will need to remove frogs with Ids that start with the number 9. These are an error in the dataset (example: "9.00043E+14")
 
-2. Fix someone's bad code... TBD
+2. You are a reviewer for a journal and are trying to run code from several manuscripts to make sure the author's results make sense. Unfortunately, with the information you are given, none of the models run. Use data('bad_data') to find the information from 3 manuscripts (Birds N-mixture, frog CJS, and falcons). Diagnose the problem(s) with each dataset. If the problem is in the initial values, determine what initial value is needed instead to make the model run. You do not need to run the models all the way, just fix the information until you can get a non-NA, non-infinite value for calculate(). 
+
+Here's an example workflow to get you started for the first manuscript (birds):
+
+```{r, eval = F, echo = T}
+data('bad_data')
+birds <- bad_data$birds
+model <- birds$model
+nd <- birds$dat
+nc <- birds$consts
+ni <- birds$inits
+params <- birds$monitors
+prepnim <- nimbleModel(code = model, constants = nc,
+                       data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() 
+prepnim$calculate()
+```
 
 3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
