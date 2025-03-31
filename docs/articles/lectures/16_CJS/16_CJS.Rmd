@@ -566,8 +566,6 @@ toads.out <- nimbleMCMC(code = cjs,
 ---
 ## Example - Wyoming Amphibians
 
-Remember that we cannot use the output from the last occasion's estimate of detection - it is unidentifiable. 
-
 ```{r, echo = F, eval = T}
 toads.out <- readRDS('toads1.RDS')
 MCMCvis::MCMCtrace(toads.out, pdf = F, params = c('p[13]', 'phi'), exact = T, ISB = F)
