@@ -458,7 +458,7 @@ cjs &lt;- nimbleCode({
 phi ~ dbeta(1, 1)
 p ~ dbeta(1, 1)
 for(i in 1:nind){
-  z[i,1] &lt;- 1 #obviously, or you wouldn't have captured it
+  z[first[i],1] &lt;- 1 #obviously, or you wouldn't have captured it
   for(t in (first[i]+1):nocc){
     z[i,t] ~ dbern(phi*z[i,t-1])
     y[i,t] ~ dbern(p*z[i,t])
@@ -637,7 +637,7 @@ for(t in 1:nocc){
     p[t] ~ dbeta(1, 1)
 }
 for(i in 1:nind){
-  z[i,1] &lt;- 1 #obviously, or you wouldn't have captured it
+  z[i,first[i]] &lt;- 1 #obviously, or you wouldn't have captured it
   for(t in (first[i]+1):nocc){
     z[i,t] ~ dbern(phi*z[i,t-1])
     y[i,t] ~ dbern(p[t]*z[i,t])
@@ -659,7 +659,7 @@ prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
 ```
 
 ```
-## [1] -2826.049
+## [1] -5411.953
 ```
 
 ---

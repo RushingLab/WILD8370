@@ -51,7 +51,8 @@ Let's organize the data to fit this simple model. We'll use the boreal toad (*Ra
 ``` r
 data("WyomingFrogs")
 Rmus <- subset(frog_caps, frog_caps$Species == 'Rana muscosa')
-Rmus$Bd <- ifelse(Rmus$Bd.presence %in% c('Negative', 'negative'), 1, ifelse(Rmus$Bd.presence == 'Positive', 0, NA) )
+Rmus$Bd <- ifelse(Rmus$Bd.presence %in% c('Negative', 'negative'), 1,
+                  ifelse(Rmus$Bd.presence == 'Positive', 0, NA) )
 Rmus$id <- as.numeric(as.factor(Rmus$Ind.ID))
 Rmus$date <- as.Date(Rmus$Survey.Date, format = '%m/%d/%y')
 Rmus$year <- as.numeric(format(Rmus$date, '%y'))
@@ -94,6 +95,11 @@ for(j in 1:nrow(new.z)){
  last[j] <-  which(is.na(new.z[j, (first[j]+1):nocc]))[1]+first[j]-1
 }
 
+```
+Above, we are finding the first detection for each individual and then the last *useable* detection. This is how we would do it for actual known-fate data as well when we are censoring. If any individuals were only seen once (the first time is also the last time), we drop them from the model:
+
+
+``` r
 z_useable <- new.z[which(last-first > 0),]
 first.use <- first[which(last-first > 0)]
 last.use <- last[which(last-first > 0)]
@@ -130,7 +136,7 @@ prepnim <- nimbleModel(code = KnownFrogs, constants = nc,
                            data = nd, inits = ni, calculate = T)
 prepnim$initializeInfo() #will tell you what is or isn't initialized
 prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
-#> [1] -253.9
+#> [1] -176.4
 ```
 Run the model:
 
@@ -157,9 +163,9 @@ Check the chains. Remember that we defined eta as similar to survival, so we're 
 MCMCvis::MCMCtrace(frogs_kf, pdf = F, Rhat = T, n.eff = T)
 ```
 
-<img src="Lab10_CJS_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab10_CJS_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" />
 
-This model suggests the annual probability of infection (conditional on survival) is around 3.5% 
+This model suggests the annual probability of infection (conditional on survival) is around 3.9% 
 
 
 ``` r
@@ -181,7 +187,7 @@ eta ~ dbeta(1, 1)
 p ~ dbeta(1, 1)
 
 for(i in 1:nind){
-  z[i,1] <- 1 #initial capture
+  z[i,first[i]] <- 1 #initial capture
   for(t in (first[i]+1):nocc){
     z[i,t] ~ dbern(eta*z[i,t-1])
     y[i,t] ~ dbern(p*z[i,t])
@@ -204,8 +210,12 @@ y.new.cjs <- y.cjs[rowSums(y.cjs, na.rm = T) > 0,] #get rid of ones with no nega
 first.cjs <- apply(y.new.cjs, 1, function(row) {
   which(row > 0)[1]  # Returns the index of the first detection
 })
+```
 
-#can't use guys only seen on the last interval
+Remember that we can't use individuals that were only seen on the last interval
+
+
+``` r
 bad <- which(first.cjs == nocc.cjs)
 y.new.cjs <- y.new.cjs[-c(bad),] #remove bad ones
 z.new.cjs <- y.new.cjs
@@ -280,7 +290,7 @@ prepnim <- nimbleModel(code = UnknownFrogs, constants = nc,
                            data = nd, inits = ni, calculate = T)
 prepnim$initializeInfo() #will tell you what is or isn't initialized
 prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
-#> [1] -1336
+#> [1] -1143
 ```
 
 Run the model:
@@ -307,7 +317,7 @@ Check the chains. Again, we're really most interested in 1-eta (probability of i
 MCMCvis::MCMCtrace(frogs_cjs, pdf = F, Rhat = T, n.eff = T)
 ```
 
-<img src="Lab10_CJS_files/figure-html/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;" />
+<img src="Lab10_CJS_files/figure-html/unnamed-chunk-22-1.png" width="768" style="display: block; margin: auto;" />
 
 Let's see how the estimates compare with the Known-fate style model. 
 
@@ -315,11 +325,27 @@ Let's see how the estimates compare with the Known-fate style model.
 ``` r
 kf_out <- 1- MCMCvis::MCMCsummary(frogs_kf, Rhat = F, n.eff = F)
 cjs_out <- 1- MCMCvis::MCMCsummary(frogs_cjs, Rhat = F, n.eff = F, params = 'eta')
-rbind(kf_out, cjs_out)
+frogs_out <- rbind(kf_out, cjs_out)
+frogs_out
 #>         mean     sd    2.5%     50%   97.5%
 #> eta  0.03892 0.9830 0.07726 0.03637 0.01294
-#> eta1 0.28028 0.9791 0.32365 0.27932 0.24219
+#> eta1 0.28274 0.9795 0.32314 0.28271 0.24415
 ```
+
+``` r
+gg_frogs <- data.frame(Median = frogs_out$`50%`,
+                       LCI = frogs_out$`2.5%`,
+                       UCI = frogs_out$`97.5%`,
+                       Model = c('Known Fate', 'CJS'))
+ggplot(gg_frogs, aes(x = Model, y = Median))+
+  geom_pointrange(aes(ymin = LCI, ymax = UCI))+
+  theme_bw()+
+  ylab('Infection Probability')+
+  theme(axis.text = element_text(size = 20), axis.title = element_text(size = 25))
+```
+
+<img src="Lab10_CJS_files/figure-html/unnamed-chunk-24-1.png" width="768" style="display: block; margin: auto;" />
+
 
 And that is why you should not ignore detection probability. 
 
