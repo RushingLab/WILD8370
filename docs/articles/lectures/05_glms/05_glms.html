@@ -54,7 +54,7 @@ class: inverse, center, middle
 
 --
 
-`$$\underbrace{\LARGE y_i \sim normal(\mu_i, \tau)}_{Stochastic}$$`  
+`$$\underbrace{\LARGE y_i \sim normal(\mu_i, \sigma^2)}_{Stochastic}$$`  
 
 ???
 
@@ -80,7 +80,7 @@ class: inverse, middle, center
 
 `$$\LARGE \mu_i = -2 + 0.5 \times x_i$$`
 
-`$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \tau)}_{Stochastic}$$`  
+`$$\underbrace{\LARGE y_i \sim Normal(\mu_i, \sigma^2)}_{Stochastic}$$`  
 
 --
 
@@ -99,7 +99,7 @@ class: inverse, middle, center
 
 `$$\LARGE \mu_i = -2 + 0.5 \times x_i$$`
 
-`$$\LARGE y_i \sim Normal(\mu_i, \tau)$$`  
+`$$\LARGE y_i \sim Normal(\mu_i, \sigma^2)$$`  
 
 &lt;img src="05_glms_files/figure-html/unnamed-chunk-4-1.png" width="288" style="display: block; margin: auto;" /&gt;
 
@@ -113,7 +113,7 @@ class: inverse, center, middle
 
 ### 1) Distribution
 
-`$$\LARGE y_i \sim normal(\mu_i, \tau)$$`
+`$$\LARGE y_i \sim normal(\mu_i, \sigma^2)$$`
 
 --
 
@@ -144,7 +144,7 @@ class: inverse, center, middle
 
 #### 1) Distribution
 
-`$$\LARGE y_i \sim normal(\mu_i, \tau)$$`
+`$$\LARGE y_i \sim normal(\mu_i, \sigma^2)$$`
 
 ---
 # components of the generalized linear model
@@ -255,10 +255,10 @@ class: inverse, center, middle
 # glms in nimble - normal link
 
 `$$\mu_i = \beta_0 + \beta_1 \times x_i$$`
-`$$y_i \sim Normal(\mu_i, \tau)$$`  
+`$$y_i \sim Normal(\mu_i, \sigma^2)$$`  
 
 
-```r
+``` r
 nimbleCode({
   ## Priors
     beta0 ~ dnorm(0, sd = 10) #mean, sd
@@ -274,14 +274,14 @@ nimbleCode({
 ```
 
 ---
-# glms in nimble - poisson Link
+# glms in nimble - poisson link
 
 `$$y_i \sim Poisson(\lambda_i)$$`
 
 `$$log(\lambda_i) = log(E(y_i)) = \beta_0 + \beta_1 \times x_i$$`
 
 
-```r
+``` r
 nimbleCode({
   ## Priors
     beta0 ~ dnorm(0, sd = 10) #mean, precision
@@ -305,7 +305,7 @@ nimbleCode({
 `$$logit(p_i) = log \bigg(\frac{p_i}{1-p_0}\bigg) = \beta_0 + \beta_1 \times x_i$$`
 
 
-```r
+``` r
 nimbleCode({
   ## Priors
     beta0 ~ dnorm(0, sd = 10) #mean, sd
@@ -344,6 +344,131 @@ class: inverse
 
 - Underlie nearly all common ecological models  
 
+
+---
+# In-class Example 
+
+In the week 2 homework, we simulated data from a deer population declining because of CWD. Let's fit our simulated data to a model in Nimble! 
+
+
+``` r
+set.seed(4) #reproducible
+nocc &lt;- 20
+EN &lt;- N &lt;- array(NA, nocc) #create empty arrays with space for 20 years
+N[1] &lt;- 475
+lambda &lt;- .95
+
+#simulate:
+for(t in 2:nocc){
+  EN[t] &lt;- N[t-1]*lambda
+  N[t] &lt;- rpois(1, EN[t])
+}
+```
+
+---
+# In-class Example
+
+First we need a model:
+
+``` r
+library(nimble)
+deermod &lt;- nimbleCode({
+  N[1] &lt;- 475
+  
+for(t in 2:nocc){
+  EN[t] &lt;- N[t-1]*lambda
+  N[t] ~ dpois(EN[t])
+} #end t
+  
+lambda ~ dgamma(1, 1)
+  
+})
+```
+---
+# In-class Example
+
+Parameters of interest:
+
+``` r
+params &lt;- c("lambda")
+```
+
+Constants:
+
+``` r
+nimconsts &lt;- list(nocc = nocc)
+```
+
+Data
+
+``` r
+nimdat &lt;- list(N = N)
+```
+
+Inits
+
+``` r
+niminits &lt;- function(){list(lambda = rgamma(1,1,1))}
+```
+
+---
+# In-class Example
+
+
+``` r
+nimfit &lt;- nimbleMCMC(code = deermod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 5000,
+                     nburnin = 1000,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+```
+## |-------------|-------------|-------------|-------------|
+## |-------------------------------------------------------|
+```
+
+```
+## |-------------|-------------|-------------|-------------|
+## |-------------------------------------------------------|
+```
+
+```
+## |-------------|-------------|-------------|-------------|
+## |-------------------------------------------------------|
+```
+
+---
+# In-class Example
+
+
+``` r
+library(MCMCvis)
+MCMCtrace(nimfit, pdf = F, Rhat = T, n.eff = T)
+```
+
+&lt;img src="05_glms_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+# In-class Example
+
+Unsurprisngly accurate! 
+
+
+``` r
+summary(nimfit)$quantiles
+```
+
+```
+##   2.5%    25%    50%    75%  97.5% 
+## 0.9286 0.9444 0.9528 0.9613 0.9772
+```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

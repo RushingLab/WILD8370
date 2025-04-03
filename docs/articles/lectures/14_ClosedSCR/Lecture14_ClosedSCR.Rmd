@@ -1,0 +1,562 @@
+---
+title: "Lecture 14"
+subtitle: "Closed Spatial Capture Recapture"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+library(ggforce)
+source(here::here("R/zzz.R"))
+library(rphylopic) 
+library(ggforce)
+library(terra)
+# library(gganimate)
+```
+## Readings
+
+> 
+
+---
+## Motivations for SCR
+
+With non-spatial capture recapture, we were able to estimate abundance
+
+<br/> 
+Unbiased estimates of $\large N$ require *accurate* estimates of $\large p$
+
+--
+
+<br/> 
+
+Non-spatial models don't account for several important sources of variation in $p$  
+
+
+  + Distance between animals and traps 
+  
+  + Trap-specific covariates 
+  
+  + Spatial variation in habitat or resources within the trapping array 
+
+--
+
+<br/> 
+SCR makes it possible to estimate **density** not just $N$ in an unknown region 
+
+---
+## Motivations for SCR
+
+With spatial data, we can ask new quetions
+
+  + What influences spatial variation in density?
+  
+  + How do survival and recruitment vary in space and time?
+  
+  + How does movement influence density and detectability?
+
+--
+
+<br/>
+
+Rather than think of SCR as a brand new estimation tool, you can think of it as a hierarchical framework combines different aspects of the environment to improve inference on population dynamics
+
+---
+## Homogenous SCR Model
+
+Imagine a bunch of penguins on an iceberg. There is nothing on the iceberg but penguins and ice.
+
+<br/>
+```{r, fig.width= 6, fig.height= 6}
+set.seed(1)
+s <- data.frame(x = runif(10, -1, 1), y = runif(10, -1, 1))
+s2 <- s+.025
+s2$y <- s2$y+.05
+s2$ind <- as.character(1:10)
+s2$color <- rainbow(10)
+s$ind <- s2$ind
+s$color <- s2$color
+uuid <- get_uuid( 'Eudyptes chrysolophus', n = 2)
+img_svg <- get_phylopic(uuid[2], format = "vector")
+ggplot(s, aes(x =x, y= y))+
+  add_phylopic(img_svg, alpha=0.9, x= s2$x, y=s2$y, height = .2, col = s2$color)+
+  xlim(-1.5,1.5)+
+  ylim(-1.5, 1.5)
+```
+
+---
+## Homogenous SCR Model
+
+The penguins are cold, so they shuffle around a bit, but they generally stay somewhat near their original positions, where they have left their children (eggs).
+
+<br/>
+```{r, fig.width= 6, fig.height= 6}
+ggplot(s, aes(x =x, y= y))+
+  geom_circle(dat = s, aes(x0 = x, y0 = y, r = .35), lty = 2, alpha = .15)+
+  add_phylopic(img_svg, alpha=0.9, x= s2$x, y=s2$y, height = .2, col = s2$color)+
+  xlim(-1.5,1.5)+
+  ylim(-1.5, 1.5)+
+  scale_fill_manual(values = rainbow(10))+
+  #scale_color_manual(values = rainbow(10))+
+  theme(legend.position = 'none')
+```
+
+---
+## Homogenous SCR Model
+
+I wish to calculate the abundance of penguins, so I set out 25 fish traps to catch them.
+
+<br/>
+```{r, fig.width= 6, fig.height= 6}
+x <- seq(-.3, 1, .3)
+traps <- expand.grid(x,x)
+uuid2 <- '381e7e19-bb44-4432-85ce-627f05d159a3'
+img2 <- get_phylopic(uuid2, format = "vector")
+ggplot(s, aes(x =x, y= y))+
+  geom_circle(aes(x0 = x, y0 = y, r = .35), lty = 2, alpha = .15, lwd = .2)+
+  add_phylopic(img_svg, alpha=0.9, x= s2$x, y=s2$y, height = .2, col = s2$color)+
+  add_phylopic(img2, alpha = .9, x = traps$Var1, y = traps$Var2, height = .05, col = 'blue')+
+  xlim(-1.5,1.5)+
+  ylim(-1.5, 1.5)
+```
+
+---
+## Homogenous SCR Model
+
+Penguins that live closer to the traps will be capture more often than those that don't.
+
+<br/>
+```{r, fig.width= 6, fig.height= 6}
+g0 <- .7
+dist <- p <- y <- array(NA, c(10, 25))
+sigma <- .35/2
+for(j in 1:25) {
+  for(i in 1:10){
+    dist[i,j] <- sqrt((s$x[i]-traps$Var1[j])^2 + (s$y[i]-traps$Var2[j])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
+    y[i,j] <- rbinom(1, 3, p[i,j]) ## Model for the capture histories
+  }
+}
+
+trap_segs <- data.frame(x0 = 1, y0 = 2, x1 = 3, y1= 4, col = NA)
+for(i in 1:10){
+  mytraps <- which(y[i,] > 0)
+  if(length(mytraps) == 0) next 
+  for(k in 1:length(mytraps)){
+    add <- data.frame(x0 = traps[mytraps[k],1], y0 = traps[mytraps[k],2], 
+                      x1 = s[i,1], y1 = s[i, 2], col = s[i,3])
+    trap_segs <- rbind(trap_segs, add)
+  }
+}
+trap_segs <- trap_segs[-1,]
+
+ggplot(s, aes(x =x, y= y))+
+  geom_circle(dat = s, aes(x0 = x, y0 = y, r = .35), lty = 2, lwd = .2)+
+  add_phylopic(img_svg, alpha=0.9, x= s2$x, y=s2$y, height = .2, col = s2$color)+
+  add_phylopic(img2, alpha = .9, x = traps$Var1, y = traps$Var2, height = .05, col = 'blue')+
+  geom_segment(dat = trap_segs, aes(x = x0, xend = x1, y = y0, yend= y1, col = col), lty = 2)+
+  xlim(-1.5,1.5)+
+  ylim(-1.5, 1.5)+
+  scale_color_manual(values = list('1' = s$color[1], '2' = s$color[2],'3' = s$color[3],'4' = s$color[4],
+                                   '5' = s$color[5], '6' = s$color[6], '7' = s$color[7], '8' = s$color[8],
+                                   '9' = s$color[9], '10' = s$color[10]))+
+  theme(legend.position = 'none')
+```
+
+---
+## SCR Model
+
+When we model spatial data, it would be convenient if two things were true:
+
+First:
+
+
+ $$ N_t \sim Pois(\lambda_t)$$
+$$ log(\lambda_t) = \beta0 + \beta1*x + \cdots$$
+This formulation is familiar and lets us put covariates on $\lambda$ that tell us the expected abundance at some known resolution (per pixel, per site, etc.). 
+
+--
+<br/>
+But we also want to use individual level data, such that:
+
+$$ z_i \sim Bernoulli(\psi_t)$$ 
+$$E(N_t) = \psi_t*M$$
+
+$$N_t = \sum_{1}^{M} z_i$$
+*where $M >> N$
+---
+## SCR Model
+
+This is inconvenient, because to use MCMC to solve for parameters, you can't have two different ways to define the same variable. 
+
+--
+
+Luckily, we can do some rearranging to make things work nicely. 
+
+
+If: 
+$$E(N_t) = \psi_t*M$$
+and 
+
+$$E(N_t) = \lambda_t$$
+
+Then:
+
+$$\psi_t = \frac{E(N_t)}{M} = \frac{\lambda_t}{M}$$
+--
+
+If space is homogenous, we can just replace this with:
+
+$$\psi_t \sim Uniform(0, 1)$$
+
+
+---
+## Homogeneous SCR Model
+
+If space is homogenous, we don't have to do much else. We can just add in a quick prior for locations:
+
+$$\large \mathbf{s_{i}} \sim Uniform(s_{min}, s_{max})$$
+Note that *ALL* animals receive an activity center location regardless if they are real or not. We just can't detect the fake ones. 
+
+--
+
+The observation process is then just based on distance between the activity center and the trap in question. 
+
+$$\large p_{ij} = g_0*e^{(-\|s_i - x_j\|^2/(2\sigma^2))}$$
+
+$$\large y_{ijk} \sim Bernoulli(z_i*p_{ij})$$
+** Note: this observation process assumes multiple animals can be captured in multiple traps on the same occasion. It is still often used for single-catch traps (like mammal traps) simply because the alternatives require knowledge of capture time. 
+
+---
+## Homogeneous SCR Model Simulation
+
+Let's simulate a simple closed, homogeneous SCR model using the following parameters:
+
+  + `set.seed(15)`
+  
+  For the real individuals:
+  
+    +  N = 25
+  
+    +  locations bound between [0, 1] in both directions
+  
+  For the observation process:
+  
+    +  $g_0$ = .8 
+    
+    +  $\sigma$ = .5
+    
+    +  traps located every .2 units from (.2, .2) to (.8, .8) 
+    
+        + Hint: `x <- seq(.2, .8, .2); expand.grid(x,x)`
+        
+    +  3 occasions (trials) 
+
+---
+## Homogeneous SCR Model Simulation
+
+```{r, echo = T}
+set.seed(15)
+N <- 25
+max <- 1
+min <- 0
+g0 <- .8
+sig <- .5
+x <- seq(.2, .8, .2)
+traps <- expand.grid(x,x)
+ntrials <- 3
+ntraps <- nrow(traps)
+s <- matrix(runif(50), ncol = 2)
+dist <- p <- y <- array(NA, c(N, ntraps))
+for(j in 1:ntraps) {
+  for(i in 1:N){
+    dist[i,j] <- sqrt((s[i,1]-traps[j,1])^2 + (s[i,2]-traps[j,2])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sig^2))
+    y[i,j] <- rbinom(1, ntrials, p[i,j]) ## Model for the capture histories
+  }
+}
+```
+
+---
+## Homogeneous SCR Model in Nimble
+
+```{r, echo = T}
+nimbleCode({
+g0 ~ dunif(0, 1)       ## Baseline capture probability
+sigma ~ dunif(0, 0.5)  ## Scale parameter of encounter function
+psi ~ dunif(0, 1)      ## Data augmentation parameter
+
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) ## x-coord of activity center
+  s[i,2] ~ dunif(ylim[1], ylim[2]) ## y-coord of activity center
+  z[i] ~ dbern(psi)                ## Is individual real?
+  for(j in 1:J) {
+    dist[i,j] <- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
+    y[i,j] ~ dbinom(p = z[i]*p[i,j], size = ntrials) ## Model for the capture histories
+    }
+  }
+
+EN <- M*psi  ## Expected value of N
+N <- sum(z)  ## Realized value of N
+}
+)
+```
+
+
+---
+## Inhomogeneous SCR Model
+
+The previous model is great if we don't have any spatial covariates. We don't even have to worry about $\lambda$ at all, we just slap a uniform prior on $\psi$ and we're good to go. 
+
+<br/>
+
+But when we *DO* have spatial variation, we are left with an issue. 
+
+<br/>
+
+How do we ensure that the locations of our $M$ individuals (real or not) follow the pattern of $Pois(\lambda_t)$? 
+
+
+$$s_i \propto \lambda_t(s)$$ 
+--
+
+In continuous space, we would say:
+
+$$\Lambda = \int_{\mathcal{S}} \lambda(s)$$
+In english, this says that the area under the curve for any given region is the expected number of points (individuals) in that region. 
+
+---
+## Inhomogeneous SCR Model
+
+In discrete space, this is similar to creating a raster where the pixel values are equal to the number of individuals in each pixel and then randomly spreading those individuals throughout that pixel. 
+
+<br/>
+
+As the pixel size gets smaller and smaller, we start to approximate continuous space. 
+
+
+<br/> 
+
+This is called a *spatial point process*. The equation ($\lambda(s)$) describes spatial variation in the density of points. We call this an *intensity function*. 
+
+<br/>
+
+Our goal here is to estimate the intensity function so that we can estimate how many individuals are located in each pixel in our area of interest. 
+
+---
+## Inhomogeneous SCR Model
+
+```{r, fig.width= 6, fig.align='center'}
+set.seed(55)
+par(oma = c(0,0,0,0))
+delta <- 0.25/6 ## Resolution
+grid0 <- seq(delta/2, 1-delta/2, delta)
+grid <- expand.grid(grid0, grid0)
+distmat <- as.matrix(dist(grid))
+npixels <- nrow(distmat)
+## Covariance matrix
+V <- exp(-0.4*distmat)
+R <- chol(V)
+X <- t(R) %*% rnorm(npixels)
+
+Canopy <- rast(nrows = length(grid0), ncols = length(grid0), extent = c(0, 1, 0, 1))
+Canopy[] <- X[,1]
+plot(Canopy) 
+```
+Consider the above raster of canopy cover. 
+
+---
+## Inhomogeneous SCR Model
+
+What if I thought the relationship betwen abundance and canopy cover was a simple poisson regression? 
+
+$$ N \sim Pois(\lambda) $$
+$$log(\lambda) = \beta_0 + \beta_1*canopy$$
+
+```{r, fig.width= 6, fig.height= 6}
+X2 <- exp(.5 + 2*X[,1])
+Canopy[] <- X2
+plot(Canopy) 
+```
+
+---
+## Inhomogeneous SCR Model
+
+If we normalize this raster, we get the relative probability of an individual being in that pixel vs any other pixel. This is the same as $\frac{\lambda}{\sum\lambda}$, so we don't *need* the raster.
+
+```{r, fig.width= 6, fig.height= 6}
+X2 <- exp(.5 + 2*X[,1])
+Canopy[] <- X2/sum(X2)
+plot(Canopy) 
+```
+
+---
+## Inhomogeneous SCR Model
+
+The problem is that this probability layer is not a distribution. So how do we trick Nimble or any other MCMC software into cooperating? 
+
+<br/>
+
+The secret is a fun trick of the poisson distribution! 
+
+--
+
+<br/>
+
+Remember that:
+
+$$P(Pois(\lambda) = 0) = e^{-\lambda}$$
+
+So we fit this model:
+
+$$0 \sim Pois(-logProb[i])$$
+For any given pixel $k$ and individual $i$, the log probability of that individual being located in that pixel is:
+
+$$logProb[i] = log(\frac{\lambda[i]}{sum(\lambda)})$$
+
+
+---
+## Inhomogeneous SCR Model
+
+This means we're saying:
+
+$$\lambda = -logProb[i]$$
+Therefore:
+
+$$P(Pois(\lambda) = 0) = e^{-\lambda} = e^{-(-logProb[i])} = e^{logProb[i]} $$ 
+
+Remember that `log(1) = 0`. 
+
+This means that as the probability of individual $i$ being in pixel $k$ approaches 1, `logProb[i]` approaches 0 and the likelihood of `Pois(-logProb[i]) = 0` also approaches 1. Nifty! 
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+In practice, this is accomplished fairly easily in nimble, though it adds a lot of lines to our code which is annoying.
+
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 45% !important;
+}
+```
+
+.smaller[
+```{r, echo = T}
+ipp <- nimbleCode({
+
+psi ~ dunif(0, 1)  ## Can't put prior on psi *and* beta0
+beta0 <- log(M*psi/SumLambda) ## Algebra
+beta1 ~ dnorm(0, 0.1)
+g0 ~ dunif(0, 1)
+sigma ~ dunif(0, 0.5)
+
+for(g in 1:G) { ## Loop over pixels
+  lambda[g] <- exp(beta1*canopy[g])*pixelArea
+  pi[g] <- lambda[g]/SumLambda
+}
+SumLambda <- sum(lambda)
+
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) 
+  s[i,2] ~ dunif(ylim[1], ylim[2])
+  pixel[i] <- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
+                     round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+  logProb[i] <- log(pi[pixel[i]])
+  zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
+  z[i] ~ dbern(psi)
+  for(j in 1:J) {
+    dist[i,j] <- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
+  }
+}
+for(i in 1:M) {  ## Model for capture histories
+  for(j in 1:J) {
+    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  }
+}
+
+EN <- M*psi
+N <- sum(z)
+})
+```
+]
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Let's go over this line by line. 
+
+<br/>
+First, the easy part - Detection! We can only see animals that are real. No false positives! 
+
+```{r, echo = T, eval = F}
+for(i in 1:M) { 
+  for(j in 1:J) {
+    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  }
+}
+```
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Our probability of detection is based on the distance between our trap and the animal's activity center. 
+
+```{r, echo = T, eval = F}
+z[i] ~ dbern(psi)
+  for(j in 1:J) {
+    dist[i,j] <- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] <- g0*exp(-dist[i,j]^2/(2*sigma^2))
+```
+
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Individuals can be anywhere in the state space. We can figure out which pixel they are in by using a lookup grid that tells us the pixel number. If you were to number pixels on a raster, the first one is the top left corner, the last one is the bottom right corner. Delta is the pixel width 
+
+```{r, echo = T, eval = F}
+s[i,1] ~ dunif(xlim[1], xlim[2]) 
+s[i,2] ~ dunif(ylim[1], ylim[2])
+pixel[i] <- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
+                    round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+```
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Finally (ignoring priors), these parts are our zeros trick
+
+```{r, echo = T, eval = F}
+logProb[i] <- log(pi[pixel[i]])
+zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
+```
+
+```{r, echo = T, eval = F}
+for(g in 1:G) { ## Loop over pixels
+  lambda[g] <- exp(beta1*canopy[g])*pixelArea
+  pi[g] <- lambda[g]/SumLambda
+}
+SumLambda <- sum(lambda)
+```
+
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+In lab we will explore how to run these models in Nimble and learn a speed trick to make our model run faster!
+

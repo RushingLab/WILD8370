@@ -1,0 +1,25 @@
+---
+title: "Nimble Errors"
+author: "Heather Gaya"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Some notes to self:
+
+> Defining model Error in processBUGScode(recurseCode, nextContextID, lineNumber = lineNumber, : invalid model code: N_AH[t] = N_BH[t] - H[t]
+
+This error is caused by using an = instead of a \<-
+
+> Warning: R object of different size than NimArrDouble. R obj has size 1 but NimArrDbl has size 10.
+
+Caused by giving an initial value that has the wrong array dimensions. Oops!
+
+> Error in processLinks() : Error, unknown link function: expError in processLinks() : Error, unknown link function: exp
+
+This is caused by using exp(f) = a + bx instead of log(f) = a + bx or f = exp(a+bx)
+

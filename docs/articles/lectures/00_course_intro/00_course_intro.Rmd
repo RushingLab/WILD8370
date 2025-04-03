@@ -80,7 +80,7 @@ class: inverse, center, middle
 **Practical advantages**  
 <br/>
 --
-1) Ability to develop custom/complex models to suite your needs  
+1) Ability to develop custom/complex models to suit your needs  
 <br/>
 
 --

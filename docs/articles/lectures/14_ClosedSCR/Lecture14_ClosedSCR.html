@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 14</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 14
+]
+.subtitle[
+## Closed Spatial Capture Recapture
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+## Readings
+
+&gt; 
+
+---
+## Motivations for SCR
+
+With non-spatial capture recapture, we were able to estimate abundance
+
+&lt;br/&gt; 
+Unbiased estimates of `\(\large N\)` require *accurate* estimates of `\(\large p\)`
+
+--
+
+&lt;br/&gt; 
+
+Non-spatial models don't account for several important sources of variation in `\(p\)`  
+
+
+  + Distance between animals and traps 
+  
+  + Trap-specific covariates 
+  
+  + Spatial variation in habitat or resources within the trapping array 
+
+--
+
+&lt;br/&gt; 
+SCR makes it possible to estimate **density** not just `\(N\)` in an unknown region 
+
+---
+## Motivations for SCR
+
+With spatial data, we can ask new quetions
+
+  + What influences spatial variation in density?
+  
+  + How do survival and recruitment vary in space and time?
+  
+  + How does movement influence density and detectability?
+
+--
+
+&lt;br/&gt;
+
+Rather than think of SCR as a brand new estimation tool, you can think of it as a hierarchical framework combines different aspects of the environment to improve inference on population dynamics
+
+---
+## Homogenous SCR Model
+
+Imagine a bunch of penguins on an iceberg. There is nothing on the iceberg but penguins and ice.
+
+&lt;br/&gt;
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Homogenous SCR Model
+
+The penguins are cold, so they shuffle around a bit, but they generally stay somewhat near their original positions, where they have left their children (eggs).
+
+&lt;br/&gt;
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Homogenous SCR Model
+
+I wish to calculate the abundance of penguins, so I set out 25 fish traps to catch them.
+
+&lt;br/&gt;
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-3-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Homogenous SCR Model
+
+Penguins that live closer to the traps will be capture more often than those that don't.
+
+&lt;br/&gt;
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-4-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## SCR Model
+
+When we model spatial data, it would be convenient if two things were true:
+
+First:
+
+
+ $$ N_t \sim Pois(\lambda_t)$$
+$$ log(\lambda_t) = \beta0 + \beta1*x + \cdots$$
+This formulation is familiar and lets us put covariates on `\(\lambda\)` that tell us the expected abundance at some known resolution (per pixel, per site, etc.). 
+
+--
+&lt;br/&gt;
+But we also want to use individual level data, such that:
+
+$$ z_i \sim Bernoulli(\psi_t)$$ 
+`$$E(N_t) = \psi_t*M$$`
+
+`$$N_t = \sum_{1}^{M} z_i$$`
+*where `\(M &gt;&gt; N\)`
+---
+## SCR Model
+
+This is inconvenient, because to use MCMC to solve for parameters, you can't have two different ways to define the same variable. 
+
+--
+
+Luckily, we can do some rearranging to make things work nicely. 
+
+
+If: 
+`$$E(N_t) = \psi_t*M$$`
+and 
+
+`$$E(N_t) = \lambda_t$$`
+
+Then:
+
+`$$\psi_t = \frac{E(N_t)}{M} = \frac{\lambda_t}{M}$$`
+--
+
+If space is homogenous, we can just replace this with:
+
+`$$\psi_t \sim Uniform(0, 1)$$`
+
+
+---
+## Homogeneous SCR Model
+
+If space is homogenous, we don't have to do much else. We can just add in a quick prior for locations:
+
+`$$\large \mathbf{s_{i}} \sim Uniform(s_{min}, s_{max})$$`
+Note that *ALL* animals receive an activity center location regardless if they are real or not. We just can't detect the fake ones. 
+
+--
+
+The observation process is then just based on distance between the activity center and the trap in question. 
+
+`$$\large p_{ij} = g_0*e^{(-\|s_i - x_j\|^2/(2\sigma^2))}$$`
+
+`$$\large y_{ijk} \sim Bernoulli(z_i*p_{ij})$$`
+** Note: this observation process assumes multiple animals can be captured in multiple traps on the same occasion. It is still often used for single-catch traps (like mammal traps) simply because the alternatives require knowledge of capture time. 
+
+---
+## Homogeneous SCR Model Simulation
+
+Let's simulate a simple closed, homogeneous SCR model using the following parameters:
+
+  + `set.seed(15)`
+  
+  For the real individuals:
+  
+    +  N = 25
+  
+    +  locations bound between [0, 1] in both directions
+  
+  For the observation process:
+  
+    +  `\(g_0\)` = .8 
+    
+    +  `\(\sigma\)` = .5
+    
+    +  traps located every .2 units from (.2, .2) to (.8, .8) 
+    
+        + Hint: `x &lt;- seq(.2, .8, .2); expand.grid(x,x)`
+        
+    +  3 occasions (trials) 
+
+---
+## Homogeneous SCR Model Simulation
+
+
+``` r
+set.seed(15)
+N &lt;- 25
+max &lt;- 1
+min &lt;- 0
+g0 &lt;- .8
+sig &lt;- .5
+x &lt;- seq(.2, .8, .2)
+traps &lt;- expand.grid(x,x)
+ntrials &lt;- 3
+ntraps &lt;- nrow(traps)
+s &lt;- matrix(runif(50), ncol = 2)
+dist &lt;- p &lt;- y &lt;- array(NA, c(N, ntraps))
+for(j in 1:ntraps) {
+  for(i in 1:N){
+    dist[i,j] &lt;- sqrt((s[i,1]-traps[j,1])^2 + (s[i,2]-traps[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sig^2))
+    y[i,j] &lt;- rbinom(1, ntrials, p[i,j]) ## Model for the capture histories
+  }
+}
+```
+
+---
+## Homogeneous SCR Model in Nimble
+
+
+``` r
+nimbleCode({
+g0 ~ dunif(0, 1)       ## Baseline capture probability
+sigma ~ dunif(0, 0.5)  ## Scale parameter of encounter function
+psi ~ dunif(0, 1)      ## Data augmentation parameter
+
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) ## x-coord of activity center
+  s[i,2] ~ dunif(ylim[1], ylim[2]) ## y-coord of activity center
+  z[i] ~ dbern(psi)                ## Is individual real?
+  for(j in 1:J) {
+    dist[i,j] &lt;- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sigma^2))
+    y[i,j] ~ dbinom(p = z[i]*p[i,j], size = ntrials) ## Model for the capture histories
+    }
+  }
+
+EN &lt;- M*psi  ## Expected value of N
+N &lt;- sum(z)  ## Realized value of N
+}
+)
+```
+
+```
+## {
+##     g0 ~ dunif(0, 1)
+##     sigma ~ dunif(0, 0.5)
+##     psi ~ dunif(0, 1)
+##     for (i in 1:M) {
+##         s[i, 1] ~ dunif(xlim[1], xlim[2])
+##         s[i, 2] ~ dunif(ylim[1], ylim[2])
+##         z[i] ~ dbern(psi)
+##         for (j in 1:J) {
+##             dist[i, j] &lt;- sqrt((s[i, 1] - x[j, 1])^2 + (s[i, 
+##                 2] - x[j, 2])^2)
+##             p[i, j] &lt;- g0 * exp(-dist[i, j]^2/(2 * sigma^2))
+##             y[i, j] ~ dbinom(p = z[i] * p[i, j], size = ntrials)
+##         }
+##     }
+##     EN &lt;- M * psi
+##     N &lt;- sum(z)
+## }
+```
+
+
+---
+## Inhomogeneous SCR Model
+
+The previous model is great if we don't have any spatial covariates. We don't even have to worry about `\(\lambda\)` at all, we just slap a uniform prior on `\(\psi\)` and we're good to go. 
+
+&lt;br/&gt;
+
+But when we *DO* have spatial variation, we are left with an issue. 
+
+&lt;br/&gt;
+
+How do we ensure that the locations of our `\(M\)` individuals (real or not) follow the pattern of `\(Pois(\lambda_t)\)`? 
+
+
+`$$s_i \propto \lambda_t(s)$$` 
+--
+
+In continuous space, we would say:
+
+`$$\Lambda = \int_{\mathcal{S}} \lambda(s)$$`
+In english, this says that the area under the curve for any given region is the expected number of points (individuals) in that region. 
+
+---
+## Inhomogeneous SCR Model
+
+In discrete space, this is similar to creating a raster where the pixel values are equal to the number of individuals in each pixel and then randomly spreading those individuals throughout that pixel. 
+
+&lt;br/&gt;
+
+As the pixel size gets smaller and smaller, we start to approximate continuous space. 
+
+
+&lt;br/&gt; 
+
+This is called a *spatial point process*. The equation (`\(\lambda(s)\)`) describes spatial variation in the density of points. We call this an *intensity function*. 
+
+&lt;br/&gt;
+
+Our goal here is to estimate the intensity function so that we can estimate how many individuals are located in each pixel in our area of interest. 
+
+---
+## Inhomogeneous SCR Model
+
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-7-1.png" width="432" style="display: block; margin: auto;" /&gt;
+Consider the above raster of canopy cover. 
+
+---
+## Inhomogeneous SCR Model
+
+What if I thought the relationship betwen abundance and canopy cover was a simple poisson regression? 
+
+$$ N \sim Pois(\lambda) $$
+`$$log(\lambda) = \beta_0 + \beta_1*canopy$$`
+
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-8-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Inhomogeneous SCR Model
+
+If we normalize this raster, we get the relative probability of an individual being in that pixel vs any other pixel. This is the same as `\(\frac{\lambda}{\sum\lambda}\)`, so we don't *need* the raster.
+
+&lt;img src="Lecture14_ClosedSCR_files/figure-html/unnamed-chunk-9-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Inhomogeneous SCR Model
+
+The problem is that this probability layer is not a distribution. So how do we trick Nimble or any other MCMC software into cooperating? 
+
+&lt;br/&gt;
+
+The secret is a fun trick of the poisson distribution! 
+
+--
+
+&lt;br/&gt;
+
+Remember that:
+
+`$$P(Pois(\lambda) = 0) = e^{-\lambda}$$`
+
+So we fit this model:
+
+`$$0 \sim Pois(-logProb[i])$$`
+For any given pixel `\(k\)` and individual `\(i\)`, the log probability of that individual being located in that pixel is:
+
+`$$logProb[i] = log(\frac{\lambda[i]}{sum(\lambda)})$$`
+
+
+---
+## Inhomogeneous SCR Model
+
+This means we're saying:
+
+`$$\lambda = -logProb[i]$$`
+Therefore:
+
+$$P(Pois(\lambda) = 0) = e^{-\lambda} = e^{-(-logProb[i])} = e^{logProb[i]} $$ 
+
+Remember that `log(1) = 0`. 
+
+This means that as the probability of individual `\(i\)` being in pixel `\(k\)` approaches 1, `logProb[i]` approaches 0 and the likelihood of `Pois(-logProb[i]) = 0` also approaches 1. Nifty! 
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+In practice, this is accomplished fairly easily in nimble, though it adds a lot of lines to our code which is annoying.
+
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 45% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+ipp &lt;- nimbleCode({
+
+psi ~ dunif(0, 1)  ## Can't put prior on psi *and* beta0
+beta0 &lt;- log(M*psi/SumLambda) ## Algebra
+beta1 ~ dnorm(0, 0.1)
+g0 ~ dunif(0, 1)
+sigma ~ dunif(0, 0.5)
+
+for(g in 1:G) { ## Loop over pixels
+  lambda[g] &lt;- exp(beta1*canopy[g])*pixelArea
+  pi[g] &lt;- lambda[g]/SumLambda
+}
+SumLambda &lt;- sum(lambda)
+
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) 
+  s[i,2] ~ dunif(ylim[1], ylim[2])
+  pixel[i] &lt;- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
+                     round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+  logProb[i] &lt;- log(pi[pixel[i]])
+  zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
+  z[i] ~ dbern(psi)
+  for(j in 1:J) {
+    dist[i,j] &lt;- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sigma^2))
+  }
+}
+for(i in 1:M) {  ## Model for capture histories
+  for(j in 1:J) {
+    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  }
+}
+
+EN &lt;- M*psi
+N &lt;- sum(z)
+})
+```
+]
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Let's go over this line by line. 
+
+&lt;br/&gt;
+First, the easy part - Detection! We can only see animals that are real. No false positives! 
+
+
+``` r
+for(i in 1:M) { 
+  for(j in 1:J) {
+    y[i,j] ~ dbinom(prob = p[i,j]*z[i], size = K)
+  }
+}
+```
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Our probability of detection is based on the distance between our trap and the animal's activity center. 
+
+
+``` r
+z[i] ~ dbern(psi)
+  for(j in 1:J) {
+    dist[i,j] &lt;- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sigma^2))
+```
+
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Individuals can be anywhere in the state space. We can figure out which pixel they are in by using a lookup grid that tells us the pixel number. If you were to number pixels on a raster, the first one is the top left corner, the last one is the bottom right corner. Delta is the pixel width 
+
+
+``` r
+s[i,1] ~ dunif(xlim[1], xlim[2]) 
+s[i,2] ~ dunif(ylim[1], ylim[2])
+pixel[i] &lt;- lookup[round((ylim[2]-s[i,2])/delta+0.5),  ## row
+                    round((s[i,1]-xlim[1])/delta+0.5)]  ## column
+```
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+Finally (ignoring priors), these parts are our zeros trick
+
+
+``` r
+logProb[i] &lt;- log(pi[pixel[i]])
+zeros[i] ~ dpois(-logProb[i]) ## zeros trick for IPP
+```
+
+
+``` r
+for(g in 1:G) { ## Loop over pixels
+  lambda[g] &lt;- exp(beta1*canopy[g])*pixelArea
+  pi[g] &lt;- lambda[g]/SumLambda
+}
+SumLambda &lt;- sum(lambda)
+```
+
+
+---
+## Inhomogeneous SCR Model in Nimble
+
+In lab we will explore how to run these models in Nimble and learn a speed trick to make our model run faster!
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

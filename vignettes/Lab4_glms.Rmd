@@ -90,7 +90,11 @@ How can we model the non-linear change in abundance if, by definition, linear mo
 
 Remember the equation for a curved line with a single peak (or bottom):
 
+<<<<<<< HEAD
 $$y = a + b \times x + c \times x^2$$
+=======
+$\Large y = a + b \times x + c \times x^2$
+>>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 25
@@ -111,7 +115,13 @@ Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ wher
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
+<<<<<<< HEAD
 $$y = a + b \times x + c \times x^2 + d \times x^3$$
+=======
+$\Large y = a + b \times x + c \times x^2 + d \times x^3$
+
+For instance:
+>>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
 
 ```{r echo = FALSE, fig.width=6, fig.height=6}
 a <- 4
@@ -146,7 +156,7 @@ $$log(\lambda_t) = \alpha + \beta_1 \times year_t + \beta_2 \times year^2_t + \b
 
 ### Accessing and viewing the Nimble model
 
-You can copy and paste the following code into your own R script. 
+You can copy and paste the following code into your own R script.
 
 ```{r eval = TRUE, echo = T}
 library(nimble)
@@ -220,7 +230,7 @@ nT <- 1 #thin
 
 Now we're ready to run the model. The easiest way to run a Nimble model is to run it in one command:
 
-```{r}
+```{r, echo =T, eval = F}
 falcon_res <- nimbleMCMC(code = falcon_mod,
                      data = nimdat,
                      constants = nimconsts,
@@ -232,6 +242,10 @@ falcon_res <- nimbleMCMC(code = falcon_mod,
                      nchains = nC,
                      samplesAsCodaMCMC = TRUE
                       )
+```
+
+```{r, echo= F, eval = T}
+falcon_res <- readRDS('falcon_mod.rds')
 ```
 
 However, sometimes (when you get more advanced), you'll want to be able to customize your Nimble runs a little bit more. It's also much easier to error check your initial values on models that take a very long time to run if you run it step by step. Here's what that would look like with one chain:
@@ -259,22 +273,22 @@ summary(falcon_res[,c('alpha', 'beta1', 'beta2', 'beta3', 'lambda[1]', 'lambda[2
 knitr::kable(summary(falcon_res[,c('alpha', 'beta1', 'beta2', 'beta3','lambda[1]', 'lambda[2]', 'lambda[3]')])$quantiles, format = 'html')
 ```
 
-Note that beta2 appears to cross 0 - there's not much of an effect of year^2 on lambda. 
+Note that beta2 appears to cross 0 - there's not much of an effect of year\^2 on lambda.
 
-This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. To do this, we'll use the `gelman.diag()` function from the `coda` package. 
+This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. To do this, we'll use the `gelman.diag()` function from the `coda` package.
 
 ```{r eval = T, echo = T}
 library(coda)
 gelman.diag(falcon_res, multivariate = F)$psrf[1:10,] #don't want to print out all 40 lambdas
 ```
 
-All parameters appear to have converged. 
+All parameters appear to have converged.
 
 As usual, let's check the trace plots to see how they look:
 
 ```{r, fig.width=6, fig.height=6}
 # View traceplots for alpha, beta1, beta2, and beta3 (not for lambda)
-plot(falcon_res[,params[-5],])
+MCMCvis::MCMCtrace(falcon_res[,params[-5],], Rhat = T, pdf = F)
 ```
 
 By monitoring `lambda` we can also plot the predicted counts along with the observed counts. First, we need to calculate the posterior means and upper/lower bounds of the 95% credible interval and add them to the falcons data frame, then use ggplot to visualize:
@@ -291,7 +305,8 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5, ymax = q97.5), fill = "grey90") +
   geom_path(aes(x = Year, y = lambda), color = "red") +
   geom_point(aes(x = Year, y = Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_bw()
 ```
 
 ## Analysis 2: Nest success model
@@ -332,7 +347,7 @@ pairs_mod <- nimbleCode({
 
 As before, we prepare the data and run the model:
 
-```{r}
+```{r, eval = F, echo = T}
 #using standardized year from above
 nimdat2 <- list(C = falcons$R.Pairs)
 nimconsts2 <- list(N = falcons$Pairs, year = year, nyears = nrow(falcons))
@@ -361,6 +376,12 @@ pairs_res <- nimbleMCMC(code = pairs_mod,
                       )
 ```
 
+```{r, eval = T, echo = F}
+pairs_res <- readRDS('falcon_mod2.rds')
+
+params2 <- c("alpha", "beta1", "beta2", "p")
+```
+
 ```{r eval = FALSE}
 summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quantiles
 ```
@@ -371,7 +392,7 @@ knitr::kable(summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[
 
 ```{r fig.width=6, fig.height=6}
 # View traceplots for alpha, beta1, and beta2(not for p)
-plot(pairs_res[,params2[-4],])
+MCMCvis::MCMCtrace(pairs_res[,params2[-4],], pdf = F, Rhat = T)
 ```
 
 ```{r fig.width=6, fig.height=6}
@@ -385,18 +406,19 @@ ggplot(falcons) +
   geom_ribbon(aes(x = Year, ymin = q2.5_p, ymax = q97.5_p), fill = "grey90") +
   geom_path(aes(x = Year, y = p), color = "red") +
   geom_point(aes(x = Year, y = R.Pairs/Pairs)) +
-  scale_y_continuous("Pairs")
+  scale_y_continuous("Pairs")+
+  theme_classic()
 ```
 
-# Homework Questions 
+# Homework Questions
 
-Using what you've learned in this lab, write out a model for the expected number of nestlings (Eyasses) per reproducing pair (R.pairs) in each year.  
+Using what you've learned in this lab, write out a model for the expected number of nestlings (Eyasses) per reproducing pair (R.pairs) in each year.
 
-a. Begin by writing out the mathematical formulation of your model 
-b. Write out the Nimble code. 
-c. Provide your model with data, constants and initial values 
-d. Check your output for convergence 
-e. Display a ggplot showing the expected number of nestlings per reproducing pair in each year (with 95% credible interval) vs the raw data. Don't forget a title and axis labels.
+a.  Begin by writing out the mathematical formulation of your model
+b.  Write out the Nimble code.
+c.  Provide your model with data, constants and initial values
+d.  Check your output for convergence
+e.  Display a ggplot showing the expected number of nestlings per reproducing pair in each year (with 95% credible interval) vs the raw data. Don't forget a title and axis labels.
 
 It may help to plot the data first to see what type of data you are working with:
 
@@ -404,11 +426,16 @@ It may help to plot the data first to see what type of data you are working with
 ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
   geom_line(lwd = 1, lty = 2)+
   geom_point()+
-  geom_smooth()
+  geom_smooth()+
+  theme_bw()
 ```
 
-2. In our second analysis, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
+2.  In our second analysis in lab, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
 
-Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data. 
+Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
 
+<<<<<<< HEAD
 3. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
+=======
+3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+>>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4

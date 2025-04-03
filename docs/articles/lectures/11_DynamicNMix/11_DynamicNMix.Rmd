@@ -1,0 +1,594 @@
+---
+title: "Lecture 11"
+subtitle: "Dynamic N-Mixture Models"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+source(here::here("R/zzz.R"))
+# library(gganimate)
+```
+
+# Readings: 
+<br/>
+> 
+
+
+
+---
+## Review of Closed N-mixture models
+
+
+- $\large \mathbf J$ sites surveyed
+
+    + Each site has an expected abundance $\large \lambda$
+    + Often expressed as a linear model: $log(\lambda_j) = \beta0 + \beta1*x_j$
+
+    + State model:  
+    
+$$\Large N_j \sim Poisson(\lambda)$$
+
+
+- Each site is surveyed $\large \mathbf K$ times
+
+    + During each visit, probability $\large p$ of detecting each individual
+
+
+- Observation model:  
+    
+$$\Large y_{j,k} \sim Binomial(N_j, p)$$
+
+---
+## Assumptions of the Closed N-mixture model
+
+1) Poisson and binomial distributions are true descriptions of state/observation processes
+
+2) Abundance at each site is random and independent of abundance at all other sites
+
+3) Population is closed between surveys
+
+4) Observers do not double count individuals
+
+5) All $\large N$ individuals have the same detection probability $\large p$
+
+
+---
+## Dynamic N-Mixtures 
+
+The simplest dynamic model is a series of closed population models:
+
+
+$$\Large log(\lambda_{i,t}) =  \beta_0 + \beta_1 x_{i,t} + \cdots$$
+$$\Large N_{j,t} \sim Poisson(\lambda_{i,t})$$
+
+--
+However, this implies that abundance at site $j$ in time $t$ is *independent* of abundance in time $t+1$
+
+<br/>
+This is rarely true in a wildlife context. 
+
+---
+## Simple Growth Rate
+
+A quick adaptation allows us to consider a simple growth model for abundance: 
+
+<br/>
+
+###For t = 1
+
+$$\Large N_{j,1} \sim Poisson(\lambda_{i,1})$$
+$$\Large log(\lambda_{i,1}) =  \beta_0 + \beta_1 x_{i,1} + \cdots$$
+###For t > 1
+
+$$\Large N_{j,t} \sim Poisson(\lambda_{i,t} \times \delta_{i,t})$$
+$$\Large log(\delta_{i,t}) = \alpha_1 + \alpha_2x_{i,t} + \cdots$$
+---
+## Simple Growth Rate
+
+Advantages: 
+<br/>
+
++ Conceptually simple 
+<br/>
+
++ Easy way to incorporate auto-correlation between years 
+<br/>
+
+Disadvantages: 
+<br/>
+
++ Not mechanistic 
+<br/>
+
++ Poisson implies that variance and mean are equal. Therefore when the population gets very large, so does the variance around the expected populations. This allows populations to fluctuate wildly. 
+
+
+---
+## Simple Growth Rate
+
+```{r}
+set.seed(789)
+N <- array(NA, c(50,30))
+N[,1] <- 500
+lam <- 1
+for(t in 2:30){
+  for(j in 1:50){
+    N[j,t] <- rpois(1, N[j,t-1]*lam)
+  }
+}
+
+N2 <-S <- R <- array(NA, c(50,30))
+N2[,1] <- 500
+gam <- .2
+phi <- .8
+for(t in 2:30){
+  for(j in 1:50){
+    S[j,t] <- rbinom(1, size = N2[j,t-1], p = phi)
+    R[j,t] <- rpois(1, N2[j,t-1]*gam)
+    N2[j,t] <- S[j,t] + R[j,t]
+  }
+}
+
+N_df <- data.frame(N = c(c(N),c(N2)),
+                   x = rep(rep(1:30, each = 50), 2),
+                   sim = rep(rep(1:50, 30), 2),
+                   group = rep(c('Growth Rate', 'Dail-Madsen'), each = 1500))
+N_df$group <- factor(N_df$group, levels = c('Growth Rate', 'Dail-Madsen'))
+
+a <- ggplot(N_df[N_df$group == 'Growth Rate',], aes(x = x, y = N, group = sim, col = sim))+
+         theme_classic()+
+         geom_line()+
+  scale_color_viridis_c()+
+  xlab("Year")+
+  ylab("N")+
+  geom_hline(yintercept = 500, lwd = 2, lty = 2)+
+  theme(legend.position = 'none', axis.title = element_text(size = 20), axis.text = element_text(size = 20), strip.text = element_text(size = 20))+
+  ggtitle('50 Simulations with Lambda = 1')
+
+b <- ggplot(N_df, aes(x = x, y = N, group = sim, col = sim))+
+         facet_wrap(~group)+
+         theme_classic()+
+         geom_line()+
+  scale_color_viridis_c()+
+  xlab("Year")+
+  ylab("N")+
+  geom_hline(yintercept = 500, lwd = 2, lty = 2)+
+  theme(legend.position = 'none', axis.title = element_text(size = 20), axis.text = element_text(size = 20), strip.text = element_text(size = 20))
+```
+
+```{r}
+a
+```
+
+
+---
+## Autoregressive Dail-Madsen Model
+
+What can we do to minimize the variance? 
+<br/>
+
+Think back to the classic *B*.*I*.*D*.*E* model in ecology. Local populations increase due to births (B) or immigration (I) and decrease due to death (D) or emmigration (E).  
+<br/>
+--
+Rearranging that, we can say apparent survival $\phi$ is just $1- P(D \cup E)$. Similarly, apparent recruitment $\gamma$ is just $P(B \cup I)$. 
+
+<br/>
+--
+The expected number of survivors and recruits is just:
+
+$$\Large E(S_{i,t}) = N_{i,t-1}*\phi$$
+$$\Large E(R_{i,t}) = N_{i,t-1}*\gamma$$
+
+$$\Large E(N_{i,t}) = E(S_{i,t}) + E(R_{i,t})$$
+
+---
+## Autoregressive Dail-Madsen Model
+
+Now we can treat survival and recruits as separate processes to give our model a better variance structure. This is the 'autoregressive' formulation of the Dail-Madsen model. 
+
+### Survivors
+$$\Large S_{i,t} \sim Binomial(N_{i,t-1}, \phi)$$
+### Recruits
+$$\Large R_{i,t} \sim Poisson(N_{i,t-1}*\gamma)$$
+### Total Population
+$$\Large N_{i,t} = S_{i,t} + R_{i,t}$$
+
+---
+## Autoregressive Dail-Madsen Model
+```{r}
+b
+```
+
+---
+## Autoregressive Dail-Madsen Model
+
+One small problem remains. 
+<br/>
+
+What if *occupancy* changes over time?  
+<br/>
+
+--
+Imagine you're monitoring a species at 5 sites and estimates indicate that 4 sites have at least 1 individual in year 1. 
+
+<br/> 
+What's the probability that the 5th site will have at least 1 individual in year 2? 
+--
+
+$$P(N_{i,t+1} > 0) = \\P((N_{i,t-1}*\phi + N_{i,t-1}*\gamma) > 0) = \\P((0*\phi + 0*\gamma) > 0  =\\ 0$$
+
+<br/> 
+
+This model does not allow an extinct local population to be rescued through apparent recruitment. 
+
+---
+## Constant Dail-Madsen
+
+An alternative is to simply model recruitment as independent of abundance. This is referred to as the 'constant' paramaterization of the Dail-Madsen model. 
+
+$$\Large R_{i,t} \sim Poisson(\gamma)$$
+
+While this may seem unsatisfying biologically, remember that we are working with unmarked individuals. The goal here is simply to account for the variance structure in our overall counts. 
+
+<br/>
+--
+A general downside to the Dail-Madsen model is interpretability - what do $\gamma$ and $\phi$ really mean from an ecological perspective? 
+
+---
+## Example - Coyote Howl Surveys
+
+```{r out.width="45%", echo = FALSE, eval = T}
+knitr::include_graphics('coyote.jpg')
+```
+
+One common method of monitoring coyote populations is howl surveys.
+
+<br/> 
+
+Observers stand at a location and play coyote howl sounds from a loudspeaker for 1 minute, listen for coyotes responding for 2 minutes, and then repeat the process. 
+
+---
+## Example - Coyote Howl Surveys
+Coyotes were surveyed this way 5 times each winter at the Savannah River Site in South Carolina from 2007-2018 and then again in 2024. 
+
+We can find this data in the WILD8370 package. 
+
+```{r, echo = T, eval = T}
+data(coyote_surveys)
+```
+```{r}
+head(as.data.frame(howl_group), n = 3)
+```
+
+<br/>
+For each evening (`occasion`) a point (`Station`) was surveyed, observers recorded how many coyotes were heard in period 1 (`R1_tot`) and period 2 (`R2_tot`), the wind speed during the survey (`wind`), the stage of the moon (`moon`) and what year the data was taken (`Year2`). 
+
+---
+## Example - Coyote Howl Surveys
+
+The number of nights each point was surveyed varied by year:
+```{r, echo  = T}
+table(howl_group$Station, howl_group$Year2)[1,]
+```
+Previous work on this coyote population suggests that detection probabiltiy is probably somewhere around 60-80%. 
+<br/>
+--
+We also know that coyote populations are largely undisturbed (not hunted) on the SRS, with the exception of a removal study conducted from 2009 – 2011. 
+
+<br/> 
+We would therefore expect $\phi$ and $\gamma$ to be different in pre-coyote removal years (pre Summer 2009), during coyote-removal (Jan 2009 – Jan 2011), and after post-removals (Summer 2011 – Jan 2024). 
+
+---
+## Example - Coyote Howl Surveys
+
+Remember:
+
+$$S_{i,t} \sim Binomial(N_{i,t-1}, \phi)$$
+$$R_{i,t} \sim Poisson(\gamma)$$
+$$N_{i,t} = S_{i,t} + R_{i,t}$$
+
+---
+## Example - Coyote Howl Surveys
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 65% !important;
+}
+```
+
+.smaller[
+```{r, echo = T, eval = T}
+coyotes <- nimbleCode({
+  for(i in 1:nstations){
+    N[i,1] ~ dpois(lambda) #initial abund
+    for(t in 2:nyears){
+      S[i,t] ~ dbinom(size = N[i,t-1], p= phi[group[t]])
+      R[i,t] ~ dpois(gamma[group[t]])
+      N[i,t] <- S[i,t] + R[i,t]
+    } #end t
+    for(t in 1:nyears){
+      for(q in 1:max.surveys){ #survey number changes per year
+        for(j in 1:2){ #2 samples per evening
+          y[i,j,q,t] ~ dbinom(size = N[i,t], p = p.det*effort[i,q,t])
+        } #end j
+      } #end q
+    } #end t
+  } #end i
+for(t in 1:nyears){
+  N.tot[t] <- sum(N[1:nstations,t])
+}
+p.det ~ dbeta(12,6) #detection
+for(m in 1:3){ #pre, during, and post-removal
+  gamma[m] ~ dgamma(1, 1)
+  phi[m] ~ dbeta(1,1)
+}
+lambda ~ dgamma(7,.5) #mean roughly 20
+})
+```
+]
+
+---
+## Example - Coyote Howl Surveys
+
+More often then not, 90% of the work in wildlife analysis is cleaning up the data. Our next task is trying to put the observation data (`y[i,j,q,t]`) and effort data (`effort[i,q,t]`) into the right format. 
+
+```{r, echo = T}
+howl_group$Year2 <- factor(howl_group$Year2, levels = 2007:2024)
+nstations <- length(unique(howl_group$Station))
+nyears <- length(2007:2024)
+max.surveys <- 6 
+howl_group$Station_f <- as.factor(howl_group$Station)
+```
+```{r, echo = T}
+y <- array(0, c(nstations, 2, max.surveys, nyears)) #y[i,j,q,t]
+effort <- array(0, c(nstations, max.surveys, nyears))
+for(k in 1:nrow(howl_group)){
+  i <- as.numeric(howl_group$Station_f[k])
+  q <- howl_group$Occ[k]
+  t <- as.numeric(howl_group$Year2[k])
+  y[i,,q,t] <- c(howl_group$R1_tot[k], howl_group$R2_tot[k])
+  effort[i,q,t] <- 1
+}
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Initial values can be a little tricky when you're working with highly correlated data (such as yearly abundance). We know we'll need to initialize `N[,1]`, `S`, `R`, `p.det`, `gamma`, `phi` and `lambda`. 
+
+Let's choose some values of gamma, phi, and lambda and simulate some possible starting values of S, R, and N. 
+
+.smaller[
+```{r, echo = T}
+set.seed(1)
+N <- S <- R <- array(0, c(nstations, nyears))
+gamma.init <- rgamma(3, 1, 1)
+phi.init <- rbeta(3,1,1)
+lam.init <- rgamma(1, 3.3,6.1)
+group = c(1,1,rep(2, 3),rep(3, 13))
+
+for(i in 1:nstations){
+    N[i,1] <- rpois(1,lam.init) #initial abund
+    for(t in 2:nyears){
+      S[i,t] <- rbinom(1, size = N[i,t-1], p= phi.init[group[t]])
+      R[i,t] <- rpois(1, gamma.init[group[t]])
+      N[i,t] <- S[i,t] + R[i,t]
+    }
+}
+N[,2:nyears] <- NA
+```
+]
+
+---
+## Example - Coyote Howl Surveys
+
+Constants
+```{r, echo = T}
+nc <- list(nyears = nyears, nstations = nstations,
+           max.surveys = max.surveys, effort = effort, group = group)
+```
+
+Data
+```{r, echo = T}
+nd <- list(y = y)
+```
+
+Initial values
+```{r, echo = T}
+ni <- list(gamma = gamma.init, phi = phi.init,
+  lambda = lam.init, N = N, S = S, R = R,
+  p.det = rbeta(1,12,6))
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Parameters of interest
+```{r, eval =F, echo = T, include= T}
+params <- c('p.det', 'gamma', 'phi', 'lambda', 'N','N.tot')
+```
+
+Run the model step by step to make sure everything is working:
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim <- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+```
+
+---
+## Example - Coyote Howl Surveys
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+```
+
+--
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+Uh oh! What went wrong? 
+
+---
+## Example - Coyote Howl Surveys
+
+We can inspect our object `prepnim` for clues. The most likely problem is something with our observation data, `y`. Let's see what nimble says the log-likehood is of our initial values. 
+We'll start with the first year. Any issues?
+
+```{r, eval = T, include = T, echo = T, message=T}
+sum(prepnim$logProb_y[,,,1])
+```
+--
+There it is. Something in year 1 isn't valid according to our model. Let's dig deeper.
+
+```{r, eval = T, include = T, echo = T, message=T}
+head(prepnim$logProb_y[,,1,1]) #all sites, occasion 1, year 1
+```
+Something isn't working for our 5th site in occasion 1, year 1. How many coyotes did we hear at that site?
+
+---
+## Example - Coyote Howl Surveys
+
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim$y[5,,1,1]
+```
+
+--
+
+Okay, we heard 3 coyotes and then 1 coyote. What were our initial values of S, R, and N for that time frame?
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim$S[5,1]; prepnim$R[5,1]; prepnim$N[5,1]
+```
+
+Oops! We told the model we saw 3 coyotes, but 0 coyote were present at that site! Let's go back and start our initial abundance a little higher to avoid these sorts of issues. 
+
+---
+## Example - Coyote Howl Surveys
+
+```{r, echo = T}
+set.seed(1)
+N <- S <- R <- array(0, c(nstations, nyears))
+gamma.init <- runif(3, 1, 2) #start gamma as always increasing the population
+phi.init <- runif(3, .8, .9) #start phi high as well
+for(i in 1:nstations){
+    N[i,1] <- round(runif(1, 50, 60)) #make year 1 much higher
+    for(t in 2:nyears){
+      S[i,t] <- rbinom(1, size = N[i,t-1], p= phi.init[group[t]])
+      R[i,t] <- rpois(1, gamma.init[group[t]])
+      N[i,t] <- S[i,t] + R[i,t]
+    }
+}
+N[,2:nyears] <- NA
+
+ni <- list(gamma = gamma.init, phi = phi.init, lambda = lam.init,
+                      N = N, S = S, R = R, p.det = rbeta(1,1,1))
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Take 2
+```{r, eval = T, include = T, echo = T}
+prepnim <- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+```
+```{r, eval = T, include = T, echo = T, message=T}
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+Good! Now that we know the model is initialized properly, we can run the model in parallel. 
+---
+## Example - Coyote Howl Surveys
+.smaller[
+```{r,echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "coyotes", 'params'))
+coyotes.out <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = coyotes, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 100000, nburnin = 50000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+coyotes.out <- as.mcmc.list(coyotes.out)
+stopCluster(cl)
+```
+]
+
+```{r}
+coyotes.out <- readRDS('mod1.rds')
+```
+
+---
+## Example - Coyote Howl Surveys
+
+Let's check convergence. In practice we would also want to check the chains visually. 
+```{r, echo = T}
+library(coda)
+gelman.diag(coyotes.out[,-grep('N', colnames(coyotes.out[[1]])),], multivariate = F)
+```
+
+---
+## Example - Coyote Howl Surveys
+
+
+```{r, echo = T}
+Ns <- summary(coyotes.out[,grep('N.tot', colnames(coyotes.out[[1]])),])$quantiles
+ab_df <- data.frame(year = 2007:2024,
+                     median = Ns[,3],
+                     LCI = Ns[,1],
+                     UCI = Ns[,5],
+                    group  = as.character(group))
+```
+
+```{r, echo = T, eval = F}
+library(ggplot2)
+ggplot(ab_df, aes(x = year, y = median)+
+  geom_line()+
+  geom_pointrange(aes(ymin = LCI, ymax = UCI, col = group))+
+  geom_vline(xintercept = 2008.5, lty = 2)+ #removals start
+  geom_vline(xintercept = 2011.5, lty = 2)+ #removals end
+  xlab('Year')+
+  ylab('Abundance')+
+  theme_bw()+
+    theme(legend.position  = 'none')
+```
+---
+## Example - Coyote Howl Surveys
+
+```{r, fig.height= 6}
+library(ggplot2)
+ggplot(ab_df, aes(x = year, y = median))+
+  geom_line()+
+  geom_pointrange(aes(ymin = LCI, ymax = UCI, col = group), cex = 1)+
+  geom_vline(xintercept = 2008.5, lty = 2)+ #removals start
+  geom_vline(xintercept = 2011.5, lty = 2)+ #removals end
+  theme_bw()+
+  theme(axis.text = element_text(size =20),
+        axis.title = element_text(size =20), 
+        legend.position  = 'none')+
+  xlab('Year')+
+  ylab('Abundance')
+```

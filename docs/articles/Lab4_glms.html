@@ -6,11 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>GLMs for modeling count data • WILD8370</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.0/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GLMs for modeling count data">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GLMs for modeling count data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -44,6 +45,15 @@
     <li><a class="dropdown-item" href="../articles/lectures/04_intro_nimble/Intro_Nimble.html">Lecture 4: Introduction to Nimble</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/05_glms/05_glms.html">Lecture 5: Generalized linear model review</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/06_priors/06_priors.html">Lecture 6: More about priors</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/07_random_effects/07_random_effects.html">Lecture 7: Random vs. Fixed Effects</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/08_occupancy/08_occupancy.html">Lecture 8: State Space Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/09_NMix/09_NMix.html">Lecture 9: N-Mixture and Occupancy</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/11_DynamicNMix/11_DynamicNMix.html">Lecture 11: Dynamic N-Mixture Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/9b_ExtraOcc/9b_ExtraOcc.html">Lecture 9b: Static Occupancy Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/10_DynamicOcc/10_DynamicOcc.html">Lecture 10: Dynamic Occupancy Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/12_MovementModels/12_MovementModels.html">Lecture 12: Movement Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/13_ClosedCMR/Lecture13_ClosedCMR.html">Lecture 13: Closed CMR</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/14_ClosedSCR/Lecture14_ClosedSCR.html">Lecture 14: Closed SCR</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -55,6 +65,10 @@
     <li><a class="dropdown-item" href="../articles/Lab3_BasicMCMC.html">Lab 3: Basic MCMC</a></li>
     <li><a class="dropdown-item" href="../articles/Lab4_glms.html">Lab 4: GLMs</a></li>
     <li><a class="dropdown-item" href="../articles/priors.html">Lab 5: Priors</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab6_MissingData.html">Lab 6: Missing Data</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab7_GOF.html">Lab 7: Goodness of Fit</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab8_Movement.html">Lab 8: Resource Selection Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab9_SCR.html">Lab 9: Spatial Capture Recapture</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -252,26 +266,18 @@ carrying capacity.</p>
 definition, linear models model linear effects? Using polynomials!</p>
 <p>Remember the equation for a curved line with a single peak (or
 bottom):</p>
-<p><span class="math display">$$\Large y = a + b \times x + c \times
-x^2$$</span></p>
+<p><span class="math inline">\Large y = a + b \times x + c \times
+x^2</span></p>
 <p><img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;"></p>
-<p>Where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
-is the maximum (or minimum) value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
-is the value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-where this maximum (or minimum) occurs and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
-determines whether the peak is a maximum
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c&lt;0</annotation></semantics></math>)
-or a minimum
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c&gt;0</annotation></semantics></math>).</p>
+<p>Where <span class="math inline">a</span> is the maximum (or minimum)
+value of <span class="math inline">y</span>, <span class="math inline">b</span> is the value of <span class="math inline">x</span> where this maximum (or minimum) occurs and
+<span class="math inline">c</span> determines whether the peak is a
+maximum (<span class="math inline">c&lt;0</span>) or a minimum (<span class="math inline">c&gt;0</span>).</p>
 <p>We can add more complex shape by adding additional polynomial terms.
 For example, including a cubic term creates an s-shaped curve:</p>
-<p><span class="math display">$$\Large y = a + b \times x + c \times x^2
-+ d \times x^3$$</span></p>
+<p><span class="math inline">\Large y = a + b \times x + c \times x^2 +
+d \times x^3</span></p>
+<p>For instance:</p>
 <p><img src="Lab4_glms_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Including polynomial terms in the linear predictor on the model gives
 us enormous flexibility to model non-linear relationships using
@@ -284,21 +290,17 @@ GLMs.</p>
 components required in all GLMs (the distribution, link function, and
 linear predictor). Because these are counts, a natural choice for the
 distribution is:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>t</mi></msub><mo>∼</mo><mi>P</mi><mi>o</mi><mi>i</mi><mi>s</mi><mi>s</mi><mi>o</mi><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">C_t \sim Poisson(\lambda_t)</annotation></semantics></math>
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>t</mi></msub><annotation encoding="application/x-tex">C_t</annotation></semantics></math>
-is the observed count in year
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\lambda_t</annotation></semantics></math>
-is the expected count.</p>
+<p><span class="math display">C_t \sim Poisson(\lambda_t)</span> where
+<span class="math inline">C_t</span> is the observed count in year <span class="math inline">t</span> and <span class="math inline">\lambda_t</span> is the expected count.</p>
 <p>As we learned in lecture, the conventional link function for count
 data is the log-link:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">log(\lambda_t) = log(E(\lambda_t))</annotation></semantics></math></p>
+<p><span class="math display">log(\lambda_t) =
+log(E(\lambda_t))</span></p>
 <p>Finally, we need to write the linear predictor. Based on the
 preliminary visualization of the data, a cubic polynomial might be
 appropriate to capture the non-linear change over time:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>λ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>α</mi><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>×</mo><mi>y</mi><mi>e</mi><mi>a</mi><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>×</mo><mi>y</mi><mi>e</mi><mi>a</mi><msubsup><mi>r</mi><mi>t</mi><mn>2</mn></msubsup><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mo>×</mo><mi>y</mi><mi>e</mi><mi>a</mi><msubsup><mi>r</mi><mi>t</mi><mn>3</mn></msubsup></mrow><annotation encoding="application/x-tex">log(\lambda_t) = \alpha + \beta_1 \times year_t + \beta_2 \times year^2_t + \beta_3 \times year^3_t</annotation></semantics></math></p>
+<p><span class="math display">log(\lambda_t) = \alpha + \beta_1 \times
+year_t + \beta_2 \times year^2_t + \beta_3 \times year^3_t</span></p>
 </div>
 <div class="section level4">
 <h4 id="accessing-and-viewing-the-nimble-model">Accessing and viewing the Nimble model<a class="anchor" aria-label="anchor" href="#accessing-and-viewing-the-nimble-model"></a>
@@ -339,10 +341,9 @@ standard deviation). As you can see, this is not as vague as the normal
 priors we have used in the past. What is the advantage of using
 less-vague normal priors?</p></li>
 <li><p>In the linear regression model we fit in the last lecture, we
-also had a prior for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>τ</mi><annotation encoding="application/x-tex">\tau</annotation></semantics></math>,
-the (inverse) of the process variance. Why do we not include that
-parameter in this model?</p></li>
+also had a prior for <span class="math inline">\tau</span>, the
+(inverse) of the process variance. Why do we not include that parameter
+in this model?</p></li>
 <li><p>Creating the <code>lambda[i]</code> object is not strictly
 necessary since it is a deterministic function of year. If you wanted to
 have fewer lines of code, you could include the linear predictor
@@ -369,10 +370,8 @@ monitor</p></li>
 </ul>
 <p>We’ve mentioned several times, it’s often a bad idea to include
 covariate values that are too far from 0. For this reason, we will first
-scale <code>year</code> to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>e</mi><mi>a</mi><mi>n</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">mean=0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>d</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">sd=1</annotation></semantics></math>:</p>
+scale <code>year</code> to <span class="math inline">mean=0</span> and
+<span class="math inline">sd=1</span>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">year</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">falcons</span><span class="op">$</span><span class="va">Year</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">falcons</span><span class="op">$</span><span class="va">Year</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">falcons</span><span class="op">$</span><span class="va">Year</span><span class="op">)</span></span>
 <span></span>
@@ -404,13 +403,7 @@ model is to run it in one command:</p>
 <span>                     nburnin <span class="op">=</span> <span class="va">nB</span>,</span>
 <span>                     nchains <span class="op">=</span> <span class="va">nC</span>,</span>
 <span>                     samplesAsCodaMCMC <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>                      <span class="op">)</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span></code></pre></div>
+<span>                      <span class="op">)</span></span></code></pre></div>
 <p>However, sometimes (when you get more advanced), you’ll want to be
 able to customize your Nimble runs a little bit more. It’s also much
 easier to error check your initial values on models that take a very
@@ -457,19 +450,19 @@ like with one chain:</p>
 alpha
 </td>
 <td style="text-align:right;">
-4.1739
+4.1685
 </td>
 <td style="text-align:right;">
-4.2103
+4.2085
 </td>
 <td style="text-align:right;">
-4.2301
+4.2289
 </td>
 <td style="text-align:right;">
-4.2516
+4.2499
 </td>
 <td style="text-align:right;">
-4.2887
+4.2879
 </td>
 </tr>
 <tr>
@@ -477,19 +470,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
-1.0190
+1.0288
 </td>
 <td style="text-align:right;">
-1.0836
+1.0880
 </td>
 <td style="text-align:right;">
-1.1170
+1.1184
 </td>
 <td style="text-align:right;">
-1.1489
+1.1499
 </td>
 <td style="text-align:right;">
-1.2057
+1.2151
 </td>
 </tr>
 <tr>
@@ -497,19 +490,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.0399
+-0.0388
 </td>
 <td style="text-align:right;">
--0.0079
+-0.0077
 </td>
 <td style="text-align:right;">
-0.0078
+0.0086
 </td>
 <td style="text-align:right;">
-0.0241
+0.0255
 </td>
 <td style="text-align:right;">
-0.0530
+0.0560
 </td>
 </tr>
 <tr>
@@ -517,19 +510,19 @@ beta2
 beta3
 </td>
 <td style="text-align:right;">
--0.2810
+-0.2844
 </td>
 <td style="text-align:right;">
--0.2514
+-0.2515
 </td>
 <td style="text-align:right;">
--0.2347
+-0.2346
 </td>
 <td style="text-align:right;">
--0.2168
+-0.2191
 </td>
 <td style="text-align:right;">
--0.1832
+-0.1886
 </td>
 </tr>
 <tr>
@@ -537,19 +530,19 @@ beta3
 lambda[1]
 </td>
 <td style="text-align:right;">
-26.5225
+26.6575
 </td>
 <td style="text-align:right;">
-30.3368
+30.3234
 </td>
 <td style="text-align:right;">
-32.4247
+32.3956
 </td>
 <td style="text-align:right;">
-34.6385
+34.6393
 </td>
 <td style="text-align:right;">
-38.9902
+39.1547
 </td>
 </tr>
 <tr>
@@ -557,19 +550,19 @@ lambda[1]
 lambda[2]
 </td>
 <td style="text-align:right;">
-25.5318
+25.6918
 </td>
 <td style="text-align:right;">
-28.6873
+28.6464
 </td>
 <td style="text-align:right;">
-30.3652
+30.3324
 </td>
 <td style="text-align:right;">
-32.1225
+32.0912
 </td>
 <td style="text-align:right;">
-35.5587
+35.6505
 </td>
 </tr>
 <tr>
@@ -577,19 +570,19 @@ lambda[2]
 lambda[3]
 </td>
 <td style="text-align:right;">
-24.9367
+25.0395
 </td>
 <td style="text-align:right;">
-27.5302
+27.4815
 </td>
 <td style="text-align:right;">
-28.9135
+28.8635
 </td>
 <td style="text-align:right;">
-30.3248
+30.2923
 </td>
 <td style="text-align:right;">
-33.1395
+33.1345
 </td>
 </tr>
 </tbody>
@@ -604,22 +597,22 @@ package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">coda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/coda/man/gelman.diag.html" class="external-link">gelman.diag</a></span><span class="op">(</span><span class="va">falcon_res</span>, multivariate <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">psrf</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span> <span class="co">#don't want to print out all 40 lambdas</span></span>
 <span><span class="co">#&gt;           Point est. Upper C.I.</span></span>
-<span><span class="co">#&gt; alpha          1.004      1.014</span></span>
-<span><span class="co">#&gt; beta1          1.016      1.056</span></span>
-<span><span class="co">#&gt; beta2          1.003      1.010</span></span>
-<span><span class="co">#&gt; beta3          1.016      1.058</span></span>
-<span><span class="co">#&gt; lambda[1]      1.004      1.015</span></span>
-<span><span class="co">#&gt; lambda[2]      1.003      1.010</span></span>
-<span><span class="co">#&gt; lambda[3]      1.001      1.004</span></span>
-<span><span class="co">#&gt; lambda[4]      1.000      1.001</span></span>
-<span><span class="co">#&gt; lambda[5]      1.000      1.000</span></span>
-<span><span class="co">#&gt; lambda[6]      1.001      1.003</span></span></code></pre></div>
+<span><span class="co">#&gt; alpha          1.004      1.013</span></span>
+<span><span class="co">#&gt; beta1          1.007      1.013</span></span>
+<span><span class="co">#&gt; beta2          1.004      1.016</span></span>
+<span><span class="co">#&gt; beta3          1.005      1.011</span></span>
+<span><span class="co">#&gt; lambda[1]      1.003      1.009</span></span>
+<span><span class="co">#&gt; lambda[2]      1.003      1.011</span></span>
+<span><span class="co">#&gt; lambda[3]      1.003      1.013</span></span>
+<span><span class="co">#&gt; lambda[4]      1.004      1.014</span></span>
+<span><span class="co">#&gt; lambda[5]      1.004      1.015</span></span>
+<span><span class="co">#&gt; lambda[6]      1.004      1.015</span></span></code></pre></div>
 <p>All parameters appear to have converged.</p>
 <p>As usual, let’s check the trace plots to see how they look:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View traceplots for alpha, beta1, beta2, and beta3 (not for lambda)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">falcon_res</span><span class="op">[</span>,<span class="va">params</span><span class="op">[</span><span class="op">-</span><span class="fl">5</span><span class="op">]</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;"></p>
+<span><span class="fu">MCMCvis</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MCMCvis/man/MCMCtrace.html" class="external-link">MCMCtrace</a></span><span class="op">(</span><span class="va">falcon_res</span><span class="op">[</span>,<span class="va">params</span><span class="op">[</span><span class="op">-</span><span class="fl">5</span><span class="op">]</span>,<span class="op">]</span>, Rhat <span class="op">=</span> <span class="cn">T</span>, pdf <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;"><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-2.png" width="576" style="display: block; margin: auto;"></p>
 <p>By monitoring <code>lambda</code> we can also plot the predicted
 counts along with the observed counts. First, we need to calculate the
 posterior means and upper/lower bounds of the 95% credible interval and
@@ -636,8 +629,9 @@ add them to the falcons data frame, then use ggplot to visualize:</p>
 <span>  <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, ymin <span class="op">=</span> <span class="va">q2.5</span>, ymax <span class="op">=</span> <span class="va">q97.5</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"grey90"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_path</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">lambda</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">Pairs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
@@ -657,18 +651,18 @@ total number of pairs, the counts in <code>falcons$.RPairs</code> are
 bounded to be less than <code>falcons$Pairs</code>. In this case, the
 Poisson distribution is not an appropriate count model. Instead, we will
 use the binomial distribution:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>t</mi></msub><mo>∼</mo><mi>b</mi><mi>i</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mi>t</mi></msub><mo>,</mo><msub><mi>p</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">C_t \sim binomial(N_t, p_t)</annotation></semantics></math></p>
-<p>Our goal is to model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>t</mi></msub><annotation encoding="application/x-tex">p_t</annotation></semantics></math>,
-the probability of nesting successfully in each year. In this case, the
-log link is not appropriate -
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>t</mi></msub><annotation encoding="application/x-tex">p_t</annotation></semantics></math>
-is bound between 0 and 1. For probabilities, the logit link is generally
-the appropriate link function:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo minsize="2.4" maxsize="2.4" stretchy="false" form="prefix">(</mo><mfrac><msub><mi>p</mi><mi>t</mi></msub><mrow><mn>1</mn><mo>−</mo><msub><mi>p</mi><mi>t</mi></msub></mrow></mfrac><mo minsize="2.4" maxsize="2.4" stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">logit(p_t) = log\bigg(\frac{p_t}{1-p_t}\bigg)</annotation></semantics></math></p>
+<p><span class="math display">C_t \sim binomial(N_t, p_t)</span></p>
+<p>Our goal is to model <span class="math inline">p_t</span>, the
+probability of nesting successfully in each year. In this case, the log
+link is not appropriate - <span class="math inline">p_t</span> is bound
+between 0 and 1. For probabilities, the logit link is generally the
+appropriate link function:</p>
+<p><span class="math display">logit(p_t) =
+log\bigg(\frac{p_t}{1-p_t}\bigg)</span></p>
 <p>Following Kéry &amp; Schaub, we’ll model probability as a quadratic
 function of year:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mi>i</mi><mi>t</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>α</mi><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mo>×</mo><mi>y</mi><mi>e</mi><mi>a</mi><msub><mi>r</mi><mi>t</mi></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mo>×</mo><mi>y</mi><mi>e</mi><mi>a</mi><msubsup><mi>r</mi><mi>t</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">logit(p_t) = \alpha + \beta_1 \times year_t + \beta_2 \times year^2_t</annotation></semantics></math></p>
+<p><span class="math display">logit(p_t) = \alpha + \beta_1 \times
+year_t + \beta_2 \times year^2_t</span></p>
 <p>As in the last example, you can copy the code here. Note that in
 Nimble the order for the arguments of a binomial are probability and
 then size, unlike what we would type in R:</p>
@@ -712,13 +706,7 @@ then size, unlike what we would type in R:</p>
 <span>                     nburnin <span class="op">=</span> <span class="va">nB</span>,</span>
 <span>                     nchains <span class="op">=</span> <span class="va">nC</span>,</span>
 <span>                     samplesAsCodaMCMC <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>                      <span class="op">)</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span>
-<span><span class="co">#&gt; |-------------|-------------|-------------|-------------|</span></span>
-<span><span class="co">#&gt; |-------------------------------------------------------|</span></span></code></pre></div>
+<span>                      <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'alpha'</span>, <span class="st">'beta1'</span>, <span class="st">'beta2'</span>, <span class="st">'p[1]'</span>, <span class="st">'p[2]'</span>, <span class="st">'p[3]'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">quantiles</span></span></code></pre></div>
 <table class="table">
@@ -747,19 +735,19 @@ then size, unlike what we would type in R:</p>
 alpha
 </td>
 <td style="text-align:right;">
-0.6767
+0.6743
 </td>
 <td style="text-align:right;">
-0.7476
+0.7485
 </td>
 <td style="text-align:right;">
-0.7847
+0.7860
 </td>
 <td style="text-align:right;">
-0.8212
+0.8233
 </td>
 <td style="text-align:right;">
-0.8918
+0.8950
 </td>
 </tr>
 <tr>
@@ -767,19 +755,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
--0.0317
+-0.0278
 </td>
 <td style="text-align:right;">
-0.0285
+0.0292
 </td>
 <td style="text-align:right;">
-0.0588
+0.0584
 </td>
 <td style="text-align:right;">
-0.0890
+0.0886
 </td>
 <td style="text-align:right;">
-0.1487
+0.1444
 </td>
 </tr>
 <tr>
@@ -787,19 +775,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.3854
+-0.3868
 </td>
 <td style="text-align:right;">
--0.3333
+-0.3330
 </td>
 <td style="text-align:right;">
--0.3048
+-0.3059
 </td>
 <td style="text-align:right;">
--0.2772
+-0.2782
 </td>
 <td style="text-align:right;">
--0.2204
+-0.2247
 </td>
 </tr>
 <tr>
@@ -807,19 +795,19 @@ beta2
 p[1]
 </td>
 <td style="text-align:right;">
-0.3869
+0.3903
 </td>
 <td style="text-align:right;">
 0.4349
 </td>
 <td style="text-align:right;">
-0.4593
+0.4595
 </td>
 <td style="text-align:right;">
-0.4852
+0.4843
 </td>
 <td style="text-align:right;">
-0.5344
+0.5307
 </td>
 </tr>
 <tr>
@@ -827,19 +815,19 @@ p[1]
 p[2]
 </td>
 <td style="text-align:right;">
-0.4139
+0.4171
 </td>
 <td style="text-align:right;">
 0.4591
 </td>
 <td style="text-align:right;">
-0.4819
+0.4820
 </td>
 <td style="text-align:right;">
-0.5056
+0.5047
 </td>
 <td style="text-align:right;">
-0.5509
+0.5477
 </td>
 </tr>
 <tr>
@@ -847,27 +835,27 @@ p[2]
 p[3]
 </td>
 <td style="text-align:right;">
-0.4400
+0.4433
 </td>
 <td style="text-align:right;">
-0.4821
+0.4823
 </td>
 <td style="text-align:right;">
 0.5033
 </td>
 <td style="text-align:right;">
-0.5250
+0.5243
 </td>
 <td style="text-align:right;">
-0.5665
+0.5639
 </td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View traceplots for alpha, beta1, and beta2(not for p)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="va">params2</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-20-1.png" width="576" style="display: block; margin: auto;"></p>
+<span><span class="fu">MCMCvis</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MCMCvis/man/MCMCtrace.html" class="external-link">MCMCtrace</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="va">params2</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span>,<span class="op">]</span>, pdf <span class="op">=</span> <span class="cn">F</span>, Rhat <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pairs_res</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'p['</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">40</span>, <span class="st">']'</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">quantiles</span> </span>
@@ -879,8 +867,9 @@ p[3]
 <span>  <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, ymin <span class="op">=</span> <span class="va">q2.5_p</span>, ymax <span class="op">=</span> <span class="va">q97.5_p</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"grey90"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_path</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">p</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">R.Pairs</span><span class="op">/</span><span class="va">Pairs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span><span class="st">"Pairs"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_classic</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="homework-questions">Homework Questions<a class="anchor" aria-label="anchor" href="#homework-questions"></a>
@@ -903,11 +892,12 @@ working with:</p>
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">falcons</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Year</span>, y <span class="op">=</span> <span class="va">Eyasses</span><span class="op">/</span><span class="va">R.Pairs</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">geom_line</span><span class="op">(</span>lwd <span class="op">=</span> <span class="fl">1</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu">geom_smooth</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;"></p>
+<span>  <span class="fu">geom_smooth</span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Lab4_glms_files/figure-html/unnamed-chunk-24-1.png" width="576" style="display: block; margin: auto;"></p>
 <ol start="2" style="list-style-type: decimal">
-<li>In our second analysis, we used a binomial GLM to describe the
-proportion of successful peregrine pairs per year in the French Jura
+<li>In our second analysis in lab, we used a binomial GLM to describe
+the proportion of successful peregrine pairs per year in the French Jura
 mountains. To see the connections between three important types of GLMs,
 first use a Poisson GLM to model the number of successful pairs (thus
 disregarding the fact that the binomial total varies by year), and
@@ -938,7 +928,7 @@ questions/confusion about the lecture or lab do you still have?</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer>

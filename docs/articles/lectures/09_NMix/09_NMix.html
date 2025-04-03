@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 9</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 9
+]
+.subtitle[
+## N-Mixture and Occupancy Models
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+# Readings: 
+&lt;br/&gt;
+&gt; Kéry &amp; Schaub 383-411
+
+
+
+---
+
+## State-space models
+
+#### Produce unbiased estimates of `\(\Large N\)` **only** when false-positives and false-negatives cancel each other out on average  
+&lt;br/&gt;
+
+#### Produce unbiased estimates of population **indices** `\(\Large (Np)\)` if detection probability has no pattern ove time  
+&lt;br/&gt;
+
+#### Do **not** produce unbiased estimates of `\(\Large N\)` or `\(\Large Np\)` if there are temporal patterns in detection probability or false-positive rates
+
+---
+## Estimating abundance
+
+#### Unbiased estimates of `\(\large N\)` require estimating `\(\large p\)`
+
+#### *Many* methods available:
+
+- Mark-recapture  
+
+- Removal sampling  
+
+- Distance sampling  
+
+- Double observer  
+
+- N-mixture models
+
+---
+
+## Closed N-mixture models
+
+#### The basic idea
+
+- `\(\large \mathbf J\)` sites surveyed
+
+    + Each site has an expected abundance `\(\large \lambda\)`
+    + Often expressed as a linear model: `\(log(\lambda_j) = \beta0 + \beta1*x_j\)`
+
+--
+    + State model:  
+    
+`$$\Large N_j \sim Poisson(\lambda)$$`
+
+--
+- Each site is surveyed `\(\large \mathbf K\)` times
+
+    + During each visit, probability `\(\large p\)` of detecting each individual
+
+--
+    + Observation model:  
+    
+`$$\Large y_{j,k} \sim Binomial(N_j, p)$$`
+---
+
+--- 
+## Increasingly Popular Tool 
+
+#### [Rozylowicz et al (2024)](https://www.sciencedirect.com/science/article/pii/S2351989424000428?via%3Dihub)
+
+&lt;img src="cool_fig.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Assumptions of the Closed N-mixture model
+
+1) Poisson and binomial distributions are true descriptions of state/observation processes
+
+2) Abundance at each site is random and independent of abundance at all other sites
+
+3) Population is closed between surveys
+
+4) Observers do not double count individuals
+
+5) All `\(\large N\)` individuals have the same detection probability `\(\large p\)`
+
+---
+## Advantages and disadvantages of the N-mixture model
+#### Advantages
+
+- Count data is "cheap" to collect (relative to mark-recapture)
+
+- Does not require auxillary information (distance, double observer, etc.)
+
+- Analysis is straightforward
+
+---
+## Advantages and disadvantages of the N-mixture model
+#### Disadvantages
+
+- Count data has less information about `\(\large p\)` than mark-recapture data
+
+- All individuals are equal 
+
+- Requires lots of replication
+
+- Trade-off between temporal replication and spatial replication
+
+- Inference can be sensitive to violating assumptions
+
+---
+## Controversy 
+
+#### [Barker et al. (2017)](https://onlinelibrary.wiley.com/doi/full/10.1111/biom.12734)
+
+- Mark-recapture data provides auxillary information about `\(\large p\)` without reference to `\(\large N\)`
+
+- Without auxillary information about `\(\large p\)`, count data cannot distinguish between N-mixture model or other possible models of `\(\large N\)`
+
+---
+## Controversy 
+
+#### [Barker et al. (2017)](https://onlinelibrary.wiley.com/doi/full/10.1111/biom.12734)
+
+#### [Kery (2017)](https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1002/ecy.2093)
+
+- No issues with identifiability of Poisson N-mixture model based on 137 bird data sets from 2,037 sites
+
+- Some parameters not identifiability with negative binomial model (especially with small sample sizes)  
+
+    + problematic because NB often selected based on AIC
+    
+
+---
+## Controversy 
+
+#### [Barker et al. (2017)](https://onlinelibrary.wiley.com/doi/full/10.1111/biom.12734)
+
+#### [Kery (2017)](https://esajournals.onlinelibrary.wiley.com/doi/pdf/10.1002/ecy.2093)
+
+#### [Link et al. (2018)](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1002/ecy.2362)
+
+- Estimates from N-mixture models sensitive to violation of double counting and constant `\(\large \lambda/p\)`
+
+- Small violations unlikely to be detected using goodness‐of‐fit tests but can influence inference about `\(\large N\)`
+
+---
+## Closed Occupancy from Basic N-Mixture Models
+
+With abundance data, occupancy comes for free 
+
+$$ N_j \sim Poisson(\lambda)$$
+$$ z_j = (N_j \geq 1)$$
+--
+
+But sometimes we don't have abundance information. 
+
+---
+## Closed Occupancy from Basic N-Mixture Models
+
+We can adjust our model for occupancy 
+
+$$logit(\psi_j) = \beta_0 + \beta_1*x_j $$
+
+
+$$ z_j \sim Bernoulli(\psi_j) $$
+
+$$ y_{j,k} \sim Bernoulli(z_j, p)$$
+
+--
+
+&lt;br/&gt;
+Technically, this is no longer an *N*-mixture model, but it is a similarly functioning hierarchical state-space model. 
+
+
+---
+## Willow Tits Example
+
+The Swiss MHB program ("Monitoring Häufige Brutvögel") has monitored the populations of approximately 150 common avian species since 1999. Sites across Switzerland are sampled 2-3 times each year and the number of birds seen of each species is recorded for each visit. 
+
+One of these species is the Willow Tit, which is just a snobbier version of a Carolina Chickadee. We will use some data provided in Chapter 3 of [Royle and Dorazio (2009)](https://www.sciencedirect.com/science/article/pii/B9780123740977000053) to model occupancy across Switzerland. 
+
+&lt;img src="Willow_tit.jpg" width="45%" style="display: block; margin: auto;" /&gt;
+
+---
+## Willow Tits Example
+
+Switzerland is well known for it's elevational gradient (the Alps!), which we expect has a large impact on site suitability for Willow Tits.
+
+&lt;img src="WillowTitElev.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+## Willow Tits Example
+
+Along with this elevational gradient, we also know that forest cover is inhomogenous throughout the study region. We will use these two covariates to predict the occupancy of Willow Tits across Switzerland. 
+
+&lt;img src="WillowTitForest.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+## Willow Tits Example
+
+First we need a model for what causes a site to be occupied. We will use a very simple model that assumes constant detection probability across the 3 visits. Following Royle and Dorazio, we will use a quadratic to explain the effects of elevation.
+
+
+``` r
+library(nimble)
+birdmod &lt;- nimbleCode({
+  for(i in 1:nsites){
+    logit(psi[i]) &lt;- beta0 + beta1*elev[i] + beta2*elev[i]*elev[i] + beta3*forest[i]
+    z[i] ~ dbern(psi[i])
+    for(j in 1:nvisits){
+      y[i,j] ~ dbern(z[i]*p)
+    }
+  }
+  beta0 ~ dnorm(0, 1) #intercept
+  beta1 ~ dnorm(0, 1) #elevation
+  beta2 ~ dnorm(0, 1) #elevation^2
+  beta3 ~ dnorm(0, 1) #forest
+  p ~ dbeta(1,1)
+})
+```
+
+---
+## Willow Tits Example
+
+Load the data and scale covariates
+
+``` r
+library(WILD8370)
+data('willow_tits')
+knitr::kable(head(willow_tits, n = 2))
+```
+
+
+
+| y.1| y.2| y.3| c.1| c.2| c.3| elev| forest| dur.1| dur.2| dur.3| day.1| day.2| day.3| length|
+|---:|---:|---:|---:|---:|---:|----:|------:|-----:|-----:|-----:|-----:|-----:|-----:|------:|
+|   0|   0|   0|   0|   0|   0|  420|      3|   240|   240|   240|    29|    58|    73|    6.2|
+|   0|   0|   0|   0|   0|   0|  450|     21|   160|   155|   140|    13|    39|    62|    5.1|
+
+``` r
+willow_tits$elev_c &lt;- (willow_tits$elev - mean(willow_tits$elev))/sd(willow_tits$elev)
+willow_tits$forest_c &lt;- (willow_tits$forest - mean(willow_tits$forest))/sd(willow_tits$forest)
+```
+
+---
+## Willow Tits Example
+
+Constants
+
+``` r
+nimconsts &lt;- list(elev = willow_tits$elev_c, forest = willow_tits$forest_c, 
+                  nsites = nrow(willow_tits), nvisits = 3)
+```
+
+Data
+
+``` r
+nimdat &lt;- list(y = as.matrix(willow_tits[, c('y.1', 'y.2', 'y.3')])) #has to be a matrix
+```
+
+Initial values
+
+``` r
+niminits &lt;- function(){list(
+  p= rbeta(1,1,1),
+  beta0 = rnorm(1,0,1),
+  beta1 = rnorm(1,0,1),
+  beta2 = rnorm(1,0,1),
+  beta3 = rnorm(1,0,1),
+  z = rep(1, 193) #193 sites
+)}
+```
+
+---
+## Willow Tits Example
+
+Params of interest
+
+``` r
+params &lt;- c('p', 'beta0', 'beta1', 'beta2', 'beta3')
+```
+
+Run the model
+
+``` r
+bird_fit &lt;- nimbleMCMC(code = birdmod,
+                     data = nimdat,
+                     constants = nimconsts,
+                     inits = niminits(),
+                     monitors = params,
+                     thin = 1,
+                     niter = 15000,
+                     nburnin = 2500,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+---
+## Willow Tits Example
+
+Check convergence
+
+
+
+``` r
+MCMCvis::MCMCtrace(bird_fit[,1:3], Rhat = T, n.eff = T, pdf = F)
+```
+
+&lt;img src="09_NMix_files/figure-html/unnamed-chunk-12-1.png" width="504" style="display: block; margin: auto;" /&gt;
+---
+## Willow Tits Example
+
+Check convergence
+
+
+``` r
+MCMCvis::MCMCtrace(bird_fit[,4:5], Rhat = T, n.eff = T, pdf = F)
+```
+
+&lt;img src="09_NMix_files/figure-html/unnamed-chunk-13-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Willow Tits Example
+
+Looking at the estimates, it seems like Willow Tits like higher elevations probably like more forested sites.
+
+
+``` r
+summary(bird_fit)$quantiles
+```
+
+|      |    2.5%|     25%|     50%|     75%|   97.5%|
+|:-----|-------:|-------:|-------:|-------:|-------:|
+|beta0 | -1.4736| -1.1072| -0.9325| -0.7494| -0.4219|
+|beta1 |  1.2877|  1.6318|  1.8289|  2.0415|  2.4628|
+|beta2 | -0.4427| -0.1064|  0.0801|  0.2789|  0.6734|
+|beta3 | -0.0413|  0.2428|  0.3949|  0.5520|  0.8523|
+|p     |  0.7427|  0.7828|  0.8025|  0.8208|  0.8545|
+
+---
+## Willow Tits Example
+
+Let's see what that means for expected occupancy across elevations:
+
+
+``` r
+library(ggplot2)
+outputs &lt;- summary(bird_fit)$quantiles
+birds_df &lt;- data.frame(elev = seq(-3, 3, by = .01))
+birds_df$pred &lt;- plogis(outputs[1,3] + outputs[2,3]*birds_df$elev + 
+                          outputs[3,3]*birds_df$elev*birds_df$elev)
+birds_df$elev_normal &lt;- birds_df$elev*sd(willow_tits$elev) + mean(willow_tits$elev) #un-standardize
+ggplot(birds_df, aes(x = elev_normal, y= pred))+
+  geom_line()+
+  theme_classic()+
+  xlab('Elevation')+
+  ylab('Occupancy Probability')
+```
+---
+## Willow Tits Example
+
+Let's see what that means for expected occupancy across elevations:
+
+&lt;img src="09_NMix_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Willow Tits Example
+
+That's a nice graph, but what about if we wanted to include confidence intervals? 
+
+--
+
+You might instinctively want to calculate this but using the 95% CIs from the beta parameters themselves. 
+
+``` r
+birds_df$pred_low &lt;- plogis(outputs[1,1] + outputs[2,1]*birds_df$elev 
+                            + outputs[3,1]*birds_df$elev*birds_df$elev)
+```
+
+--
+
+However, this will get you the WRONG answer. Each parameter in your model is estimated in conjuction with the other parameters - they are not independent. 
+
+
+So what do we do instead? 
+
+---
+## Willow Tits Example
+
+Instead, we have to use the posterior samples themselves to get a full posterior distribution for the derived variables of interest. We start by only using the last 1000 iterations of each chain - we know the chains converged, so we can feel safe in the validity of our estimates. We'll also turn our samples into a matrix so they're easier to work with
+
+
+``` r
+shorter_birds &lt;- as.matrix(window(bird_fit, start = nrow(bird_fit$chain1)-1000))
+```
+
+Now we setup an array to hold our posterior distribution. We need it to have as many rows as there are samples and as many columns as there are values of elevation that we want to predict for. 
+
+``` r
+posterior_dist &lt;- array(NA, c(3000, length(birds_df$elev)))
+```
+
+Now we can compute.
+
+``` r
+for(i in 1:3000){
+  posterior_dist[i,] &lt;- plogis(shorter_birds[i,1] + shorter_birds[i,2]*birds_df$elev + 
+                                 shorter_birds[i,3]*birds_df$elev*birds_df$elev)
+}
+```
+
+---
+## Willow Tits Example
+
+Now we have the posterior distribution! We could plot this if we really wanted. 
+
+However, what we *actually* want is the quantiles of these parameters, so that we can stick those on a graph. We can calculate those using the `quantile()` function in R. 
+
+We'll save these as part of our data frame using the `apply` function.
+
+
+``` r
+birds_df$LCI &lt;- apply(posterior_dist, 2, function(x){quantile(x, 0.025)}) #calculate the LCI 
+birds_df$UCI &lt;- apply(posterior_dist, 2, function(x){quantile(x, 0.975)}) #UCI
+```
+
+Time to graph!
+---
+## Willow Tits Example
+
+
+``` r
+ggplot(birds_df, aes(x = elev_normal, y= pred))+
+  geom_ribbon(aes(ymin = LCI, ymax = UCI), fill = 'orange', alpha =.5)+
+  geom_line()+
+  theme_classic()+
+  theme(axis.text = element_text(size = 15))+
+  xlab('Elevation')+
+  ylab('Occupancy Probability')+
+  xlim(250, 2190) #stay within data levels for elevation
+```
+
+&lt;img src="09_NMix_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Willow Tits Example
+
+If you instead use rasters instead of a range for the environmental covariates, you can then produce occupancy maps! This can produce a very nice output for manuscripts. 
+
+
+&lt;img src="WillowTitOcc.jpg" width="45%" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

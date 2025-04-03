@@ -21,7 +21,6 @@ knitr::opts_chunk$set(
 source(here::here("R/MWF.R"))
 ```
 
-
 ```{r schedule, echo = FALSE}
 library(kableExtra)
 
@@ -46,37 +45,37 @@ schedule <- data.frame(WK = c("1", "", "",
                        Week = MW(first.day = "2025/01/06", last.day = "2025/04/28"),
                        Lecture = c("Course Introduction", "Introduction to Statistics", "", #1
       "Probability Refresher", "Probability Refresher", "", #2
-      "Principles of Bayesian Inference", "Principles of Bayesian Inference", "", #3
-      "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #4
-      "Random vs. fixed effects in Linear models", "Informative Priors", "", #5
-      "Observation error, intro to hierarchical models", "Observation error, intro to hierarchical models", "", #6
-      "More about N-mixture Models", "More about N-mixture Models", "", #7
-      "Zero-inflated models", "Different types of observation processes", "", #8 
+      "No class (MLK Day)", "Snow Day!", "", #3
+      "Principles of Bayesian Inference (Part 1)", "Principles of Bayesian Inference (Part 2)" , "", #4
+      "Introduction to Linear Models and Nimble", "Generalized Linear Model Review", "", #5
+      "Informative Priors", "Random Effects", "", #6
+      "State Space Models", "More State Space Models", "", #7
+      "N-mixture Models", "Dynamic N-mixture", "", #8 
       "Spring Break - No Class", "Spring Break - No Class", "", #9
-      "Known Fate", "Simple Movement Models", "", #10
-      "Closed-population mark-recapture", "Closed-population mark-recapture", "", #11
-      "CJS models", "CJS models", "", #12
-      "Jolly-Seber models", "Jolly-Seber models", "", #13
-      "Multi-state CMR", "Multi-state CMR", "", #14 
-      "Spatial Capture Recapture", "Spatial Capture Recapture", "", #15
+      "Occupancy Models", "Dynamic Occupancy Models", "", #10
+      "Simple Movement Models", "More Movement Models", "", #11
+      "Simple CMR for Abundance", "Closed SCR", "", #12
+      "Known Fate", "CJS Models", "", #13
+      "Continuous Time CJS", "Multi-state CMR", "", #14
+      "TBD", "TBD", "", #15 
       "TBD", "", "", #16
       ""), 
                        Lab = c("", "Using R Markdown/Common Mathematical Notation", "",
                                "", "Data simulation techniques", "", 
+                               "", "Snow Day (no Lab)", "", 
                                "", "Basic MCMC", "",
                                "", "Regression analysis using Nimble", "", 
-                               "", "Choosing Priors", "",
-                               "", "Prior Predictive Checks", "", #be sure to include something about transformed priors
-                               "", "Solving Nimble errors", "", 
-                               "", "Lab 8", "",
+                               "", "Choosing Priors", "", #be sure to include something about transformed priors
+                               "", "", "", 
+                               "", "Missing Data", "",
                                "", "", "", # Spring break
-                               "", "Imputing Missing Information", "",
-                               "", "Simple Model Selection and CMR", "", 
-                               "", "Survival Models with Detection Error", "", 
-                               "", "Lab 12", "",
-                               "", "Lab 13", "", 
-                               "", "Lab 14", "", 
-                               "", "Lab 15", "",
+                               "", "Goodness of Fit tests", "",
+                               "", "Lab 8: RSFs", "", 
+                               "", "Lab 9: SCR", "", 
+                               "", "Lab 10", "",
+                               "", "Lab 11", "", 
+                               "", "Lab 12", "", 
+                               "", "Lab 13", "",
                                ""),
                        Notes = c("", "", "",
                                "", "", "", 

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>lecture 7: Random Effects</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# lecture 7: Random Effects
+]
+.subtitle[
+## FANR 8370
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+## Readings
+
+&gt; Kéry &amp; Schaub 73-82
+
+---
+class: inverse, center, middle
+
+# What are random effects?
+
+---
+## What are random effects?
+&lt;br/&gt;
+
+--
+- Fixed effects are constant across observational units, random effects vary across units  
+&lt;br/&gt;
+
+--
+- Fixed effects are used when you are interested in the specific factor levels, random effects are used when you are interested in the underlying population  
+&lt;br/&gt;
+
+--
+- When factors levels are exhaustive, they are fixed. When they are a sample of the possible levels, they are random  
+&lt;br/&gt;
+
+--
+- Random effects are the realized values of a random variable  
+&lt;br/&gt;
+
+--
+- Fixed effects are estimated by maximum likelihood, random effects are estimated with shrinkage  
+
+???
+
+Definitions from Gelman &amp; Hill (2007) pg. 245
+
+---
+## A simple linear model
+
+`$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$`
+
+`$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$`
+
+--
+- If `\(\beta_{[1]} = \beta_{[2]} = \beta_{[3]} = ...=\beta_{[J]}\)`
+
+--
+```
+nimbleCode({
+  # Priors
+  beta0 ~ dnorm(0, 1)
+  sd ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd)        
+    mu[i] &lt;- beta0
+  } #i
+})
+```
+
+---
+## A simple linear model
+
+`$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$`
+
+`$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$`
+
+--
+- If `\(\beta_{[1]} \perp \beta_{[2]} \perp \beta_{[3]} \perp ...\perp \beta_{[J]}\)`
+
+--
+```
+nimbleCode({
+  # Priors
+  for(j in 1:J){
+    beta0[j] ~ dnorm(0, 1)
+  }
+  sd ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd)        
+    mu[i] &lt;- beta0[group[i]]
+  } #i
+})
+```
+???
+
+nb `\(\perp\)` means "independent of"
+
+This should look familiar - it's the means parameterization of the ANOVA model
+
+In this case, since 'group' is not defined as a random variable, it must be provided as a constant to Nimble
+
+---
+## A simple linear model
+
+`$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$`
+
+`$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$`
+
+--
+- If `\(\beta_{[j]} \sim Normal(\mu_{\beta}, \sigma^2_{\beta})\)`
+
+&lt;img src="07_random_effects_files/figure-html/unnamed-chunk-1-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## A simple linear model
+
+`$$\Large y_{ij} = \beta_{[j]} + \epsilon_i$$`
+
+`$$\Large \epsilon_i \sim Normal(0, \sigma^2)$$`
+
+--
+- If `\(\beta_{[j]} \sim Normal(\mu_{\beta}, \sigma^2_{\beta})\)`
+
+--
+```
+nimbleCode({
+  # Priors
+  for(j in 1:J){
+    beta0[j] ~ dnorm(mu.beta, sd = sd.beta)
+  }
+  mu.beta ~ dnorm(0, 0.33)
+  sd.beta ~ dgamma(0.25, 0.25)
+  sd.mu ~ dgamma(0.25, 0.25)
+    
+  # Likelihood
+  for (i in 1:N){
+    y[i] ~ dnorm(mu[i], sd = sd.mu)        
+    mu[i] &lt;- beta0[group[i]]
+  } #i
+})
+```
+
+---
+## Random effects
+&lt;br/&gt;
+
+--
+- Only apply to factors  
+&lt;br/&gt;
+
+--
+- Imply grouped effects  
+&lt;br/&gt;
+
+--
+- Can include intercept, slope, and variance parameters  
+&lt;br/&gt;
+
+--
+- Assume exchangeability  
+&lt;br/&gt;
+
+--
+- Represent a compromise between total pooling `\((\beta_{[1]}=\beta_{[2]}=...=\beta_{[J]})\)` and no pooling `\((\beta_{[1]} \perp \beta_{[2]} \perp ...\perp \beta_{[J]})\)`  
+&lt;br/&gt;
+
+--
+- Typically require `\(&gt;5-10\)` factor levels  
+
+
+---
+## Random effects = hierarchical model
+&lt;br/&gt;
+&lt;br/&gt;
+
+
+`$$\Large [\beta_{[j]}, \mu_{\beta}, \sigma^2_{\beta}, \sigma^2|y_{ij}] = [y_{ij}|\beta_{[j]}, \sigma^2][\beta_{[j]}|\mu_{\beta}, \sigma^2_{\beta}][\sigma^2][\mu_{\beta}][\sigma^2_{\beta}]$$`
+&lt;br/&gt;
+
+--
+- Can include multiple random effects  
+
+- Can include fixed and random effects (mixed-effect models, multi-level models)  
+
+- Can include multiple levels of hierarchy  
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+- learn about `\(\beta_{[j]}\)` **and** `\(\mu_{\beta}\)`, `\(\sigma^2_{\beta}\)`  
+
+- prediction to unsampled groups (in space or time)  
+
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+- Account for variability among groups vs. among observational units
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+- modeling `\(\sigma^2_{\beta}\)` recognizes uncertainty from sampling groups
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+4) Avoiding psuedo-replication  
+
+- Account for non-independence within groups
+
+---
+## Why use random effects?
+
+1) Scope of inference  
+
+2) Partitioning of variance  
+
+3) Accounting for uncertainty  
+
+4) Avoiding psuedo-replication  
+
+5) Borrowing strength  
+
+- `\(\beta_{[j]}\)` estimating from group `\(j\)` observations + all other groups  
+
+- "shrinkage"" towards mean  
+
+    + degree of shrinkage inversely proportional to precision  
+
+    
+---
+## Why not use random effects?
+
+#### Always use random effects (Gelman &amp; Hill 2007)
+
+#### but...
+
+--
+- Assumption of exchangeability  
+&lt;br/&gt;
+
+--
+- Requires 5-10 levels  
+&lt;br/&gt;
+
+--
+- Computationally intensive  
+&lt;br/&gt;
+
+--
+- Harder to interpret  
+
+---
+## Example - Neonate feral hogs  at SREL
+
+&lt;img src="pig_study1.png" width="1084" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Neonate feral hogs  at SREL
+
+--
+- Neonate pig survival is based on many factors  
+&lt;br/&gt;
+
+
+--
+- Neonate survival seems to vary between sows. Some are better parents than others.  
+&lt;br/&gt;
+
+
+--
+- Should sow be treated as a fixed or random effect?   
+&lt;br/&gt;
+
+
+--
+-  Sow should be fixed. The success of one parent is unrelated to the success of another 
+&lt;br/&gt;
+
+
+--
+-  Sow should be a random effect. Probably most pigs aren't that different from each other; What if we want to estimate piglet survival for a sow that's not in our dataset?   
+&lt;br/&gt;
+
+
+--
+-  Sow should be ignored. Differences in survival between neonates of different sows can be absorbed in the uncertainty for the  process model  
+&lt;br/&gt;
+
+---
+## Example - Neonate feral hogs  at SREL
+
+- Neonate survival might also vary by pelt color pattern   
+&lt;br/&gt;
+
+
+--
+- Should color be treated as a fixed or random effect?   
+&lt;br/&gt;
+
+
+--
+-  Color should be fixed. No specific reason to believe that survival is similar between pelt colors. Only 6 color types. 
+
+&lt;br/&gt;
+
+--
+-  Color should be a random effect -  Some colors are less common, so we have less data; Potentially easier to estimate (shrinkage). 
+&lt;br/&gt;
+
+
+---
+## Example - Neonate feral hogs  at SREL
+
+The authors chose to use a random effect for sow. How would we expect these estimates to change if they had modeled these as fixed effects?  
+
+
+&lt;img src="Fig2_pigs.png" width="457" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

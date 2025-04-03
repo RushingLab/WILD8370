@@ -51,7 +51,7 @@ $\phi$
 
 Phi, usually used to indicate survival probability (but can also be used willy-nilly)
 
-$Norm( \mu, \sigma)$
+$Norm( \mu, \sigma^2)$
 
 The normal distribution with a mean of $\mu$ and a standard deviation of $\sigma$.
 
@@ -67,7 +67,7 @@ $\sum^w_{j=1} K_j$
 
 The sum of value $K_j$ for values of $j$ from 1 to $w$. For instance, if $K_j$ represents the number of personalized mugs in Dr. Rushing's office in year $j$ , the sum of all of them from year $j = 3$ to year 10 would be $\sum^{10}_{j=3} K_j$
 
-$\beta_0 + \epsilon \sim Norm(0, \sigma)$
+$\beta_0 + \epsilon \sim Norm(0, \sigma^2)$
 
 A shorthand way of saying that the residuals from an equation are normally distributed. This is the assumption for most linear models and it can be quicker to write it out this way rather than as a line for $E(x)$ and then a line for the residuals.
 
@@ -102,7 +102,7 @@ Let's say I come up with the following equation. What does this mean in English?
 
 $$E(weight_{it}) = \beta_0 + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-$$y_{it} \sim Normal(E(weight_{it}), \sigma)$$
+$$y_{it} \sim Normal(E(weight_{it}), \sigma^2)$$
 
 Answer: The expected weight of an individual bear at some time $t$ is a function of the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
@@ -110,20 +110,19 @@ What if the equation were the following?
 
 $$E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-$$y_{it} \sim Normal(E(weight_{it}), \sigma)$$ Answer: The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
+$$y_{it} \sim Normal(E(weight_{it}), \sigma^2)$$ Answer: The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the percent forest in the bear's county and the sex of the bear. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
 ### Example: Turtles
 
 I'm running a headstarting experiment on spotted turtles in the Northeastern United States. All turtles were sexed before release. They were released into the wild in 3 different age groupings (juvenile, subadult, adult). I come up with the following potential model to explain the probability that each turtle $i$ survived the 6 week study:
 
-$$logit(\phi_{i}) = \phi_0[relaseage_i] + \phi_1*birthweight_i$$ 
-$$y_i \sim Bernoulli(\phi_i)$$ 
+$$logit(\phi_{i}) = \phi_0[releaseage_i] + \phi_1*birthweight_i$$ $$y_i \sim Bernoulli(\phi_i)$$
 
-What does this mean in English? 
+What does this mean in English?
 
-Answer: The probability that a turtle survived the study is a function of the age group at release and the turtle's birthweight. 
+Answer: The probability that a turtle survived the study is a function of the age group at release and the turtle's birthweight.
 
-Note that here $y_i$ is going to be binary (0 = didn't make it, 1 = survived). 
+Note that here $y_i$ is going to be binary (0 = didn't make it, 1 = survived).
 
 ## Homework Questions
 
@@ -131,10 +130,12 @@ Note that here $y_i$ is going to be binary (0 = didn't make it, 1 = survived).
 
 > The expected weight of an individual bear at some time $t$ is a function of the categorical landcover, the sex of the bear, and the time since fire. The relationship for time since fire is different for males and females. The observed bear weight is a normal distribution centered around with the expected weight with a standard deviation of $\sigma$.
 
-2. Looking at the following bear equation, how would you interpret (in english) if $\beta_1$ were negative? How about if $\beta_2$ were negative? 
+Note: There are multiple ways to write this, so just choose which one makes sense to you
+
+2.  Looking at the following bear equation, how would you interpret (in english) if $\beta_1$ were negative? How about if $\beta_2$ were negative?
 
 $$E(weight_{it}) = \beta_0[landcover_{it}] + \beta_1*percentforest_{it} + \beta_2 * sex_i $$
 
-3. Looking at my data again, I notice that we also recorded each turtle's sex before release. Sex was recorded as either juvenile, male or female. How would I add this information into the previous turtle model of survival probability? 
+3.  Looking at my data again (Example 2 in Lab), I notice that we also recorded each turtle's sex before release. Sex was recorded as either unknown, male or female. How would I add this information into the previous turtle model of survival probability? (Assume that it's possible for turtles of each sex category to be any age.)
 
-4. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
+4.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

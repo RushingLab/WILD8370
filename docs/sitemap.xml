@@ -4,6 +4,11 @@
 <url><loc>http://rushinglab.github.io/WILD8370/articles/Lab2_simulation.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/Lab3_BasicMCMC.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/Lab4_glms.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/Lab6_MissingData.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/Lab7_GOF.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/Lab8_Movement.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/Lab9_SCR.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/NimbleErrors.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/RMarkdown.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/graphics.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/homework.html</loc></url>
@@ -17,6 +22,15 @@
 <url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/04_intro_nimble/Intro_Nimble.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/05_glms/05_glms.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/06_priors/06_priors.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/07_random_effects/07_random_effects.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/08_occupancy/08_occupancy.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/09_NMix/09_NMix.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/10_DynamicOcc/10_DynamicOcc.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/11_DynamicNMix/11_DynamicNMix.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/12_MovementModels/12_MovementModels.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/13_ClosedCMR/Lecture13_ClosedCMR.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/14_ClosedSCR/Lecture14_ClosedSCR.html</loc></url>
+<url><loc>http://rushinglab.github.io/WILD8370/articles/lectures/9b_ExtraOcc/9b_ExtraOcc.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/moment_matching.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/priors.html</loc></url>
 <url><loc>http://rushinglab.github.io/WILD8370/articles/projects_and_directories.html</loc></url>
