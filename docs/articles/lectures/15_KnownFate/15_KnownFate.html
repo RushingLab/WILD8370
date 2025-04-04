@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 15</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 15
+]
+.subtitle[
+## Known Fate
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+## Readings
+
+&gt; https://data.princeton.edu/wws509/notes/c7s1 
+
+&gt; Program MARK - 'A Gentle Introduction' by Evan Cooch
+
+&gt; Chapter 15: Analysis and Management of Animal Populations by Byron Williams, James Nichols and Michael Conroy (UGA! UGA!)
+
+---
+## Survival Models
+
+Broadly speaking, the objective of survival analysis is to understand the factors influencing mortality rates.
+
+&lt;br/&gt;
+
+Known-fate models do not have to involve survival, but often that is the parameter of interest. 
+
+--
+
+In continuous time, we often express this as a `failure time` or `time to event` approach.
+
+&lt;br/&gt;
+
+In discrete time, we often flip this and model `survival` rather than mortality. 
+
+&lt;br/&gt;
+
+Either way, our goal is to estimate when and why animals die (or experience some event) 
+
+---
+## Known-Fate Survival Models
+
+Known-fate survival models require data that has 3 main characteristics:
+
+  + The dependent variable is the waiting time until the occurrence of a well-defined event (death, infection, etc.)
+    
+  + Observations are censored - not every individual dies/gets infected during the study period*
+    
+  + There are predictors or explanatory variables whose effect on the waiting time is of interest to us 
+    
+
+&lt;br/&gt;
+
+*If every individual dies or becomes infected before the study is over, we don't have data to use to understand survival after that point. Also, if nobody dies, you can't use this model either 
+
+---
+## Known-Fate Survival Models
+
+The following data are potentially appropriate for a known-fate model:
+
+  + Animals with GPS collars
+    
+  + Animals with VHF collars that are checked on a consistent schedule (every 3 days, every week, etc.)
+    
+  + Nest survival 
+  
+  + Animals that are repeatedly tested for some disease 
+    
+&lt;br/&gt;
+
+--
+
+But these are not:
+
+  + Animals with ear tags seen by camera traps
+    
+  + Harvest data 
+    
+  + Trapping studies where animals don't receive tracking devices
+    
+&lt;br/&gt;
+
+We will discuss CJS survival models for those types of data in a future lecture.
+
+---
+## A Quick Note
+
+In the literature, you will find the term 'known-fate' is used somewhat sparsely. 
+
+&lt;br/&gt;
+
+This is because this is a very wildlife specific term for a concept that the rest of the world just calls "survival analysis". 
+
+&lt;br/&gt; 
+
+These types of models do not necessarily have to involve death, though in wildlife they are most often used to evaluate mortality. 
+
+&lt;br/&gt;
+
+You can just as easily model infection, reproduction or any other sort of "event" using these same techniques.
+
+---
+## Types of Censoring
+
+An important concept in Known Fate modeling is the idea of `censoring`. 
+
+Data can be censored in 3 ways:
+
+  + Right censoring (most common) - Animals survive to the end of the study or 'start time' was unknown 
+  
+  + Left censoring - true survival is less than or equal to the observed survival time
+  
+  + Interval censoring - Event occurred between two time points, but unclear exactly when 
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The animal survives to the end of the study 
+  
+Example: We collar 30 bears and track their survival for 60 days. At day 60, 15 bears are still alive. These 15 individuals are right censored. 
+  
+&lt;br/&gt;
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-1-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The starting time is unknown
+    
+
+Example: We are studying nest survival. We find a nest that already has eggs in it and start to monitor it. On day 5 of our monitoring, the eggs are predated. We don't know the time interval between lay date and the start of monitoring.
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-2-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+&lt;br/&gt;
+
+Data can be right censored for several reasons. 
+
+  + The batteries die on the animal's collar or the animal drops the transmitter
+
+
+Example: We are monitoring quail with VHF transmitters. On day 9 we find a quail transmitter on the ground, happily transmitting with no quail in site. From the woods behind you, you hear a quail giggling. 
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-3-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+---
+## Left Censoring 
+  
+Left censoring means **true survival ≥ observed survival**
+
+Example: You are studying daily fawn survival. You capture a fawn and tag it. 
+
+After you release it, the fawn is immediately eaten by a coyote and does not survive to the first observation day. Since you cannot use data that has a survival time of 0, this individual is left censored. 
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-4-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+## Interval Censoring   
+
+Left and right censoring are really just special cases of interval censoring. 
+
+Example: You are studying CWD in deer. You want to know about infection rate at the monthly level. 
+
+However, you are unable to test every deer every month except at the beginning and end of your study due to budget constraints. You test a doe at time `\(t\)` and she is negative for CWD. 
+
+At time `\(t+4\)` you test her again and she is positive. You know she was infected sometime after `\(t\)` and before `\(t+4\)` but it is unclear exactly when. 
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-5-1.png" width="360" style="display: block; margin: auto;" /&gt;
+  
+---
+## Model Structure
+
+A simple way of modeling survival is to discretize time and use a binary variable to indicate if an individual is dead or alive:
+
+
+`$$\Large z_{i,t} \sim \mathrm{Bern}(z_{i,t-1}\times \phi_t)$$`
+ 
+ 
+ We can then model `\(\Large \phi_t\)` as the result of various individual or environmental covariates 
+ 
+ 
+ 
+ `$$\Large logit(\phi_t) = \beta_0 + \beta_1*x_1 + \cdots$$`
+
+---
+## Model Structure in Nimble
+
+If we want to, we can have an incredibly simple model. 
+
+
+``` r
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi)
+  }
+}
+})
+```
+
+*Note that the code above implies you could live again after death, so we restrict our analysis to end at the point of death. 
+
+---
+## Model Structure in Nimble
+Or we can get fancy
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 45% !important;
+}
+&lt;/style&gt;
+
+
+``` r
+known_fate &lt;- nimbleCode({
+phi0[1] ~ dnorm(.316, sd = .018)  #neg F fawns; prior from fawn survival model
+for(ss in 2:12){
+  logit(phi0[ss]) &lt;- phi_int + phi_infect*infected[ss] + phi_age[age[ss]]
+}
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    survive[i,t] ~ dbern(phi0[knownstate_live[i,t-1]])
+  }
+}
+phi_int ~ dnorm(0, 1)
+phi_infect ~ dnorm(0, 1)
+phi_sex ~ dnorm(0, 1)
+phi_age[1] &lt;- 0
+for(jj in 2:3){
+  phi_age[jj] ~ dnorm(0, 1)
+}
+})
+```
+]
+---
+## Model Structure in Nimble
+
+Sometimes we might want to model survival at a time step that's different than the data collection timing. For instance, maybe you want to know daily nest survival, but you can only get to each nest every other day. In that case, you'd want to make sure that `\(z\)` was dependent on both `\(phi\)` and `\(z_{t-1}\)`.
+
+Then some of your z's would be `NA` and require initial values:
+
+
+``` r
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi*z[i,t-1])
+  }
+}
+})
+```
+
+---
+## Some Words of Caution
+
+There are a few pitfalls to be aware of with known fate models. 
+
+- The assumption that censoring is random is essential for accurate survival rate estimates
+
+  + Censoring must be unrelated to the fate of the individual – either survival or mortality. For example, if the animal's transmitter often stops working during an animal's death, we will end up with censors that are correlated with mortality. This will bias survival high.
+
+--
+
+- You can't back-fill information 
+  
+  + If you look for an animal and cannot find it during a sampling interval but then find it again during a future time period, you have a problem. This is because you are NOT modeling detection and it's much easier to find an animal that wanders off and comes back than it is to detect an animal that wanders off and dies. 
+  
+--
+
+-  Probability of detecting death needs to be equal to the probability of detecting life 
+
+  + If your animal hides underground right before death and this means you can no longer locate the animal, estimates will be biased. 
+
+---
+## In Class Example
+
+As an example, we will use a classic dataset - Female American Black Ducks! This data comes from a 1989 paper by Mike Conroy, Gary Costanzo and Daniel Stotts and shows up in countless examples of how to use Program MARK, WinBUGS, JAGS, etc. It seems fitting to keep subjecting students to this example.  
+
+227 ducks were captured in Virginia and New Jersey from 1983 to 1985 and fitted with radio transmitters. We have access to 48 of these duck records across 8 weeks of 1983.  
+
+This data is conveniently stored in the RMark package. 
+
+
+``` r
+library(RMark)
+data(Blackduck)
+head(Blackduck, n = 3)
+```
+
+```
+##                 ch BirdAge Weight Wing_Len condix
+## 1 1100000000000000       1   1.16     27.7   4.19
+## 2 1011000000000000       0   1.16     26.4   4.39
+## 3 1011000000000000       1   1.08     26.7   4.04
+```
+
+---
+## In Class Example
+
+In the old world of Program MARK, RMark, captures were recorded as two digits. 
+
+  + “00” = censored (not yet in study, or already exited/removed for some reason)
+  + “10” = alive at beginning and end of the interval
+  + “11” = alive at the beginning of the interval, but animal died before the end of the interval
+
+&lt;br/&gt;
+
+In this dataset, weekly survival was of interest and animals were tracked . Thus the '1011' seen in animals 2 and 3 means those animals were alive in week 1 and then died some time in week 2. 
+
+&lt;br/&gt;
+
+We need to convert this format to something more useful for our own modeling. 
+
+---
+## In Class Example
+
+We're going to use a function in R that helps split character strings to do what we want. This will create a list, which we will turn into a vector of all the capture histories, then reformat and stick to our original data frame. 
+
+This type of data cleaning will probably not come up very often in your own work, unless you are using old data sets or trying to get information from other people's RMark files. 
+
+
+``` r
+split_string &lt;- unlist(strsplit(Blackduck$ch, "(?&lt;=.{2})", perl = TRUE))
+head(split_string)
+```
+
+```
+## [1] "11" "00" "00" "00" "00" "00"
+```
+
+``` r
+Blackduck &lt;- cbind(Blackduck, matrix(split_string, ncol =8, byrow = T))
+head(Blackduck, n = 3)
+```
+
+```
+##                 ch BirdAge Weight Wing_Len condix  1  2  3  4  5  6  7  8
+## 1 1100000000000000       1   1.16     27.7   4.19 11 00 00 00 00 00 00 00
+## 2 1011000000000000       0   1.16     26.4   4.39 10 11 00 00 00 00 00 00
+## 3 1011000000000000       1   1.08     26.7   4.04 10 11 00 00 00 00 00 00
+```
+
+---
+## In Class Example
+
+Let's fit a known-fate model to this dataset where survival is a function of the bird's age (HY = 0, AHY= 1) and initial body weight. 
+
+
+``` r
+Ducks &lt;- nimbleCode({
+  
+b1 ~ dnorm(0, 1)
+b2[1] ~ dnorm(0, 1)
+b2[2] ~ dnorm(0, 1)
+
+for(i in 1:nind){
+  logit(phi[i]) &lt;- b1*weight[i] + b2[age[i]]
+  
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi[i])
+  }
+}
+})
+```
+
+
+---
+## In Class Example
+
+We need to calculate the first and last time we saw each animal, as well as the `z` matrix. It's important to note that all individuals have an *extra* occasions when they were tagged, which is not included in our dataframe. All animals were tagged in the same interval (no staggered entry)
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 85% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+z &lt;- array(NA, c(nrow(Blackduck), 9))
+for(i in 1:nrow(Blackduck)){
+  mych &lt;- Blackduck[i,as.character(1:8)]
+  dead &lt;- which(mych == '11') #ded
+  censor &lt;- which(mych == '00') #disappeared or post-dead
+  if(length(dead) &gt; 0){
+    z[i,dead+1] &lt;- 0 #remember that first occasion isn't in data frame
+    z[i,1:dead] &lt;- 1 #alive prior to death
+  } else {
+    if(length(censor) &gt; 0){
+      z[i,1:censor[1]] &lt;- 1 #alive until unknown
+    } else { #not dead not censored
+      z[i,1:9] &lt;- 1
+    } #end else #2
+  } #end else #1
+} #end i
+```
+]
+
+---
+## In Class Example
+
+We can take a look at our finished product for z
+
+
+``` r
+head(z, n = 5)
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+## [1,]    1    0   NA   NA   NA   NA   NA   NA   NA
+## [2,]    1    1    0   NA   NA   NA   NA   NA   NA
+## [3,]    1    1    0   NA   NA   NA   NA   NA   NA
+## [4,]    1    1    1   NA   NA   NA   NA   NA   NA
+## [5,]    1    1    1   NA   NA   NA   NA   NA   NA
+```
+
+Individuals 1-3 died, but 4 and 5 were censored. 
+
+---
+## In Class Example
+
+We also need to calculate the first and last times each animal's fate was known. The first time is easy, since everyone was tagged the same day:
+
+
+``` r
+first &lt;- rep(1, nrow(Blackduck))
+last &lt;- apply(z, 1, function(row) {
+  which(is.na(row))[1]-1  # Returns the index of the first NA in the row
+})
+last[is.na(last)] &lt;- 9 #if it lived beyond study, end at last occ
+head(last)
+```
+
+```
+## [1] 2 3 3 3 3 4
+```
+
+---
+## In Class Example
+
+Prepare for nimble
+
+
+``` r
+nc &lt;- list(weight = (Blackduck$Weight - mean(Blackduck$Weight))/sd(Blackduck$Weight), 
+           age = as.numeric(Blackduck$BirdAge),
+           nind = nrow(Blackduck),
+           first_live = first,
+           last_live = last)
+nd &lt;- list(z = z)
+ni &lt;- list(b1 = rnorm(1), b2 = rnorm(2))
+params &lt;- c('b1', 'b2')
+```
+
+---
+## In Class Example
+
+Check that everything is working properly:
+
+
+``` r
+prepnim &lt;- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -310
+```
+
+---
+## In Class Example
+
+Full model run:
+
+
+``` r
+library(parallel)
+cl &lt;- makeCluster(2) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "Ducks", 'params'))
+ducks1 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 2000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+ducks1 &lt;- as.mcmc.list(ducks1)
+stopCluster(cl)
+```
+
+---
+## In Class Example
+
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-23-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+---
+## In Class Example
+
+
+``` r
+MCMCvis::MCMCsummary(ducks1)
+```
+
+```
+##         mean     sd    2.5%    50%  97.5% Rhat n.eff
+## b1    0.3606 0.2512 -0.1295 0.3627 0.8744 1.01   986
+## b2[1] 2.6916 0.2921  2.1651 2.6750 3.2932 1.00  1112
+## b2[2] 2.1434 0.3548  1.4901 2.1254 2.8914 1.00  1352
+```
+
+
+Younger, fatter ducks had the highest survival, but the effect of weight was fairly slight. 
+
+
+---
+## In Class Example
+
+Let's graph cumulative survival probability over time for young vs. old ducks of an average weight.
+
+
+``` r
+times &lt;- 1:9 #weeks
+betas &lt;- as.matrix(ducks1) #betas
+age_seq &lt;- c(1,2) #ages 
+p_out &lt;- array(NA, c(nrow(betas), length(times), length(age_seq)))
+for(j in 1:nrow(betas)){
+  for(t in 1:length(times)){
+    p_out[j,t,1] &lt;- plogis(betas[j, 'b2[1]'])^t #young ducks
+    p_out[j,t,2] &lt;- plogis(betas[j, 'b2[2]'])^t #old ducks
+    }
+}
+surv_qs &lt;- apply(p_out, c(2,3), function(x){quantile(x, c(0.025, .5, .975))})
+gg_surv &lt;- data.frame(Week= rep(1:9, 2),
+                      LCI = c(surv_qs[1,,]),
+                      UCI = c(surv_qs[3,,]),
+                      Median = c(surv_qs[2,,]),
+                      Age = rep(c("HY", "AHY"), each= 9))
+```
+
+---
+## In Class Example
+
+
+``` r
+ggplot(gg_surv, aes(x = Week, y = Median, group = Age))+
+  geom_ribbon(aes(ymin = LCI, ymax = UCI, fill = Age), alpha= .4)+
+  geom_line(aes(col = Age))+
+  theme_bw()+ scale_fill_viridis_d()+ scale_color_viridis_d()+
+  theme(axis.text = element_text(size  = 15))
+```
+
+&lt;img src="15_KnownFate_files/figure-html/unnamed-chunk-26-1.png" width="360" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

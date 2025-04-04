@@ -1,11 +1,13 @@
-pandoc: '3.3'
-pkgdown: 2.1.1.9000
-pkgdown_sha: 18cca452d736fea33d47b19b4ef4973db9104a75
+pandoc: 3.1.4
+pkgdown: 2.1.1
+pkgdown_sha: ~
 articles:
   graphics: graphics.html
   homework: homework.html
   lab01_intro_to_R: lab01_intro_to_R.html
   Lab01b_Mathematical_Notation: Lab01b_Mathematical_Notation.html
+  Lab10_CJS: Lab10_CJS.html
+  Lab11_Multistate: Lab11_Multistate.html
   Lab2_simulation: Lab2_simulation.html
   Lab3_BasicMCMC: Lab3_BasicMCMC.html
   Lab4_glms: Lab4_glms.html
@@ -20,11 +22,7 @@ articles:
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-<<<<<<< HEAD
-last_built: 2025-01-05T15:33Z
-=======
-last_built: 2025-03-26T17:23Z
->>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
+last_built: 2025-04-04T17:03Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles

@@ -1,0 +1,587 @@
+---
+title: "Lecture 15"
+subtitle: "Known Fate"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+library(ggforce)
+source(here::here("R/zzz.R"))
+library(ggforce)
+library(terra)
+library(RMark)
+# library(gganimate)
+```
+## Readings
+
+> https://data.princeton.edu/wws509/notes/c7s1 
+
+> Program MARK - 'A Gentle Introduction' by Evan Cooch
+
+> Chapter 15: Analysis and Management of Animal Populations by Byron Williams, James Nichols and Michael Conroy (UGA! UGA!)
+
+---
+## Survival Models
+
+Broadly speaking, the objective of survival analysis is to understand the factors influencing mortality rates.
+
+<br/>
+
+Known-fate models do not have to involve survival, but often that is the parameter of interest. 
+
+--
+
+In continuous time, we often express this as a `failure time` or `time to event` approach.
+
+<br/>
+
+In discrete time, we often flip this and model `survival` rather than mortality. 
+
+<br/>
+
+Either way, our goal is to estimate when and why animals die (or experience some event) 
+
+---
+## Known-Fate Survival Models
+
+Known-fate survival models require data that has 3 main characteristics:
+
+  + The dependent variable is the waiting time until the occurrence of a well-defined event (death, infection, etc.)
+    
+  + Observations are censored - not every individual dies/gets infected during the study period*
+    
+  + There are predictors or explanatory variables whose effect on the waiting time is of interest to us 
+    
+
+<br/>
+
+*If every individual dies or becomes infected before the study is over, we don't have data to use to understand survival after that point. Also, if nobody dies, you can't use this model either 
+
+---
+## Known-Fate Survival Models
+
+The following data are potentially appropriate for a known-fate model:
+
+  + Animals with GPS collars
+    
+  + Animals with VHF collars that are checked on a consistent schedule (every 3 days, every week, etc.)
+    
+  + Nest survival 
+  
+  + Animals that are repeatedly tested for some disease 
+    
+<br/>
+
+--
+
+But these are not:
+
+  + Animals with ear tags seen by camera traps
+    
+  + Harvest data 
+    
+  + Trapping studies where animals don't receive tracking devices
+    
+<br/>
+
+We will discuss CJS survival models for those types of data in a future lecture.
+
+---
+## A Quick Note
+
+In the literature, you will find the term 'known-fate' is used somewhat sparsely. 
+
+<br/>
+
+This is because this is a very wildlife specific term for a concept that the rest of the world just calls "survival analysis". 
+
+<br/> 
+
+These types of models do not necessarily have to involve death, though in wildlife they are most often used to evaluate mortality. 
+
+<br/>
+
+You can just as easily model infection, reproduction or any other sort of "event" using these same techniques.
+
+---
+## Types of Censoring
+
+An important concept in Known Fate modeling is the idea of `censoring`. 
+
+Data can be censored in 3 ways:
+
+  + Right censoring (most common) - Animals survive to the end of the study or 'start time' was unknown 
+  
+  + Left censoring - true survival is less than or equal to the observed survival time
+  
+  + Interval censoring - Event occurred between two time points, but unclear exactly when 
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The animal survives to the end of the study 
+  
+Example: We collar 30 bears and track their survival for 60 days. At day 60, 15 bears are still alive. These 15 individuals are right censored. 
+  
+<br/>
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,64), c(1, 1), type = 'l', xlim = c(-2, 65), ylim= c(.75, 1.25), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(64,1, pch = 4, col = 'red', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 60, lty = 3, col = 'black', lwd = 2)
+```
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+Data can be right censored for several reasons. 
+
+  + The starting time is unknown
+    
+
+Example: We are studying nest survival. We find a nest that already has eggs in it and start to monitor it. On day 5 of our monitoring, the eggs are predated. We don't know the time interval between lay date and the start of monitoring.
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(-2,5), c(1, 1), type = 'l', xlim = c(-5, 10), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(-2,1, pch = 19, col = 'green', cex = 2)
+ points(5,1, pch = 4, col = 'red', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 8, lty = 3, col = 'black', lwd = 2)
+```
+
+
+---
+## Right Censoring 
+
+Right censoring means **true survival ≥ observed survival**
+
+<br/>
+
+Data can be right censored for several reasons. 
+
+  + The batteries die on the animal's collar or the animal drops the transmitter
+
+
+Example: We are monitoring quail with VHF transmitters. On day 9 we find a quail transmitter on the ground, happily transmitting with no quail in site. From the woods behind you, you hear a quail giggling. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,9), c(1, 1), type = 'l', xlim = c(-5, 20), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+lines(c(9, 12), c(1,1), lty = 2)
+points(0,1, pch = 19, col = 'green', cex = 2)
+points(12,1, pch = 4, col = 'red', cex = 2)
+points(9,1, pch = 21, col = 'purple', bg = 'white', cex = 2)
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 15, lty = 3, col = 'black', lwd = 2)
+```
+
+---
+## Left Censoring 
+  
+Left censoring means **true survival <= observed survival**
+
+Example: You are studying daily fawn survival. You capture a fawn and tag it. 
+
+After you release it, the fawn is immediately eaten by a coyote and does not survive to the first observation day. Since you cannot use data that has a survival time of 0, this individual is left censored. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,0.15), c(1, 1), type = 'l', xlim = c(-2, 12), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(0.15,1, pch = 4, col = 'red', cex = 2)
+abline(v = c(1,3,5,7,9), lty = 2, col = 'blue')
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 10, lty = 3, col = 'black', lwd = 2)
+```
+
+
+
+---
+## Interval Censoring   
+
+Left and right censoring are really just special cases of interval censoring. 
+
+Example: You are studying CWD in deer. You want to know about infection rate at the monthly level. 
+
+However, you are unable to test every deer every month except at the beginning and end of your study due to budget constraints. You test a doe at time $t$ and she is negative for CWD. 
+
+At time $t+4$ you test her again and she is positive. You know she was infected sometime after $t$ and before $t+4$ but it is unclear exactly when. 
+
+```{r, fig.width = 5, fig.height= 4}
+plot(c(0,5.5), c(1, 1), type = 'l', xlim = c(-2, 12), ylim= c(.5, 1.5), yaxt = 'n', 
+     ylab = '', xlab = '')
+ points(0,1, pch = 19, col = 'green', cex = 2)
+ points(5.5,1, pch = 4, col = 'red', cex = 2)
+abline(v = c(1,3,5,7,9), lty = 2, col = 'blue')
+abline(v = 0, lty = 3, col = 'black', lwd = 2)
+abline(v = 10, lty = 3, col = 'black', lwd = 2)
+```
+  
+---
+## Model Structure
+
+A simple way of modeling survival is to discretize time and use a binary variable to indicate if an individual is dead or alive:
+
+
+$$\Large z_{i,t} \sim \mathrm{Bern}(z_{i,t-1}\times \phi_t)$$
+ 
+ 
+ We can then model $\Large \phi_t$ as the result of various individual or environmental covariates 
+ 
+ 
+ 
+ $$\Large logit(\phi_t) = \beta_0 + \beta_1*x_1 + \cdots$$
+
+---
+## Model Structure in Nimble
+
+If we want to, we can have an incredibly simple model. 
+
+```{r, echo = T, eval = F}
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi)
+  }
+}
+})
+```
+
+*Note that the code above implies you could live again after death, so we restrict our analysis to end at the point of death. 
+
+---
+## Model Structure in Nimble
+Or we can get fancy
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 45% !important;
+}
+```
+
+```{r, echo = T, eval = F}
+known_fate <- nimbleCode({
+phi0[1] ~ dnorm(.316, sd = .018)  #neg F fawns; prior from fawn survival model
+for(ss in 2:12){
+  logit(phi0[ss]) <- phi_int + phi_infect*infected[ss] + phi_age[age[ss]]
+}
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    survive[i,t] ~ dbern(phi0[knownstate_live[i,t-1]])
+  }
+}
+phi_int ~ dnorm(0, 1)
+phi_infect ~ dnorm(0, 1)
+phi_sex ~ dnorm(0, 1)
+phi_age[1] <- 0
+for(jj in 2:3){
+  phi_age[jj] ~ dnorm(0, 1)
+}
+})
+```
+]
+---
+## Model Structure in Nimble
+
+Sometimes we might want to model survival at a time step that's different than the data collection timing. For instance, maybe you want to know daily nest survival, but you can only get to each nest every other day. In that case, you'd want to make sure that $z$ was dependent on both $phi$ and $z_{t-1}$.
+
+Then some of your z's would be `NA` and require initial values:
+
+```{r, echo = T, eval = F}
+nimbleCode({
+phi ~ dbeta(1, 1)
+for(i in 1:knownInd_Live){
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi*z[i,t-1])
+  }
+}
+})
+```
+
+---
+## Some Words of Caution
+
+There are a few pitfalls to be aware of with known fate models. 
+
+- The assumption that censoring is random is essential for accurate survival rate estimates
+
+  + Censoring must be unrelated to the fate of the individual – either survival or mortality. For example, if the animal's transmitter often stops working during an animal's death, we will end up with censors that are correlated with mortality. This will bias survival high.
+
+--
+
+- You can't back-fill information 
+  
+  + If you look for an animal and cannot find it during a sampling interval but then find it again during a future time period, you have a problem. This is because you are NOT modeling detection and it's much easier to find an animal that wanders off and comes back than it is to detect an animal that wanders off and dies. 
+  
+--
+
+-  Probability of detecting death needs to be equal to the probability of detecting life 
+
+  + If your animal hides underground right before death and this means you can no longer locate the animal, estimates will be biased. 
+
+---
+## In Class Example
+
+As an example, we will use a classic dataset - Female American Black Ducks! This data comes from a 1989 paper by Mike Conroy, Gary Costanzo and Daniel Stotts and shows up in countless examples of how to use Program MARK, WinBUGS, JAGS, etc. It seems fitting to keep subjecting students to this example.  
+
+227 ducks were captured in Virginia and New Jersey from 1983 to 1985 and fitted with radio transmitters. We have access to 48 of these duck records across 8 weeks of 1983.  
+
+This data is conveniently stored in the RMark package. 
+
+```{r, echo = T}
+library(RMark)
+data(Blackduck)
+head(Blackduck, n = 3)
+```
+
+---
+## In Class Example
+
+In the old world of Program MARK, RMark, captures were recorded as two digits. 
+
+  + “00” = censored (not yet in study, or already exited/removed for some reason)
+  + “10” = alive at beginning and end of the interval
+  + “11” = alive at the beginning of the interval, but animal died before the end of the interval
+
+<br/>
+
+In this dataset, weekly survival was of interest and animals were tracked . Thus the '1011' seen in animals 2 and 3 means those animals were alive in week 1 and then died some time in week 2. 
+
+<br/>
+
+We need to convert this format to something more useful for our own modeling. 
+
+---
+## In Class Example
+
+We're going to use a function in R that helps split character strings to do what we want. This will create a list, which we will turn into a vector of all the capture histories, then reformat and stick to our original data frame. 
+
+This type of data cleaning will probably not come up very often in your own work, unless you are using old data sets or trying to get information from other people's RMark files. 
+```{r}
+Blackduck <- as.data.frame(Blackduck)
+```
+```{r, echo = TRUE}
+split_string <- unlist(strsplit(Blackduck$ch, "(?<=.{2})", perl = TRUE))
+head(split_string)
+```
+```{r, echo = TRUE}
+Blackduck <- cbind(Blackduck, matrix(split_string, ncol =8, byrow = T))
+head(Blackduck, n = 3)
+```
+
+---
+## In Class Example
+
+Let's fit a known-fate model to this dataset where survival is a function of the bird's age (HY = 0, AHY= 1) and initial body weight. 
+
+```{r, echo = T}
+Ducks <- nimbleCode({
+  
+b1 ~ dnorm(0, 1)
+b2[1] ~ dnorm(0, 1)
+b2[2] ~ dnorm(0, 1)
+
+for(i in 1:nind){
+  logit(phi[i]) <- b1*weight[i] + b2[age[i]]
+  
+  for(t in (first_live[i]+1):last_live[i]){
+    z[i,t] ~ dbern(phi[i])
+  }
+}
+})
+```
+
+
+---
+## In Class Example
+
+We need to calculate the first and last time we saw each animal, as well as the `z` matrix. It's important to note that all individuals have an *extra* occasions when they were tagged, which is not included in our dataframe. All animals were tagged in the same interval (no staggered entry)
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 85% !important;
+}
+```
+
+.smaller[
+```{r, echo = T}
+z <- array(NA, c(nrow(Blackduck), 9))
+for(i in 1:nrow(Blackduck)){
+  mych <- Blackduck[i,as.character(1:8)]
+  dead <- which(mych == '11') #ded
+  censor <- which(mych == '00') #disappeared or post-dead
+  if(length(dead) > 0){
+    z[i,dead+1] <- 0 #remember that first occasion isn't in data frame
+    z[i,1:dead] <- 1 #alive prior to death
+  } else {
+    if(length(censor) > 0){
+      z[i,1:censor[1]] <- 1 #alive until unknown
+    } else { #not dead not censored
+      z[i,1:9] <- 1
+    } #end else #2
+  } #end else #1
+} #end i
+```
+]
+
+---
+## In Class Example
+
+We can take a look at our finished product for z
+
+```{r, echo = T}
+head(z, n = 5)
+```
+
+Individuals 1-3 died, but 4 and 5 were censored. 
+
+---
+## In Class Example
+
+We also need to calculate the first and last times each animal's fate was known. The first time is easy, since everyone was tagged the same day:
+
+```{r, echo = T}
+first <- rep(1, nrow(Blackduck))
+last <- apply(z, 1, function(row) {
+  which(is.na(row))[1]-1  # Returns the index of the first NA in the row
+})
+last[is.na(last)] <- 9 #if it lived beyond study, end at last occ
+head(last)
+```
+
+---
+## In Class Example
+
+Prepare for nimble
+
+```{r, echo = T}
+nc <- list(weight = (Blackduck$Weight - mean(Blackduck$Weight))/sd(Blackduck$Weight), 
+           age = as.numeric(Blackduck$BirdAge),
+           nind = nrow(Blackduck),
+           first_live = first,
+           last_live = last)
+nd <- list(z = z)
+ni <- list(b1 = rnorm(1), b2 = rnorm(2))
+params <- c('b1', 'b2')
+```
+
+---
+## In Class Example
+
+Check that everything is working properly:
+
+```{r, echo = T, eval = T, warning=FALSE}
+prepnim <- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+---
+## In Class Example
+
+Full model run:
+
+```{r, echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(2) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "Ducks", 'params'))
+ducks1 <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = Ducks, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 2000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+ducks1 <- as.mcmc.list(ducks1)
+stopCluster(cl)
+```
+
+---
+## In Class Example
+```{r}
+ducks1 <- readRDS('ducks1.RDS')
+```
+
+```{r, fig.width = 5, fig.height= 4}
+MCMCvis::MCMCtrace(ducks1, pdf = F, Rhat = T, n.eff =T)
+```
+
+---
+## In Class Example
+
+```{r,echo = T}
+MCMCvis::MCMCsummary(ducks1)
+```
+
+
+Younger, fatter ducks had the highest survival, but the effect of weight was fairly slight. 
+
+
+---
+## In Class Example
+
+Let's graph cumulative survival probability over time for young vs. old ducks of an average weight.
+
+```{r, echo= TRUE}
+times <- 1:9 #weeks
+betas <- as.matrix(ducks1) #betas
+age_seq <- c(1,2) #ages 
+p_out <- array(NA, c(nrow(betas), length(times), length(age_seq)))
+for(j in 1:nrow(betas)){
+  for(t in 1:length(times)){
+    p_out[j,t,1] <- plogis(betas[j, 'b2[1]'])^t #young ducks
+    p_out[j,t,2] <- plogis(betas[j, 'b2[2]'])^t #old ducks
+    }
+}
+surv_qs <- apply(p_out, c(2,3), function(x){quantile(x, c(0.025, .5, .975))})
+gg_surv <- data.frame(Week= rep(1:9, 2),
+                      LCI = c(surv_qs[1,,]),
+                      UCI = c(surv_qs[3,,]),
+                      Median = c(surv_qs[2,,]),
+                      Age = rep(c("HY", "AHY"), each= 9))
+```
+
+---
+## In Class Example
+
+```{r, echo = T,  fig.width = 5, fig.height= 4}
+ggplot(gg_surv, aes(x = Week, y = Median, group = Age))+
+  geom_ribbon(aes(ymin = LCI, ymax = UCI, fill = Age), alpha= .4)+
+  geom_line(aes(col = Age))+
+  theme_bw()+ scale_fill_viridis_d()+ scale_color_viridis_d()+
+  theme(axis.text = element_text(size  = 15))
+  
+```

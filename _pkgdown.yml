@@ -58,8 +58,12 @@ navbar:
           href: articles/lectures/13_ClosedCMR/Lecture13_ClosedCMR.html
         - text: "Lecture 14: Closed SCR"
           href: articles/lectures/14_ClosedSCR/Lecture14_ClosedSCR.html
-        - text: "Lecture 16: Open CMR"
-          href: articles/lectures/16_OpenCMR/Lecture16_OpenCMR.html
+        - text: "Lecture 15: Known Fate Modeling"
+          href: articles/lectures/15_KnownFate/15_KnownFate.html
+        - text: "Lecture 16: CJS Models"
+          href: articles/lectures/16_CJS/16_CJS.html
+        - text: "Lecture 17: Multistate Models"
+          href: articles/lectures/17_Multistate/17_Multistate.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:
@@ -83,6 +87,9 @@ navbar:
           href: articles/Lab8_Movement.html
         - text: "Lab 9: Spatial Capture Recapture"
           href: articles/Lab9_SCR.html
+        - text: "Lab 10: CJS"
+          href: articles/Lab10_CJS.html
+
     - icon: far fa-bookmark
       text: "References"
       menu:
