@@ -434,8 +434,7 @@ ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
 
 Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
 
-<<<<<<< HEAD
 3. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
-=======
+
+
 3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
->>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
