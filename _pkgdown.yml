@@ -63,7 +63,7 @@ navbar:
         - text: "Lecture 16: CJS Models"
           href: articles/lectures/16_CJS/16_CJS.html
         - text: "Lecture 17: Multistate Models"
-          href: articles/lectures/17_Multistate/17_Multistate.html
+          href: articles/lectures/17_MultiState/17_Multistate.html
     - text: "Labs"
       icon: fas fa-laptop-code
       menu:
