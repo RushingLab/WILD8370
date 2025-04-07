@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>lecture 18: continuous-time capture recapture models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# lecture 18: continuous-time capture recapture models
+]
+.subtitle[
+## FANR 8370
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+
+## Readings
+
+&gt; [Rushing (2023) J. Anim Ecol. 92 (4), 936-944](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2656.13902)
+
+---
+# discrete vs continuous time
+
+For all capture-recapture models we have seen so far, time was formulated as *discrete* intervals
+
+--
+
+Treating time as discrete makes sense when individuals can only be encountered during distinct sampling occasions, which are often pre-defined parts of the study design
+
+--
+
+Often, however, "captures" are not limited to discrete, pre-defined sampling occasions but instead can occur more or less continuously 
+
+- Camera traps
+
+- Automated telemetry
+
+- Band re-sights/re-encounters
+
+---
+# discrete vs continuous time
+
+Discrete-time formulations assume that capture occasions are short relative to the time between occasions
+
+- This assumption is necessary because survival probabilities correspond to a specific amount of time
+
+- All individuals are assumed to survive the same amount of time between encounters
+
+&lt;img src="figs/dtCH.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# continuous time
+
+&lt;img src="figs/ct0.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# continuous time
+
+&lt;img src="figs/ctD1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# continuous time
+
+&lt;img src="figs/ctBinned.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+---
+# continuous time
+
+&lt;img src="figs/ctEH.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# continuous time
+
+Both the number of encounters and the time between encounters is obviously very different between these two individuals
+
+But the *post-hoc* binning of time into discrete intervals produces the same encounter histories
+
+&lt;img src="figs/ctEH.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+# continuous time
+
+Instead of binning, we could treat the observations as occurring in continuous time by directly modeling the time between detections
+
+&lt;img src="figs/ctDelta.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+---
+# continuous time
+
+How do we model continuous detections? 
+
+Generally, continuous processes are modeled as "time to event" - i.e., how much time passes before the "event" of interest happens
+
+- Many types of "events" - earthquakes, appliance failure, 
+
+--
+
+In the case of survival models, what "events" are we interested in?
+
+--
+
+- Mortality and detection
+
+--
+
+Time to event models are based on *hazard rates* - the number of events expected to occur within a (usually short) unit of time
+
+- For mortality events, the hazard rate is the "expected number of deadly events occurring per time-unit for an immortal individual" [(Ergon et al. 2018)](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13059)
+
+- For detection events, the hazard rate is the expected number of detections occurring per time-unit
+
+---
+# hazard rates vs survival probability
+
+Hazard rates and survival probabilities are inversely related 
+
+- As hazard rate increases, survival probability decreases
+
+--
+
+More specifically, for any amount of time `\(\Delta\)`:
+
+`$$\Large \phi = e^{-h\Delta}$$`
+&lt;img src="18_CT_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+# the cjs as a multistate model
+
+The CJS model we previously saw can be formulated as a multistate model with 2 states
+
+- What are the states?
+
+--
+
+- Alive and Dead (or emigrated) 
+
+.left-column[
+&lt;br/&gt;
+&lt;br/&gt;
+&lt;br/&gt;
+#### True state at time *t*
+]
+
+.right-column[
+&lt;center&gt;
+#### True state at time *t + 1*
+&lt;/center&gt;
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 14px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:center;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Alive &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Dead &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Alive &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; \(\phi\) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; \(1 - \phi\) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:center;"&gt; Dead &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+---
+# the cjs as a continuous-time model
+
+Instead of formulated the model in terms of survival probability, we need to formulate it in terms of hazard rate
+
+--
+
+Fortunately, we just need to modify the transition matrix to become an *intensity matrix* 
+`$$\large {\mathbf{Q} = \begin{bmatrix}
+-h &amp; h\\
+0 &amp; 0
+\end{bmatrix}}$$`
+
+--
+
+#### Notes:
+
+- The intensity matrix is still interpreted as transitions *from row i to column j* but instantaneously rather than between discrete sampling occasions
+
+- The rows of the intensity matrix have to sum to 0
+
+
+---
+# from the intensity matrix to transition probabilities
+
+
+As we saw earlier, hazard rates can be converted to survival probabilities using `\(\phi = e^{-h\Delta}\)`
+
+--
+
+We can similarly convert the intensity matrix to a transition probability matrix using the *matrix exponential* 
+
+`$$\Large \Phi = e^{Q \Delta}$$`
+
+Note that the matrix exponential is not the same the exponential of a scalar! 
+
+--
+
+Importantly, the transition probabilities in `\(\Phi\)` account for intermediate states an individual *could have experienced* within the interval `\(\Delta\)`
+
+- In effect, this operation marginalizes over all possible ways an individual could transition between states
+
+- More relevant when there are &gt; 2 states
+
+---
+# from the intensity matrix to transition probabilities
+
+For example, if:
+
+`$$\large {\mathbf{Q} = \begin{bmatrix}
+-0.2 &amp; 0.2\\
+0 &amp; 0
+\end{bmatrix}}$$`
+
+the probabilities of remaining alive (or not) after 5.6 units of time is:
+
+
+`$$\large {\mathbf{\Phi} = e^{-Q \times 5.6} = \begin{bmatrix}
+0.33 &amp; 0.67\\
+0 &amp; 1
+\end{bmatrix}}$$`
+
+Note that the rows of `\(\Phi\)` sum to 1, as expected
+
+---
+# the cjs as a continuous-time model
+
+How does this allow us to estimate survival? Imagine an individual that is released at `\(t=0\)` and then re-encountered alive at times `\(t = 1.3, 4.5, 9.2\)`
+
+--
+
+First, we need to calculate the time between detections:
+
+
+```r
+t &lt;- c(0, 1.3, 4.5, 9.2)
+(delta &lt;- diff(t))
+```
+
+```
+## [1] 1.3 3.2 4.7
+```
+
+---
+# the cjs as a continuous-time model
+
+.pull-left[
+
+```r
+Q &lt;- matrix(c(-0.2, 0, 0.2, 0), 2, 2)
+(Phi1 &lt;- expm::expm(Q * delta[1]))
+```
+
+```
+##        [,1]   [,2]
+## [1,] 0.7711 0.2289
+## [2,] 0.0000 1.0000
+```
+
+```r
+(Phi2 &lt;- expm::expm(Q * delta[2]))
+```
+
+```
+##        [,1]   [,2]
+## [1,] 0.5273 0.4727
+## [2,] 0.0000 1.0000
+```
+
+```r
+(Phi3 &lt;- expm::expm(Q * delta[3]))
+```
+
+```
+##        [,1]   [,2]
+## [1,] 0.3906 0.6094
+## [2,] 0.0000 1.0000
+```
+]
+
+.pull-right[
+What probabilities from these matrices correspond to the re-encounters?
+]
+
+---
+# the cjs as a continuous-time model
+
+Assume the study lasts 15 time units. From the last detection to the end of the study:
+
+
+```r
+(Phi4 &lt;- expm::expm(Q * (15 - t[4])))
+```
+
+```
+##        [,1]   [,2]
+## [1,] 0.3135 0.6865
+## [2,] 0.0000 1.0000
+```
+
+What probabilities from this matrix corresponds to the last encounter to the end of the study?
+
+--
+
+Going back to the beginning of the semester, we can calculate the total (log) likelihood of this encounter history as:
+
+
+```r
+log(Phi1[1, 1]) + log(Phi2[1, 1]) + log(Phi3[1, 1]) + log(sum(Phi4[1, ]))
+```
+
+```
+## [1] -1.84
+```
+
+---
+# the cjs as a continuous-time model
+
+But wait! That was just the likelihood of surviving between each encounter. 
+
+What is this model missing?
+
+--
+
+- Detection probability!
+
+--
+
+Assuming the detection rate of alive individuals is `\(\lambda\)` (and is 0 for dead individuals), the detection process can also be formulated as an intensity matrix:
+
+`$$\large {\mathbf{\Lambda} = \begin{bmatrix}
+\lambda &amp; 0\\
+0 &amp; 0
+\end{bmatrix}}$$`
+
+And probability of being detected after `\(\Delta\)` units of time (but not before) is `\(\large \Lambda e^{-\Lambda \Delta}\)`
+
+---
+# the cjs as a continuous-time model
+
+We can combine the two intensity matrices to calculate the probability of surviving and being detected after `\(\Delta\)`:
+
+`$$\Large \Gamma = e^{Q\Delta} \times \Lambda e^{-\Lambda \Delta} = \Lambda e^{(Q \Delta - \Lambda \Delta)} = \Lambda e^{(Q-\Lambda) \Delta}$$`
+--
+
+For the first encounter of our imaginary individual: 
+
+
+```r
+Lambda &lt;- matrix(c(0.5, 0, 0, 0), 2, 2)
+(Gamma1 &lt;- Lambda %*% expm::expm((Q - Lambda) * Delta[1]))
+```
+
+```
+##        [,1]    [,2]
+## [1,] 0.2483 0.07192
+## [2,] 0.0000 0.00000
+```
+
+What is the interpretation of each element of `\(\Gamma\)`?
+
+--
+
+- `\(\Gamma_{1,1}\)` = if alive at time `\(t_0\)`, probability of being alive and detected at `\(t_1\)`
+- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being alive and detected after `\(t_1\)`
+- `\(\Gamma_{1,2}\)` = if alive at time `\(t_0\)`, probability of being dead and not detected at `\(t_1\)`
+- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being dead and not detected after `\(t_1\)`
+
+---
+# the cjs as a continuous-time model
+
+Because the individual was *not* detected after the last encounter:
+
+`$$\Large \Gamma = e^{(Q-\Lambda) (T - t)}$$`
+
+
+```r
+(Gamma4 &lt;- expm::expm((Q - Lambda) * (15 - t[4])))
+```
+
+```
+##         [,1]   [,2]
+## [1,] 0.01725 0.2808
+## [2,] 0.00000 1.0000
+```
+
+and thus, the total log likelihood of the encounter history is:
+
+
+```r
+log(Gamma1[1,1]) + log(Gamma2[1,1]) + log(Gamma3[1,1]) + log(sum(Gamma4[1,1:2])) 
+```
+
+---
+# continuous time models
+
+For "capture-recapture" data that is not restricted to pre-defined, discrete sampling occasions, continuous-time models may be more appropriate
+
+- no need to arbitrarily "bin" detections (less bias, loss of information)
+
+- computational efficiency (in some cases)
+
+- hazard rates are easily interpreted and compared (Ergon et al. 2018)
+
+- "easily" expanded to &gt;2 states, temporal variation, co-variates, etc.
+
+--
+
+But...
+
+- less familiar to ecologists and fewer resources for learning
+
+- coding can be challenging (as we will see in lab)
+
+- certain circumstances can be challenging to formulate (deterministic transitions, behavioral effects)
+
+- computational efficiency (in some cases)
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
