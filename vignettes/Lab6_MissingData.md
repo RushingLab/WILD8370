@@ -29,7 +29,7 @@ Over the past few weeks, we've covered a lot of the foundational concepts that y
 
 ## European Hares 
 
-Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland.Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
+Data for today comes from the Swiss hare data included in Marc Kéry's 2010 book, *Introduction to WinBUGS for Ecologists*. The data contain replicated counts of Brown hares (*Lepus europaeus*) conducted over 17 years (1992-2008) at 56 sites in 8 regions of Switzerland. Each year, two counts were conducted during a two-week period. Sites vary in area, elevation, and belong to two types of habitat (arable and grassland). You can read more about this study here: <https://www.sciencedirect.com/science/article/pii/S0006320710004921?via=ihub> 
 
 <img src="Hare.webp" width="50%" style="display: block; margin: auto;" />
 
@@ -554,9 +554,9 @@ We can see numerically that the spread of the alphas is a little smaller for the
 
 ``` r
 var(mod1_alphas[,3])
-#> [1] 0.4704
+#> [1] 0.4728
 var(mod2_alphas[,3])
-#> [1] 0.3972
+#> [1] 0.4
 ```
 
 
@@ -566,12 +566,10 @@ var(mod2_alphas[,3])
 
 Hint: Instead of putting your data in the "data" object, put it in as an initial value. Other than your data, all other information (constants, params, etc.) is still the same. 
 
-2. In the lab example, we just looked at hares in the central region. Using the entire dataset, fit the two working model we ran above - one where detection is a random effect of site and one where it is a fixed effect. Use ggplot to create a graph showing the difference in the parameter estimates and calculate the variance in the mean alpha parameter value. How does the change in variance between the two models compare with our lab run on just a subset of data?
+2. When this data was formally analyzed, the authors used a random effect of year in the process model and a random effect of site in the detection process. Run the model with both of these random effects. Use ggplot to compare the beta1 values (the effect of landuse type on the expected abundance) produced by this new mode vs the model in Question 1. At a site with average area (scaled area = 0), what is the expected abundance for each land use type?
 
-3. When this data was formally analyzed, the authors used a random effect of year in the process model and a random effect of site in the detection process. Run the model with both of these random effects. Use ggplot to compare the beta1 values (the effect of landuse type on the expected abundance) produced by this new mode vs the model in Question 1. At a site with average area (scaled area = 0), what is the expected abundance for each land use type?
+3. Since this is an abundance model, it makes sense to make a plot of abundance over time. Inside the model that you used for Question 2, create 2 *derived parameterS* that represents the total abundance of all sites of each landtype (one parameter for each landtype) in each year. Use ggplot to graph the estimated total average density by landtype over time, including the CIs.  (Note: To get density, determine the total area of all plots of each landtype, then divide your estimates by this number). 
 
-4. Since this is an abundance model, it makes sense to make a plot of abundance over time. Inside the model that you used for Question 2, create 2 *derived parameterS* that represents the total abundance of all sites of each landtype (one parameter for each landtype) in each year. Use ggplot to graph the estimated total average density by landtype over time, including the CIs.  (Note: To get density, determine the total area of all plots of each landtype, then divide your estimates by this number). 
+4. To practice converting model code to the mathematical notation expected in a scientific paper, write your model for Question 2 in its full mathematical form, including priors. 
 
-5. To practice converting model code to the mathematical notation expected in a scientific paper, write your model for Question 2 in its full mathematical form, including priors. 
-
-6.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
+5.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

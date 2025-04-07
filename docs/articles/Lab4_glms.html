@@ -56,6 +56,7 @@
     <li><a class="dropdown-item" href="../articles/lectures/14_ClosedSCR/Lecture14_ClosedSCR.html">Lecture 14: Closed SCR</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/15_KnownFate/15_KnownFate.html">Lecture 15: Known Fate Modeling</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/16_CJS/16_CJS.html">Lecture 16: CJS Models</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/17_Multistate/17_Multistate.html">Lecture 17: Multistate Models</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -269,8 +270,10 @@ carrying capacity.</p>
 definition, linear models model linear effects? Using polynomials!</p>
 <p>Remember the equation for a curved line with a single peak (or
 bottom):</p>
-<p><span class="math inline">\Large y = a + b \times x + c \times
-x^2</span></p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD <span class="math display">y = a +
+b \times x + c \times x^2</span> ======= <span class="math inline">\Large y = a + b \times x + c \times x^2</span>
+&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+ce5d54b074616c65c7754d9e4f0af1acd8908fa4</p>
 <p><img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Where <span class="math inline">a</span> is the maximum (or minimum)
 value of <span class="math inline">y</span>, <span class="math inline">b</span> is the value of <span class="math inline">x</span> where this maximum (or minimum) occurs and
@@ -278,9 +281,11 @@ value of <span class="math inline">y</span>, <span class="math inline">b</span> 
 maximum (<span class="math inline">c&lt;0</span>) or a minimum (<span class="math inline">c&gt;0</span>).</p>
 <p>We can add more complex shape by adding additional polynomial terms.
 For example, including a cubic term creates an s-shaped curve:</p>
-<p><span class="math inline">\Large y = a + b \times x + c \times x^2 +
-d \times x^3</span></p>
-<p>For instance:</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD <span class="math display">y = a +
+b \times x + c \times x^2 + d \times x^3</span> ======= <span class="math inline">\Large y = a + b \times x + c \times x^2 + d \times
+x^3</span></p>
+<p>For instance: &gt;&gt;&gt;&gt;&gt;&gt;&gt;
+ce5d54b074616c65c7754d9e4f0af1acd8908fa4</p>
 <p><img src="Lab4_glms_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>Including polynomial terms in the linear predictor on the model gives
 us enormous flexibility to model non-linear relationships using
@@ -453,19 +458,19 @@ like with one chain:</p>
 alpha
 </td>
 <td style="text-align:right;">
-4.1685
+4.1739
 </td>
 <td style="text-align:right;">
-4.2085
+4.2118
 </td>
 <td style="text-align:right;">
-4.2289
+4.2306
 </td>
 <td style="text-align:right;">
-4.2499
+4.2501
 </td>
 <td style="text-align:right;">
-4.2879
+4.2884
 </td>
 </tr>
 <tr>
@@ -473,19 +478,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
-1.0288
+1.0238
 </td>
 <td style="text-align:right;">
-1.0880
+1.0844
 </td>
 <td style="text-align:right;">
-1.1184
+1.1159
 </td>
 <td style="text-align:right;">
-1.1499
+1.1452
 </td>
 <td style="text-align:right;">
-1.2151
+1.2022
 </td>
 </tr>
 <tr>
@@ -493,19 +498,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.0388
+-0.0393
 </td>
 <td style="text-align:right;">
--0.0077
+-0.0082
 </td>
 <td style="text-align:right;">
-0.0086
+0.0075
 </td>
 <td style="text-align:right;">
-0.0255
+0.0229
 </td>
 <td style="text-align:right;">
-0.0560
+0.0527
 </td>
 </tr>
 <tr>
@@ -513,19 +518,19 @@ beta2
 beta3
 </td>
 <td style="text-align:right;">
--0.2844
+-0.2785
 </td>
 <td style="text-align:right;">
--0.2515
+-0.2490
 </td>
 <td style="text-align:right;">
--0.2346
+-0.2335
 </td>
 <td style="text-align:right;">
--0.2191
+-0.2171
 </td>
 <td style="text-align:right;">
--0.1886
+-0.1853
 </td>
 </tr>
 <tr>
@@ -533,19 +538,19 @@ beta3
 lambda[1]
 </td>
 <td style="text-align:right;">
-26.6575
+26.6889
 </td>
 <td style="text-align:right;">
-30.3234
+30.2211
 </td>
 <td style="text-align:right;">
-32.3956
+32.3052
 </td>
 <td style="text-align:right;">
-34.6393
+34.4064
 </td>
 <td style="text-align:right;">
-39.1547
+38.6127
 </td>
 </tr>
 <tr>
@@ -553,19 +558,19 @@ lambda[1]
 lambda[2]
 </td>
 <td style="text-align:right;">
-25.6918
+25.6956
 </td>
 <td style="text-align:right;">
-28.6464
+28.5859
 </td>
 <td style="text-align:right;">
-30.3324
+30.2625
 </td>
 <td style="text-align:right;">
-32.0912
+31.9602
 </td>
 <td style="text-align:right;">
-35.6505
+35.2361
 </td>
 </tr>
 <tr>
@@ -573,19 +578,19 @@ lambda[2]
 lambda[3]
 </td>
 <td style="text-align:right;">
-25.0395
+25.0503
 </td>
 <td style="text-align:right;">
-27.4815
+27.4629
 </td>
 <td style="text-align:right;">
-28.8635
+28.8161
 </td>
 <td style="text-align:right;">
-30.2923
+30.2126
 </td>
 <td style="text-align:right;">
-33.1345
+32.8666
 </td>
 </tr>
 </tbody>
@@ -600,16 +605,16 @@ package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">coda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/coda/man/gelman.diag.html" class="external-link">gelman.diag</a></span><span class="op">(</span><span class="va">falcon_res</span>, multivariate <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">psrf</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="op">]</span> <span class="co">#don't want to print out all 40 lambdas</span></span>
 <span><span class="co">#&gt;           Point est. Upper C.I.</span></span>
-<span><span class="co">#&gt; alpha          1.004      1.013</span></span>
-<span><span class="co">#&gt; beta1          1.007      1.013</span></span>
-<span><span class="co">#&gt; beta2          1.004      1.016</span></span>
-<span><span class="co">#&gt; beta3          1.005      1.011</span></span>
-<span><span class="co">#&gt; lambda[1]      1.003      1.009</span></span>
-<span><span class="co">#&gt; lambda[2]      1.003      1.011</span></span>
-<span><span class="co">#&gt; lambda[3]      1.003      1.013</span></span>
-<span><span class="co">#&gt; lambda[4]      1.004      1.014</span></span>
-<span><span class="co">#&gt; lambda[5]      1.004      1.015</span></span>
-<span><span class="co">#&gt; lambda[6]      1.004      1.015</span></span></code></pre></div>
+<span><span class="co">#&gt; alpha          1.002      1.008</span></span>
+<span><span class="co">#&gt; beta1          1.004      1.011</span></span>
+<span><span class="co">#&gt; beta2          1.004      1.012</span></span>
+<span><span class="co">#&gt; beta3          1.004      1.009</span></span>
+<span><span class="co">#&gt; lambda[1]      1.003      1.007</span></span>
+<span><span class="co">#&gt; lambda[2]      1.003      1.006</span></span>
+<span><span class="co">#&gt; lambda[3]      1.003      1.006</span></span>
+<span><span class="co">#&gt; lambda[4]      1.002      1.006</span></span>
+<span><span class="co">#&gt; lambda[5]      1.002      1.006</span></span>
+<span><span class="co">#&gt; lambda[6]      1.002      1.007</span></span></code></pre></div>
 <p>All parameters appear to have converged.</p>
 <p>As usual, let’s check the trace plots to see how they look:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -738,19 +743,19 @@ then size, unlike what we would type in R:</p>
 alpha
 </td>
 <td style="text-align:right;">
-0.6743
+0.6699
 </td>
 <td style="text-align:right;">
-0.7485
+0.7432
 </td>
 <td style="text-align:right;">
-0.7860
+0.7818
 </td>
 <td style="text-align:right;">
-0.8233
+0.8188
 </td>
 <td style="text-align:right;">
-0.8950
+0.8914
 </td>
 </tr>
 <tr>
@@ -758,19 +763,19 @@ alpha
 beta1
 </td>
 <td style="text-align:right;">
--0.0278
+-0.0298
 </td>
 <td style="text-align:right;">
-0.0292
+0.0279
 </td>
 <td style="text-align:right;">
-0.0584
+0.0585
 </td>
 <td style="text-align:right;">
-0.0886
+0.0893
 </td>
 <td style="text-align:right;">
-0.1444
+0.1469
 </td>
 </tr>
 <tr>
@@ -778,19 +783,19 @@ beta1
 beta2
 </td>
 <td style="text-align:right;">
--0.3868
+-0.3833
 </td>
 <td style="text-align:right;">
--0.3330
+-0.3305
 </td>
 <td style="text-align:right;">
--0.3059
+-0.3026
 </td>
 <td style="text-align:right;">
--0.2782
+-0.2747
 </td>
 <td style="text-align:right;">
--0.2247
+-0.2220
 </td>
 </tr>
 <tr>
@@ -798,19 +803,19 @@ beta2
 p[1]
 </td>
 <td style="text-align:right;">
-0.3903
+0.3893
 </td>
 <td style="text-align:right;">
-0.4349
+0.4352
 </td>
 <td style="text-align:right;">
-0.4595
+0.4602
 </td>
 <td style="text-align:right;">
-0.4843
+0.4854
 </td>
 <td style="text-align:right;">
-0.5307
+0.5324
 </td>
 </tr>
 <tr>
@@ -818,19 +823,19 @@ p[1]
 p[2]
 </td>
 <td style="text-align:right;">
-0.4171
+0.4163
 </td>
 <td style="text-align:right;">
 0.4591
 </td>
 <td style="text-align:right;">
-0.4820
+0.4825
 </td>
 <td style="text-align:right;">
-0.5047
+0.5058
 </td>
 <td style="text-align:right;">
-0.5477
+0.5489
 </td>
 </tr>
 <tr>
@@ -838,19 +843,19 @@ p[2]
 p[3]
 </td>
 <td style="text-align:right;">
-0.4433
+0.4422
 </td>
 <td style="text-align:right;">
-0.4823
+0.4821
 </td>
 <td style="text-align:right;">
-0.5033
+0.5037
 </td>
 <td style="text-align:right;">
-0.5243
+0.5252
 </td>
 <td style="text-align:right;">
-0.5639
+0.5649
 </td>
 </tr>
 </tbody>
@@ -914,9 +919,12 @@ for this one.]</li>
 extremely low counts, be sure to look at your priors. If selected
 correctly, you should see all 3 models roughly overlap the raw data.</p>
 <ol start="3" style="list-style-type: decimal">
-<li>On a 1-10 scale, with 1 being the worst week ever and 10 being the
-best, how would you rate this week’s content? What lingering
-questions/confusion about the lecture or lab do you still have?</li>
+<li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
+the best, how would you rate this week’s content? What lingering
+questions/confusion about the lecture or lab do you still have?</p></li>
+<li><p>On a 1-10 scale, with 1 being the worst week ever and 10 being
+the best, how would you rate this week’s content? What lingering
+questions/confusion about the lecture or lab do you still have?</p></li>
 </ol>
 </div>
 

@@ -8,8 +8,6 @@ vignette: >
   %\VignetteIndexEntry{Lab4_glms}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-template:
-  math-rendering: katex
 ---
 
 
@@ -126,7 +124,11 @@ How can we model the non-linear change in abundance if, by definition, linear mo
 
 Remember the equation for a curved line with a single peak (or bottom):
 
+<<<<<<< HEAD
+$$y = a + b \times x + c \times x^2$$
+=======
 $\Large y = a + b \times x + c \times x^2$
+>>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" />
 
@@ -134,9 +136,13 @@ Where $a$ is the maximum (or minimum) value of $y$, $b$ is the value of $x$ wher
 
 We can add more complex shape by adding additional polynomial terms. For example, including a cubic term creates an s-shaped curve:
 
+<<<<<<< HEAD
+$$y = a + b \times x + c \times x^2 + d \times x^3$$
+=======
 $\Large y = a + b \times x + c \times x^2 + d \times x^3$
 
 For instance:
+>>>>>>> ce5d54b074616c65c7754d9e4f0af1acd8908fa4
 
 <img src="Lab4_glms_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
 
@@ -288,59 +294,59 @@ summary(falcon_res[,c('alpha', 'beta1', 'beta2', 'beta3', 'lambda[1]', 'lambda[2
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 4.1685 </td>
-   <td style="text-align:right;"> 4.2085 </td>
-   <td style="text-align:right;"> 4.2289 </td>
-   <td style="text-align:right;"> 4.2499 </td>
-   <td style="text-align:right;"> 4.2879 </td>
+   <td style="text-align:right;"> 4.1739 </td>
+   <td style="text-align:right;"> 4.2118 </td>
+   <td style="text-align:right;"> 4.2306 </td>
+   <td style="text-align:right;"> 4.2501 </td>
+   <td style="text-align:right;"> 4.2884 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> 1.0288 </td>
-   <td style="text-align:right;"> 1.0880 </td>
-   <td style="text-align:right;"> 1.1184 </td>
-   <td style="text-align:right;"> 1.1499 </td>
-   <td style="text-align:right;"> 1.2151 </td>
+   <td style="text-align:right;"> 1.0238 </td>
+   <td style="text-align:right;"> 1.0844 </td>
+   <td style="text-align:right;"> 1.1159 </td>
+   <td style="text-align:right;"> 1.1452 </td>
+   <td style="text-align:right;"> 1.2022 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
-   <td style="text-align:right;"> -0.0388 </td>
-   <td style="text-align:right;"> -0.0077 </td>
-   <td style="text-align:right;"> 0.0086 </td>
-   <td style="text-align:right;"> 0.0255 </td>
-   <td style="text-align:right;"> 0.0560 </td>
+   <td style="text-align:right;"> -0.0393 </td>
+   <td style="text-align:right;"> -0.0082 </td>
+   <td style="text-align:right;"> 0.0075 </td>
+   <td style="text-align:right;"> 0.0229 </td>
+   <td style="text-align:right;"> 0.0527 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta3 </td>
-   <td style="text-align:right;"> -0.2844 </td>
-   <td style="text-align:right;"> -0.2515 </td>
-   <td style="text-align:right;"> -0.2346 </td>
-   <td style="text-align:right;"> -0.2191 </td>
-   <td style="text-align:right;"> -0.1886 </td>
+   <td style="text-align:right;"> -0.2785 </td>
+   <td style="text-align:right;"> -0.2490 </td>
+   <td style="text-align:right;"> -0.2335 </td>
+   <td style="text-align:right;"> -0.2171 </td>
+   <td style="text-align:right;"> -0.1853 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[1] </td>
-   <td style="text-align:right;"> 26.6575 </td>
-   <td style="text-align:right;"> 30.3234 </td>
-   <td style="text-align:right;"> 32.3956 </td>
-   <td style="text-align:right;"> 34.6393 </td>
-   <td style="text-align:right;"> 39.1547 </td>
+   <td style="text-align:right;"> 26.6889 </td>
+   <td style="text-align:right;"> 30.2211 </td>
+   <td style="text-align:right;"> 32.3052 </td>
+   <td style="text-align:right;"> 34.4064 </td>
+   <td style="text-align:right;"> 38.6127 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[2] </td>
-   <td style="text-align:right;"> 25.6918 </td>
-   <td style="text-align:right;"> 28.6464 </td>
-   <td style="text-align:right;"> 30.3324 </td>
-   <td style="text-align:right;"> 32.0912 </td>
-   <td style="text-align:right;"> 35.6505 </td>
+   <td style="text-align:right;"> 25.6956 </td>
+   <td style="text-align:right;"> 28.5859 </td>
+   <td style="text-align:right;"> 30.2625 </td>
+   <td style="text-align:right;"> 31.9602 </td>
+   <td style="text-align:right;"> 35.2361 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> lambda[3] </td>
-   <td style="text-align:right;"> 25.0395 </td>
-   <td style="text-align:right;"> 27.4815 </td>
-   <td style="text-align:right;"> 28.8635 </td>
-   <td style="text-align:right;"> 30.2923 </td>
-   <td style="text-align:right;"> 33.1345 </td>
+   <td style="text-align:right;"> 25.0503 </td>
+   <td style="text-align:right;"> 27.4629 </td>
+   <td style="text-align:right;"> 28.8161 </td>
+   <td style="text-align:right;"> 30.2126 </td>
+   <td style="text-align:right;"> 32.8666 </td>
   </tr>
 </tbody>
 </table>
@@ -356,16 +362,16 @@ This seems reasonable, but let's make sure the `Rhat` values are less than 1.1. 
 library(coda)
 gelman.diag(falcon_res, multivariate = F)$psrf[1:10,] #don't want to print out all 40 lambdas
 #>           Point est. Upper C.I.
-#> alpha          1.004      1.013
-#> beta1          1.007      1.013
-#> beta2          1.004      1.016
-#> beta3          1.005      1.011
-#> lambda[1]      1.003      1.009
-#> lambda[2]      1.003      1.011
-#> lambda[3]      1.003      1.013
-#> lambda[4]      1.004      1.014
-#> lambda[5]      1.004      1.015
-#> lambda[6]      1.004      1.015
+#> alpha          1.002      1.008
+#> beta1          1.004      1.011
+#> beta2          1.004      1.012
+#> beta3          1.004      1.009
+#> lambda[1]      1.003      1.007
+#> lambda[2]      1.003      1.006
+#> lambda[3]      1.003      1.006
+#> lambda[4]      1.002      1.006
+#> lambda[5]      1.002      1.006
+#> lambda[6]      1.002      1.007
 ```
 
 All parameters appear to have converged.
@@ -491,51 +497,51 @@ summary(pairs_res[,c('alpha', 'beta1', 'beta2', 'p[1]', 'p[2]', 'p[3]')])$quanti
 <tbody>
   <tr>
    <td style="text-align:left;"> alpha </td>
-   <td style="text-align:right;"> 0.6743 </td>
-   <td style="text-align:right;"> 0.7485 </td>
-   <td style="text-align:right;"> 0.7860 </td>
-   <td style="text-align:right;"> 0.8233 </td>
-   <td style="text-align:right;"> 0.8950 </td>
+   <td style="text-align:right;"> 0.6699 </td>
+   <td style="text-align:right;"> 0.7432 </td>
+   <td style="text-align:right;"> 0.7818 </td>
+   <td style="text-align:right;"> 0.8188 </td>
+   <td style="text-align:right;"> 0.8914 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta1 </td>
-   <td style="text-align:right;"> -0.0278 </td>
-   <td style="text-align:right;"> 0.0292 </td>
-   <td style="text-align:right;"> 0.0584 </td>
-   <td style="text-align:right;"> 0.0886 </td>
-   <td style="text-align:right;"> 0.1444 </td>
+   <td style="text-align:right;"> -0.0298 </td>
+   <td style="text-align:right;"> 0.0279 </td>
+   <td style="text-align:right;"> 0.0585 </td>
+   <td style="text-align:right;"> 0.0893 </td>
+   <td style="text-align:right;"> 0.1469 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> beta2 </td>
-   <td style="text-align:right;"> -0.3868 </td>
-   <td style="text-align:right;"> -0.3330 </td>
-   <td style="text-align:right;"> -0.3059 </td>
-   <td style="text-align:right;"> -0.2782 </td>
-   <td style="text-align:right;"> -0.2247 </td>
+   <td style="text-align:right;"> -0.3833 </td>
+   <td style="text-align:right;"> -0.3305 </td>
+   <td style="text-align:right;"> -0.3026 </td>
+   <td style="text-align:right;"> -0.2747 </td>
+   <td style="text-align:right;"> -0.2220 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[1] </td>
-   <td style="text-align:right;"> 0.3903 </td>
-   <td style="text-align:right;"> 0.4349 </td>
-   <td style="text-align:right;"> 0.4595 </td>
-   <td style="text-align:right;"> 0.4843 </td>
-   <td style="text-align:right;"> 0.5307 </td>
+   <td style="text-align:right;"> 0.3893 </td>
+   <td style="text-align:right;"> 0.4352 </td>
+   <td style="text-align:right;"> 0.4602 </td>
+   <td style="text-align:right;"> 0.4854 </td>
+   <td style="text-align:right;"> 0.5324 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[2] </td>
-   <td style="text-align:right;"> 0.4171 </td>
+   <td style="text-align:right;"> 0.4163 </td>
    <td style="text-align:right;"> 0.4591 </td>
-   <td style="text-align:right;"> 0.4820 </td>
-   <td style="text-align:right;"> 0.5047 </td>
-   <td style="text-align:right;"> 0.5477 </td>
+   <td style="text-align:right;"> 0.4825 </td>
+   <td style="text-align:right;"> 0.5058 </td>
+   <td style="text-align:right;"> 0.5489 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> p[3] </td>
-   <td style="text-align:right;"> 0.4433 </td>
-   <td style="text-align:right;"> 0.4823 </td>
-   <td style="text-align:right;"> 0.5033 </td>
-   <td style="text-align:right;"> 0.5243 </td>
-   <td style="text-align:right;"> 0.5639 </td>
+   <td style="text-align:right;"> 0.4422 </td>
+   <td style="text-align:right;"> 0.4821 </td>
+   <td style="text-align:right;"> 0.5037 </td>
+   <td style="text-align:right;"> 0.5252 </td>
+   <td style="text-align:right;"> 0.5649 </td>
   </tr>
 </tbody>
 </table>
@@ -594,5 +600,8 @@ ggplot(falcons, aes(x = Year, y = Eyasses/R.Pairs))+
 2.  In our second analysis in lab, we used a binomial GLM to describe the proportion of successful peregrine pairs per year in the French Jura mountains. To see the connections between three important types of GLMs, first use a Poisson GLM to model the number of successful pairs (thus disregarding the fact that the binomial total varies by year), and second, use a normal GLM to do the same. In the same graph, compare the predicted numbers of successful pairs for every year under all three models (binomial, Poisson, and normal GLMs). [This assignment stolen directly from the WinBUGS book, so blame Marc Kéry and Michael Schaub for this one.]
 
 Note: If you find that your normal distribution model predicts extremely low counts, be sure to look at your priors. If selected correctly, you should see all 3 models roughly overlap the raw data.
+
+3. On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have? 
+
 
 3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?

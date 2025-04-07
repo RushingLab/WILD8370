@@ -414,7 +414,7 @@ for (i in 1:nInd){
 ```
 
 ---
-# multistate models
+# Multistate models
 
 #### Very flexible
 - Most capture-recapture models can be formulated as multi-state models (we will explore this more in the next lecture and lab)
@@ -429,3 +429,70 @@ for (i in 1:nInd){
 - Often not fully identifiable
 
 - Computationally intensive
+
+---
+# Example - Montana Toads (Our Favorite!)
+
+Consider a data set we've used before - toads in Montana being tested for chytrid. 
+
+```{r, echo = T}
+data('WyomingFrogs')
+head(frog_caps, n = 3)
+```
+
+If we're interested both in survival AND infection probability, a multistate model is one option for analyzing the data.
+
+---
+# Example - Montana Toads (Our Favorite!)
+
+Imagine we want to know both survival and infection probability by sex. This means we have 5 total states: Neg M, Neg F, Pos M, Pos F, and Dead. First let's just look at the true state probabilities. We will define the states in the order listed above. 
+
+```{r eval = FALSE, echo = TRUE}
+   # Define probabilities of state S(t+1) given S(t)
+      ps[1,1] <- phiNM * (1-psiNM) #prob Neg M to Neg M
+      ps[1,2] <- 0 #prob Neg M to Neg F
+      ps[1,3] <- phiNM * psiNM #prob Neg M to Pos M
+      ps[1,4] <- 0 #prob Neg M to Pos F
+      ps[1,5] <- 1-phiNM #prob Neg M to death
+      ps[2,1] <- 0 #prob Neg F to Neg M
+      ps[2,2] <- phiNF * (1-psiNF) #prob Neg F to Neg F
+      ps[2,3] <- 0 #prob Neg F to Pos M
+      ps[2,4] <- phiNF * psiNF #prob Neg F to Pos F
+      ps[2,5] <- 1-phiNF #prob Neg F to death
+      ...
+      etc. 
+```
+
+---
+# Example - Montana Toads (Our Favorite!)
+
+The next part of the model would need to describe our observation process. Even if we test every animal we capture, there's always a possibility of false negatives or false positives (tests can be wrong!). We can also just miss the animal. Let's assume we're very good at sexing animals and we capture males and females with equal probability.
+
+```{css, echo = F}
+.smaller .remark-code { 
+font-size: 65% !important;
+}
+```
+
+.smaller[
+```{r eval = FALSE, echo = TRUE}
+ # Define probabilities of O(t) given S(t)
+# Account for both capture probability and testing error
+      po[1,1] <- pCap * (1-pFalseP) #observed as Neg M given it was a Neg M
+      po[1,2] <- 0 #observed as Neg M given it was a Neg F. 
+      po[1,3] <- pCap * pFalseP #observed as Neg M given it was actually positive
+      po[1,4] <- 0 #observed as Neg M given it was a Pos F. 
+      po[1,5] <- 0 #observed as Neg M given it was dead
+      po[2,1] <- 0 #observed Neg F given it was a Neg M
+      po[2,2] <- pCap * (1-pFalseP) #observed Neg F given it was a Neg F
+      ...
+      ...
+      po[5,1] <- 1-pCap #not seen given it was Neg M 
+      po[5,2] <- 1-pCap #not seen given it was Neg F
+      po[5,3] <- 1-pCap #not seen given it was Pos M
+      po[5,4] <- 1-pCap #not seen given it was Pos F
+      po[5,5] <- 1 #not seen given it was dead
+      ... 
+      etc
+```
+]
