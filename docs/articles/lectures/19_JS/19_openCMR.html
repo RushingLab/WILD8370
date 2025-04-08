@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # Lecture 19
 ]
 .subtitle[
-## Open Population Mark Recapture
+## Open Population Mark Recapture Part 1
 ]
 .author[
 ### <br/><br/><br/>Spring 2025
@@ -29,10 +29,10 @@ class: center, middle, inverse, title-slide
 
 ## Readings
 
-&gt; 
+&gt; Analysis of Capture-Recapture Data By Rachel S. McCrea, Byron J. T. Morgan
 
 
-&gt; 
+&gt; Kéry &amp; Schaub Chapter 10
 
 ---
 ## Closed Capture-mark-recapture
@@ -120,7 +120,7 @@ among individuals. Remember the assumptions of the original CJS models:
 
 &lt;br/&gt;
 
-Closed CJS models are robust to this un-modeled variation; Open model are *NOT*
+Closed CJS models are robust to this un-modeled variation; Open models are *NOT*
 
 --
 
@@ -129,6 +129,9 @@ In his original papers, the likelihood was estimated in steps, by first estimati
 
 We no longer estimate the likelihood in this exact way, but we have 40+ years of technology and research on our side :) 
 
+---
+## The Open Population
+&lt;img src="figs/flow.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Assumptions of the Open C-R Models
@@ -146,6 +149,138 @@ We no longer estimate the likelihood in this exact way, but we have 40+ years of
 &lt;br/&gt;
 
 + The fate of individual animals and the fates of animals in differing cohorts are independent.
+
+
+---
+## Open C-R Models - Restricted Dynamic Occupancy
+#### Very similar to open occupancy models, except you can't come back from the dead
+`$$\Large z_{i1} \sim Bernoulli(\psi)$$`
+`$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} z_{it})\gamma)$$`
+
+
+`$$\Large y_{ikt} \sim Bernoulli(z_{it}p)$$`
+
+
+`$$\Large \psi \sim beta(1,1)$$`
+
+
+`$$\Large N_t = \sum_{i=1}^M z_{it}$$`
+---
+## Open C-R Models - Restricted Dynamic Occupancy
+
+What does this mean in the equation? 
+
+`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
+
+In these models, `\(z_{it}\)` = 0 means one of two things:
+
+  + This individual was previously alive and has died
+    
+  + This individual is availble to enter the population but hasn't entered it yet 
+    
+
+&lt;br/&gt; 
+
+We only want individuals that have not yet been born (or immigrated in) to enter the population. No zombies. 
+
+---
+## Open C-R Models - Restricted Dynamic Occupancy
+
+One problem with this formulation is that we only have a fixed number of individuals (`\(M\)`) in our augmented population  (that's why we augmented in the first place). 
+
+&lt;br/&gt;
+
+In time period 1, the expected number of newly arriving individuals is `\(M\gamma_1\)` (everyone is new). In time period 2, it is `\(M(1-\gamma_1)\gamma_2\)`.  More generally, it is `\(M \prod_{i=1}^{t-1}(1-\gamma_i)\gamma_t\)`. 
+
+&lt;br/&gt;
+
+Thus even if per capita recruitment is stable over time, the expected number of recruits will tend to **decrease** and `\(\gamma\)` becomes a biologically meaningless number. 
+
+&lt;br/&gt;
+
+This is not necessarily a problem and can be partially avoided by allowing `\(\gamma\)` to change over time. 
+
+---
+## Open C-R Models - Restricted Dynamic Occupancy
+
+Imagine a population that start with 20 individuals and `\(\gamma\)` = .2. Our augmented population brings us up to 200 individuals. Survival does not impact recruitment. 
+
+
+
+```
+##       Avail Not Avail Recruits Recruitment Probability
+##  [1,]   180        20       20                  0.2000
+##  [2,]   144        56       36                  0.2500
+##  [3,]   115        85       29                  0.2522
+##  [4,]    92       108       23                  0.2500
+##  [5,]    74       126       18                  0.2432
+##  [6,]    59       141       15                  0.2542
+##  [7,]    47       153       12                  0.2553
+##  [8,]    38       162        9                  0.2368
+##  [9,]    30       170        8                  0.2667
+## [10,]    24       176        6                  0.2500
+```
+
+---
+## Open C-R Models - Restricted Dynamic Occupancy
+
+If the number of recruits is stable over time (rather than `\(\gamma\)`), how does entry probability have to change to accommodate that?
+
+
+```
+##       Avail Not Avail Recruits Entry Probability
+##  [1,]   180        20       20            0.2000
+##  [2,]   160        40       20            0.1250
+##  [3,]   140        60       20            0.1429
+##  [4,]   120        80       20            0.1667
+##  [5,]   100       100       20            0.2000
+##  [6,]    80       120       20            0.2500
+##  [7,]    60       140       20            0.3333
+##  [8,]    40       160       20            0.5000
+##  [9,]    20       180       20            1.0000
+## [10,]     0       200       20               Inf
+```
+
+---
+## Open C-R Models - Per Capita
+
+An alternative way of modeling recruitment is to use per-capita recruitment. 
+
+Let `\(\Large A_{t}\)` represent the sum of all the individuals available for recruitment in time `\(t\)`. Then instead of introducing recruitment via:
+
+`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
+
+We use:
+
+`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$`
+where 
+`$$\Large \gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$`
+Thus we are weighting the value of `\(\gamma\)` by the number of individuals that are alive in the last time period and the total number still available to be recruited. 
+
+
+---
+## Open C-R Models - Per Capita
+
+Imagine that same population that started with 20 individuals and `\(\gamma\)` = .2. Our augmented population brings us up to 200 individuals. Let `\(\phi\)` = 0.95. 
+
+
+```
+##       Avail Not Avail Recruits Now Alive Entry Probability
+##  [1,]   180        20       20        20           0.20000
+##  [2,]   175        25        5        20           0.02222
+##  [3,]   173        27        2        18           0.02286
+##  [4,]   171        29        2        18           0.02081
+##  [5,]   168        32        3        18           0.02105
+##  [6,]   162        38        6        17           0.02143
+##  [7,]   159        41        3        15           0.02099
+##  [8,]   156        44        3        15           0.01887
+##  [9,]   155        45        1        14           0.01923
+## [10,]   154        46        1        13           0.01806
+```
+
+
+
+
 
 
 
