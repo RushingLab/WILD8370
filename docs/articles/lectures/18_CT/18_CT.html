@@ -363,14 +363,14 @@ Assuming the detection rate of alive individuals is `\(\lambda\)` (and is 0 for 
 0 &amp; 0
 \end{bmatrix}}$$`
 
-And probability of being detected after `\(\Delta\)` units of time (but not before) is `\(\large \Lambda e^{-\Lambda \Delta}\)`
+And probability of being detected after `\(\Delta\)` units of time (but not before) is $\large e^{-\Lambda \Delta}\Lambda $
 
 ---
 # the cjs as a continuous-time model
 
 We can combine the two intensity matrices to calculate the probability of surviving and being detected after `\(\Delta\)`:
 
-`$$\Large \Gamma = e^{Q\Delta} \times \Lambda e^{-\Lambda \Delta} = \Lambda e^{(Q \Delta - \Lambda \Delta)} = \Lambda e^{(Q-\Lambda) \Delta}$$`
+`$$\Large \Gamma = e^{Q\Delta} \times e^{-\Lambda \Delta} \Lambda = e^{(Q \Delta - \Lambda \Delta)} \Lambda = e^{(Q-\Lambda) \Delta}\Lambda$$`
 --
 
 For the first encounter of our imaginary individual: 
@@ -378,13 +378,13 @@ For the first encounter of our imaginary individual:
 
 ```r
 Lambda &lt;- matrix(c(0.5, 0, 0, 0), 2, 2)
-(Gamma1 &lt;- Lambda %*% expm::expm((Q - Lambda) * Delta[1]))
+(Gamma1 &lt;- expm::expm((Q - Lambda) * Delta[1])) %*% Lambda
 ```
 
 ```
-##        [,1]    [,2]
-## [1,] 0.2483 0.07192
-## [2,] 0.0000 0.00000
+##        [,1] [,2]
+## [1,] 0.2483    0
+## [2,] 0.0000    0
 ```
 
 What is the interpretation of each element of `\(\Gamma\)`?
@@ -392,9 +392,9 @@ What is the interpretation of each element of `\(\Gamma\)`?
 --
 
 - `\(\Gamma_{1,1}\)` = if alive at time `\(t_0\)`, probability of being alive and detected at `\(t_1\)`
-- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being alive and detected after `\(t_1\)`
-- `\(\Gamma_{1,2}\)` = if alive at time `\(t_0\)`, probability of being dead and not detected at `\(t_1\)`
-- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being dead and not detected after `\(t_1\)`
+- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being alive and detected at `\(t_1\)`
+- `\(\Gamma_{1,2}\)` = if alive at time `\(t_0\)`, probability of being dead and detected at `\(t_1\)`
+- `\(\Gamma_{2,1}\)` = if dead at time `\(t_0\)`, probability of being dead and detected at `\(t_1\)`
 
 ---
 # the cjs as a continuous-time model
