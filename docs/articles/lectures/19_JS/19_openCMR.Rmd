@@ -153,7 +153,7 @@ knitr::include_graphics("figs/flow.png")
 
 <br/>
 
-+ All animals, both marked and unmarked have the *same* capture probability (if you want to violate this, use an SCR models)
++ All animals, both marked and unmarked have the *same* capture probability (if you want to violate this, use an SCR models or Band-resight models)
 
 
 ---
@@ -252,10 +252,6 @@ Z
 ```
 
 ---
-## Restricted Dynamic Occupancy in Nimble
-
-
----
 ## Restricted Dynamic Occupancy Pros and Cons
 
 Pros:
@@ -271,6 +267,13 @@ Cons:
   + Gamma parameter is biologically meaningless 
   
   + Can't put a prior on the superpopulation (total ever alive)
+  
+
+---
+## Restricted Dynamic Occupancy in Nimble
+
+
+
 
 ---
 ## Open C-R Models - Per Capita

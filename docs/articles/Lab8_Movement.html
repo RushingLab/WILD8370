@@ -74,6 +74,7 @@
     <li><a class="dropdown-item" href="../articles/Lab8_Movement.html">Lab 8: Resource Selection Functions</a></li>
     <li><a class="dropdown-item" href="../articles/Lab9_SCR.html">Lab 9: Spatial Capture Recapture</a></li>
     <li><a class="dropdown-item" href="../articles/Lab10_CJS.html">Lab 10: CJS</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab11_Multistate.html">Lab 11: Continuous-time CMR</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -172,7 +173,7 @@ dataset after scaling:</p>
 <span><span class="va">npixels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">distmat</span><span class="op">)</span></span>
 <span><span class="co">## Covariance matrix</span></span>
 <span><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.4</span><span class="op">*</span><span class="va">distmat</span><span class="op">)</span></span>
-<span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/chol.html" class="external-link">chol</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
+<span><span class="va">R</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/chol-methods.html" class="external-link">chol</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
 <span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/transpose.html" class="external-link">t</a></span><span class="op">(</span><span class="va">R</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">npixels</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Canopy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span>nrows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">grid0</span><span class="op">)</span>, ncols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">grid0</span><span class="op">)</span><span class="op">)</span></span>
