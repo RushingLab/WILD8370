@@ -91,7 +91,8 @@ navbar:
           href: articles/Lab9_SCR.html
         - text: "Lab 10: CJS"
           href: articles/Lab10_CJS.html
-
+        - text: "Lab 11: Continuous-time CMR"
+          href: articles/Lab11_Multistate.html
     - icon: far fa-bookmark
       text: "References"
       menu:
