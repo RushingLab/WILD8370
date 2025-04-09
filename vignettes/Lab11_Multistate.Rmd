@@ -136,7 +136,7 @@ for(i in 1:N){
 }
 ```
 
-To fit the model, we next need to calculate the time between detections $\Delta t$. For each individual's first detection, $\Delta t_1 = t_1 - 0 = t_1$. We will also include the time from each individual's last detection to the end of the study $\Delta t_{U+1} = T - t_{U+1}$. 
+To fit the continuous-time model, we also need to calculate the time between detections $\Delta t$. For each individual's first detection, $\Delta t_1 = t_1 - 0 = t_1$. We will also include the time from each individual's last detection to the end of the study $\Delta t_{U+1} = T - t_{U+1}$. 
 
 ```{r}
 # Calculate time difference between detections (including last detection to end of study)
@@ -167,7 +167,7 @@ Next, we need to fill in the observed states. We can use the `cut()` function to
 
 ```{r}
 # Cut returns a factor, so convert to numeric
-bin <- as.numeric(cut(det_list[[6]], breaks = seq(0, 100, by = 10)))
+bin <- as.numeric(cut(det_list[[6]], breaks = seq(0, T, by = 10)))
 obs_state <- state_list[[6]]
 
 data.frame(bin, obs_state)
@@ -242,7 +242,7 @@ Prepare the data and fit the model:
 f <- rep(1, N)
 z <- z.init <- d
 
-### NA for occasion 1 (deterministic) or where individual was not captured
+### NA for occasion 1 (deterministic) or occasions individual was not captured
 z[,1] <- NA
 z[z == 3] <- NA
 
@@ -344,7 +344,8 @@ dCTMS <- nimbleFunction(
 
 The `nimbleFunction()` function allows us to define our own functions to use inside of nimble models using notation that is similar to creating functions in R. Our `dCTMS()` function takes two matrices (`Q` and `Lambda`), the time between the detections, the observed states associated with each detection, and whether or not it was the individuals last detection. The function then returns the associated likelihood of that detection, using some matrix algebra that you can read about elsewhere if you really want to know how it works. 
 
-To use the function in our nimble model, we need to first compile it. We can then test that it works correctly by testing it against the expm() function:
+To use the function in our nimble model, we need to first compile it. We can then test that it works correctly by testing it against the `expm()` function: 
+
 ```{r}
 C_dCTMS <- compileNimble(dCTMS)
 C_dCTMS(Q = Q, Lambda = diag(lambda), delta = 0.75, s1 = 1, s2 = 2)
@@ -354,8 +355,7 @@ C_dCTMS(Q = Q, Lambda = diag(lambda), delta = 0.75, s1 = 1, s2 = 2, last = T)
 sum(expm::expm((Q - diag(lambda)) * 0.75)[1,])
 ```
 
-Now we're ready to write the model code and estimate the parameters. To make the code a little easier, we will distinguish between three groups of individuals - those never recountered, those recaptured once, and those captured more than once. Those groups have slightly different indexing to calculate their likelihoods, so this makes it slightly easier:
-
+Now we're ready to write the model code and estimate the parameters. To make the code a little easier, we will distinguish between three groups of individuals - those never recountered, those recaptured once, and those captured more than once. Those groups have different indexing to calculate their likelihoods, so this makes it slightly easier (though probably slower):
 
 ```{r eval = F}
 ct_ms <- nimbleCode({
@@ -435,23 +435,23 @@ Next, we'll create the data objects, constants, and initiatial values. Note that
 
 ```{r eval = F}
 ord <- order(U)    
-data1 <- list(zeros=rep(0, N))
-const1 <- list(N = N, N0 = sum(U == 0), 
+ct_data <- list(zeros=rep(0, N))
+ct_const <- list(N = N, N0 = sum(U == 0), 
                N1 = sum(U==1),
                U = U[ord], 
                delta = delta[ord,], 
                state = state[ord,])
-inits1 <- function(){list(h=runif(2, 0, 0.005), 
+ct_inits <- function(){list(h=runif(2, 0, 0.005), 
                           eta12 = runif(1, 0, 0.05), p = c(runif(2, 0, 0.5), NA))}
 
 # Parameters monitored
-parameters <- c("h", "p", "eta12")
+param <- c("h", "p", "eta12")
 
 ct_fit <- nimbleMCMC(code = ct_ms,
-                     data = data1,
-                     constants = const1,
-                     inits = inits1,
-                     monitors = parameters,
+                     data = ct_data,
+                     constants = ct_const,
+                     inits = ct_inits,
+                     monitors = param,
                      thin = 1,
                      niter = 1500,
                      nburnin = 500,
