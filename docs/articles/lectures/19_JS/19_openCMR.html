@@ -124,10 +124,28 @@ Closed CJS models are robust to this un-modeled variation; Open models are *NOT*
 
 --
 
-In his original papers, the likelihood was estimated in steps, by first estimating each primary period as a closed population model and then separately estimating the likelihood of moving from one time period to the next. 
+In his original papers, the likelihood was estimated ah-hoc, by first estimating each primary period as a closed population model and then separately estimating the likelihood of moving from one time period to the next. 
 
 
 We no longer estimate the likelihood in this exact way, but we have 40+ years of technology and research on our side :) 
+
+---
+## Robust Design
+
+Advantages of the Robust Design:
+
+
+  + Estimates of `\(p\)` (and thus, `\(N\)` and `\(\gamma\)`) are less biased by heterogeneity in capture probability 
+  
+
+  + Temporary emigration can be estimated (in most cases)
+  
+
+  + If there is no temporary emigration, can estimate `\(N\)`, `\(\phi\)` and `\(\gamma\)` in all time periods (not possible with classic JS models)
+  
+
+  + Better precision on estimates 
+
 
 ---
 ## The Open Population
@@ -144,11 +162,17 @@ We no longer estimate the likelihood in this exact way, but we have 40+ years of
 
 &lt;br/&gt;
 
-+ Tagging is accurate, no tag loss, no misread tags, no data entry errors.
++ Tagging is accurate, no tag loss, no misread tags, no data entry errors
 
 &lt;br/&gt;
 
-+ The fate of individual animals and the fates of animals in differing cohorts are independent.
++ The fate of individual animals and the fates of animals in differing cohorts are independent
+
+&lt;br/&gt;
+
++ All animals, both marked and unmarked have the *same* capture process/probability**
+
+** unless you use the robust design
 
 
 ---
@@ -158,7 +182,7 @@ We no longer estimate the likelihood in this exact way, but we have 40+ years of
 `$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} z_{it})\gamma)$$`
 
 
-`$$\Large y_{ikt} \sim Bernoulli(z_{it}p)$$`
+`$$\Large y_{it} \sim Binomial(z_{it}p, J)$$`
 
 
 `$$\Large \psi \sim beta(1,1)$$`
@@ -240,22 +264,128 @@ If the number of recruits is stable over time (rather than `\(\gamma\)`), how do
 ##  [9,]    20       180       20            1.0000
 ## [10,]     0       200       20               Inf
 ```
+---
+## Parameters of Interest
+
+Lots of parameters of potential interest in these models
+
+- `\(\phi\)` = probability of survival 
+
+- `\(\gamma\)` = biologically meaningless parameter indicating if you are 'removed' from the available population 
+
+- `\(N_t\)` = realized abundance in time `\(t\)`
+
+- `\(N_s\)` = total number of individuals ever alive (superpopulation)
+
+- `\(B_t\)` = realized recruits in time `\(t\)`
+
+- `\(b_t\)` = probability of being recruited in time `\(t\)` given that you ARE recruited at some point from time `\(t = 1\)` to time `\(t = T\)` (semi-meaningless biologically)
+
+- `\(\psi\)` = proportion of the total augmented population (real + imaginary) that are real
+
+- `\(f = \frac{B_t}{N_t}\)` = per capita realized recruitment 
+
+
+---
+## Restricted Dynamic Occupancy Pros and Cons
+
+Pros:
+
+  + Relatively fast 
+  
+  + Fairly simple code (all things considered)
+  
+  + Can be marginalized to remove `\(z\)` 
+  
+  
+
+Cons: 
+
+  + Gamma parameter is biologically meaningless 
+  
+  + Can't put a prior on the superpopulation (total ever alive)
+  
+  + Can't put a prior on fecundity 
+  
+  + Recruitment probability remains a black box
+  
+
+---
+## Restricted Dynamic Occupancy in Nimble
+
+State Process
+
+``` r
+openCR1 &lt;- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] &lt;-  1-z[i,1] #available for recruitment
+
+  for(t in 2:nocc){
+    phi.p[i,t] &lt;- phi*z[i,t-1] + a[i,t-1]*gamma[t] #effective survival or recruitment 
+    a[i,t] &lt;- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
+
+---
+## Restricted Dynamic Occupancy in Nimble
+
+Detection Process
+
+``` r
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+  }#i
+  } #t
+```
+
+---
+## Restricted Dynamic Occupancy in Nimble
+
+Derived Parameters
+
+``` r
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] &lt;- sum(z[1:M, t]) #realized abundance in time t
+    A[t] &lt;- sum(a[1:M, t]) #available for recruitment in time t
+    qgamma[t] &lt;- 1-gamma[t] #not entering this time period
+  } #end t
+  cprob[1] &lt;- gamma[1] #expected recruitment probability 
+  for(t in 2:nocc){
+    cprob[t] &lt;- gamma[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] &lt;- A[t-1]-A[t] #how many actually got recruited
+    f[t] &lt;- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi &lt;- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] &lt;- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper &lt;- M-A[nocc] #Superpopulation (ever alive)
+})
+```
 
 ---
 ## Open C-R Models - Per Capita
 
-An alternative way of modeling recruitment is to use per-capita recruitment. 
-
 Let `\(\Large A_{t}\)` represent the sum of all the individuals available for recruitment in time `\(t\)`. Then instead of introducing recruitment via:
 
-`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
+`$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
 
 We use:
 
-`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$`
+`$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$`
 where 
-`$$\Large \gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$`
-Thus we are weighting the value of `\(\gamma\)` by the number of individuals that are alive in the last time period and the total number still available to be recruited. 
+`$$\gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$`
+Thus we are weighting the value of `\(\gamma\)` by the number of individuals that are alive in the last time period and the total number still available to be recruited.
 
 
 ---
@@ -267,20 +397,106 @@ Imagine that same population that started with 20 individuals and `\(\gamma\)` =
 ```
 ##       Avail Not Avail Recruits Now Alive Entry Probability
 ##  [1,]   180        20       20        20           0.20000
-##  [2,]   175        25        5        20           0.02222
-##  [3,]   173        27        2        18           0.02286
-##  [4,]   171        29        2        18           0.02081
-##  [5,]   168        32        3        18           0.02105
-##  [6,]   162        38        6        17           0.02143
-##  [7,]   159        41        3        15           0.02099
-##  [8,]   156        44        3        15           0.01887
-##  [9,]   155        45        1        14           0.01923
-## [10,]   154        46        1        13           0.01806
+##  [2,]   176        24        4        19           0.02222
+##  [3,]   170        30        6        19           0.02159
+##  [4,]   168        32        2        19           0.02235
+##  [5,]   164        36        4        17           0.02262
+##  [6,]   161        39        3        17           0.02073
+##  [7,]   152        48        9        16           0.02112
+##  [8,]   146        54        6        15           0.02105
+##  [9,]   141        59        5        14           0.02055
+## [10,]   139        61        2        14           0.01986
 ```
 
+---
+## Open C-R Models - Per Capita in Nimble
 
+In Nimble, we only need to change a few lines:
 
+``` r
+openCR2 &lt;- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] &lt;-  1-z[i,1] #available for recruitment
 
+  for(t in 2:nocc){
+    gammaPrime[t] &lt;- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
+    phi.p[i,t] &lt;- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+    a[i,t] &lt;- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
+
+---
+## Open C-R Models - Per Capita in Nimble
+
+Detection Process (doesn't change)
+
+``` r
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+  }#i
+  } #t
+```
+
+---
+## Open C-R Models - Per Capita in Nimble
+Derived Parameters (small change)
+
+``` r
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] &lt;- sum(z[1:M, t]) #realized abundance in time t
+    A[t] &lt;- sum(a[1:M, t]) #available for recruitment in time t
+  } #end t
+  cprob[1] &lt;- gamma[1] #expected recruitment probability 
+  qgamma[1] &lt;- 1 - gamma[1]
+  for(t in 2:nocc){
+    qgamma[t] &lt;- 1-gammaPrime[t] #not entering this time period
+    cprob[t] &lt;- gammaPrime[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] &lt;- A[t-1]-A[t] #how many actually got recruited
+    f[t] &lt;- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi &lt;- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] &lt;- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper &lt;- M-A[nocc] #Superpopulation (ever alive)
+})
+```
+
+---
+## Parameters of Interest
+
+To review:
+
+- `\(\phi\)` = probability of survival 
+
+- `\(\gamma\)` = biologically meaningless parameter indicating if you are 'removed' from the available population 
+
+- `\(N_t\)` = realized abundance in time `\(t\)`
+
+- `\(N_s\)` = total number of individuals ever alive (superpopulation)
+
+- `\(B_t\)` = realized recruits in time `\(t\)`
+
+- `\(b_t\)` = probability of being recruited in time `\(t\)` given that you ARE recruited at some point from time `\(t = 1\)` to time `\(t = T\)` 
+
+- `\(\psi\)` = proportion of the total augmented population (real + imaginary) that are real
+
+- `\(f = \frac{B_t}{N_t}\)` = per capita realized recruitment 
+
+---
+## All parameters are connected 
+
+&lt;img src="figs/book.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 
 

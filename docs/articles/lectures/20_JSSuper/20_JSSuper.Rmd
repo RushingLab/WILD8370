@@ -1,0 +1,90 @@
+---
+title: "Lecture 20"
+subtitle: "Open Population Mark Recapture Part 2"
+author: "<br/><br/><br/>Spring 2025"
+output:
+  xaringan::moon_reader:
+    css: ["default", "FANR8370.css", "FANR8370-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+      slideNumberFormat: '%current%' 
+---
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', warning=FALSE, message=FALSE,fig.retina = 2)
+library(WILD8370)
+library(nimble)
+library(MCMCvis)
+library(ggforce)
+source(here::here("R/zzz.R"))
+# library(gganimate)
+```
+## Readings
+
+> Analysis of Capture-Recapture Data By Rachel S. McCrea, Byron J. T. Morgan
+
+
+> Kéry & Schaub Chapter 10
+
+---
+## Review
+
+Lots of parameters of potential interest in these models
+
+- $\phi$ = probability of survival 
+
+- $\gamma$ = biologically meaningless parameter indicating if you are 'removed' from the available population 
+
+- $N_t$ = realized abundance in time $t$
+
+- $N_s$ = total number of individuals ever alive (superpopulation)
+
+- $B_t$ = realized recruits in time $t$
+
+- $b_t$ = probability of being recruited in time $t$ given that you ARE recruited at some point from time $t = 1$ to time $t = T$ (semi-meaningless biologically)
+
+- $\psi$ = proportion of the total augmented population (real + imaginary) that are real
+
+- $f = \frac{B_t}{N_t}$ = per capita realized recruitment 
+
+---
+## "POPAN Style" Superpopulation Model 
+
+
+
+---
+## Pros and Cons - POPAN 
+
+One limitation of the POPAN data type is with the use of individual covariates.  
+
+Super-populations size (N) estimates the number of animals never captured, this parameter includes animals for which the individual covariate is not known.  Thus, modeling N as a function of individual covariates is inappropriate. 
+
+---
+## Pros and Cons - General 
+
+####Regardless of parameterization, fully time-dependent models are hard 
+
+In a fully time-dependent model (both $p$ and $\phi$ vary with time) 
+
+    + Cannot separately estimate first entry probability and first capture probability 
+    
+    + Cannot separately estimate last surival and last capture probability without robust design
+    
+
+
+---
+## Other Models Exist
+
+  + Pradel Model (reverse-time formulation)
+  
+  + Link-Barker Model (allows for direct prior on per-capita fecundity)
+  
+  + Multi-state Formulation
+
+
+

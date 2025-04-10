@@ -1,6 +1,6 @@
 ---
 title: "Lecture 19"
-subtitle: "Open Population Mark Recapture"
+subtitle: "Open Population Mark Recapture Part 1"
 author: "<br/><br/><br/>Spring 2025"
 output:
   xaringan::moon_reader:
@@ -123,10 +123,28 @@ Closed CJS models are robust to this un-modeled variation; Open models are *NOT*
 
 --
 
-In his original papers, the likelihood was estimated in steps, by first estimating each primary period as a closed population model and then separately estimating the likelihood of moving from one time period to the next. 
+In his original papers, the likelihood was estimated ah-hoc, by first estimating each primary period as a closed population model and then separately estimating the likelihood of moving from one time period to the next. 
 
 
 We no longer estimate the likelihood in this exact way, but we have 40+ years of technology and research on our side :) 
+
+---
+## Robust Design
+
+Advantages of the Robust Design:
+
+
+  + Estimates of $p$ (and thus, $N$ and $\gamma$) are less biased by heterogeneity in capture probability 
+  
+
+  + Temporary emigration can be estimated (in most cases)
+  
+
+  + If there is no temporary emigration, can estimate $N$, $\phi$ and $\gamma$ in all time periods (not possible with classic JS models)
+  
+
+  + Better precision on estimates 
+
 
 ---
 ## The Open Population
@@ -153,7 +171,9 @@ knitr::include_graphics("figs/flow.png")
 
 <br/>
 
-+ All animals, both marked and unmarked have the *same* capture probability (if you want to violate this, use an SCR models or Band-resight models)
++ All animals, both marked and unmarked have the *same* capture process/probability**
+
+** unless you use the robust design
 
 
 ---
@@ -250,6 +270,27 @@ for(t in 2:nocc){
 colnames(Z) <- c("Avail", "Not Avail", "Recruits", "Entry Probability")
 Z
 ```
+---
+## Parameters of Interest
+
+Lots of parameters of potential interest in these models
+
+- $\phi$ = probability of survival 
+
+- $\gamma$ = biologically meaningless parameter indicating if you are 'removed' from the available population 
+
+- $N_t$ = realized abundance in time $t$
+
+- $N_s$ = total number of individuals ever alive (superpopulation)
+
+- $B_t$ = realized recruits in time $t$
+
+- $b_t$ = probability of being recruited in time $t$ given that you ARE recruited at some point from time $t = 1$ to time $t = T$ (semi-meaningless biologically)
+
+- $\psi$ = proportion of the total augmented population (real + imaginary) that are real
+
+- $f = \frac{B_t}{N_t}$ = per capita realized recruitment 
+
 
 ---
 ## Restricted Dynamic Occupancy Pros and Cons
@@ -260,6 +301,8 @@ Pros:
   
   + Fairly simple code (all things considered)
   
+  + Can be marginalized to remove $z$ 
+  
   
 
 Cons: 
@@ -268,27 +311,83 @@ Cons:
   
   + Can't put a prior on the superpopulation (total ever alive)
   
+  + Can't put a prior on fecundity 
+  
+  + Recruitment probability remains a black box
+  
 
 ---
 ## Restricted Dynamic Occupancy in Nimble
 
+State Process
+```{r, echo = T, eval = F}
+openCR1 <- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] <-  1-z[i,1] #available for recruitment
 
+  for(t in 2:nocc){
+    phi.p[i,t] <- phi*z[i,t-1] + a[i,t-1]*gamma[t] #effective survival or recruitment 
+    a[i,t] <- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
 
+---
+## Restricted Dynamic Occupancy in Nimble
+
+Detection Process
+```{r, echo = T, eval = F}
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+  }#i
+  } #t
+```
+
+---
+## Restricted Dynamic Occupancy in Nimble
+
+Derived Parameters
+```{r, echo = T, eval = F}
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] <- sum(z[1:M, t]) #realized abundance in time t
+    A[t] <- sum(a[1:M, t]) #available for recruitment in time t
+    qgamma[t] <- 1-gamma[t] #not entering this time period
+  } #end t
+  cprob[1] <- gamma[1] #expected recruitment probability 
+  for(t in 2:nocc){
+    cprob[t] <- gamma[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] <- A[t-1]-A[t] #how many actually got recruited
+    f[t] <- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi <- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] <- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper <- M-A[nocc] #Superpopulation (ever alive)
+})
+```
 
 ---
 ## Open C-R Models - Per Capita
 
-An alternative way of modeling recruitment is to use per-capita recruitment. 
-
 Let $\Large A_{t}$ represent the sum of all the individuals available for recruitment in time $t$. Then instead of introducing recruitment via:
 
-$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$
+$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma$$
 
 We use:
 
-$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$
+$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$
 where 
-$$\Large \gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$
+$$\gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$
 Thus we are weighting the value of $\gamma$ by the number of individuals that are alive in the last time period and the total number still available to be recruited.
 
 
@@ -319,38 +418,93 @@ Z
 ```
 
 ---
-## "POPAN Style" Superpopulation Model 
+## Open C-R Models - Per Capita in Nimble
 
+In Nimble, we only need to change a few lines:
+```{r, echo = T, eval = F}
+openCR2 <- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] <-  1-z[i,1] #available for recruitment
 
-
----
-## Pros and Cons - POPAN 
-
-One limitation of the POPAN data type is with the use of individual covariates.  
-
-Super-populations size (N) estimates the number of animals never captured, this parameter includes animals for which the individual covariate is not known.  Thus, modeling N as a function of individual covariates is inappropriate. 
-
----
-## Pros and Cons - General 
-
-##Regardless of parameterization, fully time-dependent models are hard 
-
-In a fully time-dependent model (both $p$ and $\phi$ vary with time) 
-
-    + Cannot separately estimate first entry probability and first capture probability 
-    
-    + Cannot separately estimate last surival and last capture probability 
-    
-
+  for(t in 2:nocc){
+    gammaPrime[t] <- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
+    phi.p[i,t] <- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+    a[i,t] <- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
 
 ---
-## Other Models Exist
+## Open C-R Models - Per Capita in Nimble
 
-  + Pradel Model (reverse-time formulation)
-  
-  + Link-Barker Model (allows for direct prior on per-capita fecundity)
-  
-  + Multi-state Formulation
+Detection Process (doesn't change)
+```{r, echo = T, eval = F}
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+  }#i
+  } #t
+```
+
+---
+## Open C-R Models - Per Capita in Nimble
+Derived Parameters (small change)
+```{r, echo = T, eval = F}
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] <- sum(z[1:M, t]) #realized abundance in time t
+    A[t] <- sum(a[1:M, t]) #available for recruitment in time t
+  } #end t
+  cprob[1] <- gamma[1] #expected recruitment probability 
+  qgamma[1] <- 1 - gamma[1]
+  for(t in 2:nocc){
+    qgamma[t] <- 1-gammaPrime[t] #not entering this time period
+    cprob[t] <- gammaPrime[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] <- A[t-1]-A[t] #how many actually got recruited
+    f[t] <- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi <- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] <- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper <- M-A[nocc] #Superpopulation (ever alive)
+})
+```
+
+---
+## Parameters of Interest
+
+To review:
+
+- $\phi$ = probability of survival 
+
+- $\gamma$ = biologically meaningless parameter indicating if you are 'removed' from the available population 
+
+- $N_t$ = realized abundance in time $t$
+
+- $N_s$ = total number of individuals ever alive (superpopulation)
+
+- $B_t$ = realized recruits in time $t$
+
+- $b_t$ = probability of being recruited in time $t$ given that you ARE recruited at some point from time $t = 1$ to time $t = T$ 
+
+- $\psi$ = proportion of the total augmented population (real + imaginary) that are real
+
+- $f = \frac{B_t}{N_t}$ = per capita realized recruitment 
+
+---
+## All parameters are connected 
+
+```{r out.width = "75%"}
+knitr::include_graphics("figs/book.png")
+```
 
 
 
