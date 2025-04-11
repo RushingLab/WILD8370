@@ -229,10 +229,12 @@ There appears to be a slight negative effect of elevation on deer movements. In 
 
 ## Homework
 
-1. In the WILD8370 package, you'll find a dataset called `coyote_moves`. This object contains a named list. The first list is some data collected by Dr. Chamberlain et al from collared coyotes. The second is the matrix version of a raster containing information about the distance to roads (in meters). The EPSG code for this raster is 4326. Use this data to fit an RSF like we did above to this new dataset. Several steps will be required:
+1. In the WILD8370 package, you'll find a dataset called `coyote_moves`. This object contains a named list. The first list is some data collected by Dr. Chamberlain et al from collared coyotes. The second is the matrix version of a raster containing information about the distance to roads (in meters). The EPSG code for this raster is 26917. Use this data to fit an RSF like we did above to the 2019 coyote points. Several steps will be required:
     + Make sure the points are in order by date for each individual 
-    + Convert Latitude and Longitude to UTMs (EPSG 4326 aka UTM 17N)
+    + Convert Latitude and Longitude to UTMs (EPSG 26917 aka UTM 17N)
     + Find the easting and northing values for each collar location based on the aspect of the roads tif 
+    + Remove any points that don't fall on the tif
+    + Fit the model
 
 2. Using the deer collar data, fit a correlated random walk (see slide 16 from lecture for a refresher). Report your estimates for $\gamma$ and $\sigma$. 
 
