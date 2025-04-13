@@ -34,6 +34,9 @@ class: center, middle, inverse, title-slide
 
 &gt; Kéry &amp; Schaub Chapter 10
 
+
+&gt; http://www.phidot.org/software/mark/docs/book/pdf/chap12.pdf
+
 ---
 ## Review
 
@@ -56,16 +59,72 @@ Lots of parameters of potential interest in these models
 - `\(f = \frac{B_t}{N_t}\)` = per capita realized recruitment 
 
 ---
-## "POPAN Style" Superpopulation Model 
+## JS Open Population Model 
 
+In the classic Jolly-Seber formulation, the population followed this structure:
 
+&lt;img src="figs/js.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+Here, what the authors call `\(M_t\)` is just marked individuals, so `\(M_t\)` + `\(U_t\)` = `\(N_t\)`.
+---
+## POPAN Style Superpopulation Model 
+
+First published by Schwarz et al. (1993) and then Schwarz and Arnason (1996). The model was run using a software package called "POPAN", hence we now call it the "POPAN model". 
+
+This formulation was much more ground-breaking before we had data augmentation techniques.
+
+&lt;img src="figs/popan.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
-## Pros and Cons - POPAN 
+## POPAN Style Superpopulation Model 
 
-One limitation of the POPAN data type is with the use of individual covariates.  
+As mentioned, this formulation has very little impact when we actually go to code the model in Nimble. 
 
-Super-populations size (N) estimates the number of animals never captured, this parameter includes animals for which the individual covariate is not known.  Thus, modeling N as a function of individual covariates is inappropriate. 
+&lt;br/&gt;
+
+In our Bayesian framework, `\(N_s\)` = `\(\psi*M\)` (proportion of total augmented population ever alive).
+
+&lt;br/&gt;
+
+Then at each time set, animals can enter the population with some probability `\(b\)`, such that the expected value of recruits in each time step is just `\(N_s*b\)` = `\(\psi*M*b\)`. 
+
+&lt;br/&gt;
+
+Assuming you are using data augmentation and the robust design, the only difference is that animals can be alive (z = 1) but not real. This has some implications for MCMC mixing but no biological difference. 
+
+---
+## POPAN Model in Nimble
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 85% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+for (i in 1:M){
+    w[i] ~ dbern(psi)   # Draw latent inclusion
+    z[i,1] ~ dbern(nu[1])
+    # Observation process
+    mu1[i] &lt;- p[i,1] * z[i,1] * w[i]
+    y[i,1] ~ dbern(mu1[i])
+    # Subsequent occasions
+    for (t in 2:n.occasions){
+       # State process
+       q[i,t-1] &lt;- 1-z[i,t-1]
+       mu2[i,t] &lt;- phi[i,t-1] * z[i,t-1] + nu[t] * prod(q[i,1:(t-1)])
+       z[i,t] ~ dbern(mu2[i,t])
+       # Observation process
+       mu3[i,t] &lt;- z[i,t] * p[i,t] * w[i]
+       y[i,t] ~ dbern(mu3[i,t])
+    } #t
+ } #i
+for(t in 1:n.occasions){
+  nu[t] ~ dbeta(1,1)
+}
+```
+] 
 
 ---
 ## Pros and Cons - General 
@@ -73,8 +132,11 @@ Super-populations size (N) estimates the number of animals never captured, this 
 ####Regardless of parameterization, fully time-dependent models are hard 
 
 In a fully time-dependent model (both `\(p\)` and `\(\phi\)` vary with time) 
+&lt;br/&gt;
 
     + Cannot separately estimate first entry probability and first capture probability 
+    
+&lt;br/&gt;
     
     + Cannot separately estimate last surival and last capture probability without robust design
     
@@ -83,11 +145,66 @@ In a fully time-dependent model (both `\(p\)` and `\(\phi\)` vary with time)
 ---
 ## Other Models Exist
 
+
   + Pradel Model (reverse-time formulation)
+  
+  &lt;br/&gt;
   
   + Link-Barker Model (allows for direct prior on per-capita fecundity)
   
+  &lt;br/&gt;
+  
   + Multi-state Formulation
+  
+  &lt;br/&gt;
+  
+--
+&lt;br/&gt;
+
+All these model requires a lot of data on marked individuals - we need a lot of data to understand complex processes
+
+---
+## Example open population - Dipper!
+
+As promised, this would not be a wildlife Bayesian statistics class without learning about the Dipper dataset. 
+
+
+
+European Dipper (*Cinclus cinclus*) were captured annually from 1981--1987. This dataset was originally analyzed in a CJS format and later in POPAN. It has be analyzed excessively since its original publication. 
+
+
+
+Consider this a history lesson :) 
+
+
+
+We will use the version of this data contained in the `bayess` package 
+
+
+---
+## Dippers 
+
+In eurodip, each row corresponds to a capture-recapture story for a given adult dipper, 0 indicating an absence of capture that year and, in the case of a capture, 1, 2, or 3 representing the zone where the dipper is captured.
+
+We will first analyze this data using the per-capita restricted dynamic occupancy form of the JS model and then as a multi-state model that explicitly accounts for location. 
+
+
+``` r
+library(bayess)
+data("eurodip")
+head(eurodip)
+```
+
+```
+##   t1 t2 t3 t4 t5 t6 t7
+## 1  2  3  2  3  0  0  0
+## 2  2  2  0  0  0  0  0
+## 3  2  2  1  2  3  3  0
+## 4  1  1  0  0  0  0  0
+## 5  2  0  0  0  0  0  0
+## 6  1  0  3  0  0  0  0
+```
+
 
 
 
