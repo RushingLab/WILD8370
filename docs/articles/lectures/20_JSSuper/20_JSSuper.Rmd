@@ -79,7 +79,7 @@ knitr::include_graphics("figs/popan.png")
 ---
 ## POPAN Style Superpopulation Model 
 
-As mentioned, this formulation has very little impact when we actually go to code the model in Nimble. 
+This formulation has very little impact when we actually go to code the model in Nimble. 
 
 <br/>
 
@@ -197,6 +197,70 @@ We will first analyze this data using the per-capita restricted dynamic occupanc
 head(eurodip)
 ```
 
+---
+## Dippers - Per capita restricted dynamic occupancy 
 
+```{r, echo = T, eval = F}
+openCR2 <- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] <-  1-z[i,1] #available for recruitment
+
+  for(t in 2:nocc){
+    gammaPrime[t] <- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
+    phi.p[i,t] <- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+    a[i,t] <- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Detection Process
+```{r, echo = T, eval = F}
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbern(p[t])
+  }#i
+  } #t
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Derived Parameters
+```{r, echo = T, eval = F}
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] <- sum(z[1:M, t]) #realized abundance in time t
+    A[t] <- sum(a[1:M, t]) #available for recruitment in time t
+  } #end t
+  cprob[1] <- gamma[1] #expected recruitment probability 
+  qgamma[1] <- 1 - gamma[1]
+  for(t in 2:nocc){
+    qgamma[t] <- 1-gammaPrime[t] #not entering this time period
+    cprob[t] <- gammaPrime[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] <- A[t-1]-A[t] #how many actually got recruited
+    f[t] <- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi <- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] <- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper <- M-A[nocc] #Superpopulation (ever alive)
+})
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+In a non-spatial model, we don't really care where the animals was captured, just that it *was* captured. That means we'll treat captures at sites 1, 2, or 3 the same. 
 
 

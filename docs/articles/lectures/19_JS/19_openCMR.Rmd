@@ -346,7 +346,7 @@ Detection Process
   for(t in 1:nocc){ #each year
     p[t] ~ dbeta(1,1) 
     for(i in 1:M){
-      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t]*z[i,t])
   }#i
   } #t
 ```
@@ -448,7 +448,7 @@ Detection Process (doesn't change)
   for(t in 1:nocc){ #each year
     p[t] ~ dbeta(1,1) 
     for(i in 1:M){
-      y[i,t] ~ dbinom(size = ntrials[t], p = p[t])
+      y[i,t] ~ dbinom(size = ntrials[t], p = p[t]*z[i,t])
   }#i
   } #t
 ```
