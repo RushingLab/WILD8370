@@ -179,7 +179,7 @@ Advantages of the Robust Design:
 ## Open C-R Models - Restricted Dynamic Occupancy
 #### Very similar to open occupancy models, except you can't come back from the dead
 `$$\Large z_{i1} \sim Bernoulli(\psi)$$`
-`$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} z_{it})\gamma)$$`
+`$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma)$$`
 
 
 `$$\Large y_{it} \sim Binomial(z_{it}p, J)$$`
@@ -194,7 +194,7 @@ Advantages of the Robust Design:
 
 What does this mean in the equation? 
 
-`$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
+`$$\Large (1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma$$`
 
 In these models, `\(z_{it}\)` = 0 means one of two things:
 
@@ -320,6 +320,7 @@ openCR1 &lt;- nimbleCode({
   for(t in 1:nocc){
     gamma[t] ~ dbeta(1,1) #some probability of entry
   }
+   phi ~ dbeta(1,1)
   for(i in 1:M){
     z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
     a[i,1] &lt;-  1-z[i,1] #available for recruitment
@@ -378,11 +379,11 @@ Derived Parameters
 
 Let `\(\Large A_{t}\)` represent the sum of all the individuals available for recruitment in time `\(t\)`. Then instead of introducing recruitment via:
 
-`$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma$$`
+`$$(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma$$`
 
 We use:
 
-`$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$`
+`$$(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma_t'$$`
 where 
 `$$\gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$`
 Thus we are weighting the value of `\(\gamma\)` by the number of individuals that are alive in the last time period and the total number still available to be recruited.
@@ -397,15 +398,15 @@ Imagine that same population that started with 20 individuals and `\(\gamma\)` =
 ```
 ##       Avail Not Avail Recruits Now Alive Entry Probability
 ##  [1,]   180        20       20        20           0.20000
-##  [2,]   177        23        3        20           0.02222
-##  [3,]   172        28        5        19           0.02260
-##  [4,]   170        30        2        17           0.02209
-##  [5,]   168        32        2        16           0.02000
-##  [6,]   164        36        4        15           0.01905
-##  [7,]   158        42        6        15           0.01829
-##  [8,]   155        45        3        13           0.01899
-##  [9,]   153        47        2        10           0.01677
-## [10,]   153        47        0        10           0.01307
+##  [2,]   178        22        2        18           0.02222
+##  [3,]   174        26        4        17           0.02022
+##  [4,]   169        31        5        16           0.01954
+##  [5,]   167        33        2        15           0.01893
+##  [6,]   164        36        3        15           0.01796
+##  [7,]   163        37        1        15           0.01829
+##  [8,]   162        38        1        15           0.01840
+##  [9,]   160        40        2        14           0.01852
+## [10,]   156        44        4        13           0.01750
 ```
 
 ---
@@ -418,15 +419,17 @@ openCR2 &lt;- nimbleCode({
   for(t in 1:nocc){
     gamma[t] ~ dbeta(1,1) #some probability of entry
   }
+   phi ~ dbeta(1,1)
   for(i in 1:M){
     z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
     a[i,1] &lt;-  1-z[i,1] #available for recruitment
-
+  } #end i
   for(t in 2:nocc){
     gammaPrime[t] &lt;- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
-    phi.p[i,t] &lt;- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
-    a[i,t] &lt;- (1-z[i,t])*a[i,t-1] #available for recruitment
-    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+    for(i in 1:M){
+      phi.p[i,t] &lt;- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+      a[i,t] &lt;- (1-z[i,t])*a[i,t-1] #available for recruitment
+      z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
   } #end t
   }# end i
 ```

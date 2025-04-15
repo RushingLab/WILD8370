@@ -78,7 +78,7 @@ This formulation was much more ground-breaking before we had data augmentation t
 ---
 ## POPAN Style Superpopulation Model 
 
-As mentioned, this formulation has very little impact when we actually go to code the model in Nimble. 
+This formulation has very little impact when we actually go to code the model in Nimble. 
 
 &lt;br/&gt;
 
@@ -90,7 +90,7 @@ Then at each time set, animals can enter the population with some probability `\
 
 &lt;br/&gt;
 
-Assuming you are using data augmentation and the robust design, the only difference is that animals can be alive (z = 1) but not real. This has some implications for MCMC mixing but no biological difference. 
+Assuming you are using data augmentation and the robust design, the only difference is that animals can be alive (z = 1) but not real. Thus we hope to avoid some of the 'recruitment rate' issues by allowing animals to 'become real' at a different rate than they 'are born'. 
 
 ---
 ## POPAN Model in Nimble
@@ -173,25 +173,30 @@ As promised, this would not be a wildlife Bayesian statistics class without lear
 European Dipper (*Cinclus cinclus*) were captured annually from 1981--1987. This dataset was originally analyzed in a CJS format and later in POPAN. It has be analyzed excessively since its original publication. 
 
 
-
 Consider this a history lesson :) 
-
 
 
 We will use the version of this data contained in the `bayess` package 
 
+
+
+``` r
+library(bayess)
+data("eurodip")
+```
 
 ---
 ## Dippers 
 
 In eurodip, each row corresponds to a capture-recapture story for a given adult dipper, 0 indicating an absence of capture that year and, in the case of a capture, 1, 2, or 3 representing the zone where the dipper is captured.
 
-We will first analyze this data using the per-capita restricted dynamic occupancy form of the JS model and then as a multi-state model that explicitly accounts for location. 
+We will first analyze this data using the per-capita restricted dynamic occupancy form of the JS model, then in the POPAN style, and then as a hidden markov model. Note that we *do not* have a robust design here. 
+
+To save computation time, we'll only analyze the first 100 individuals in the dataset. 
+
 
 
 ``` r
-library(bayess)
-data("eurodip")
 head(eurodip)
 ```
 
@@ -205,7 +210,725 @@ head(eurodip)
 ## 6  1  0  3  0  0  0  0
 ```
 
+---
+## Dippers - Per capita restricted dynamic occupancy 
 
+``` r
+openCR2 &lt;- nimbleCode({
+  for(t in 1:nocc){
+    gamma[t] ~ dbeta(1,1) #some probability of entry
+  }
+   phi ~ dbeta(1,1)
+  for(i in 1:M){
+    z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
+    a[i,1] &lt;-  1-z[i,1] #available for recruitment
+  } #end i
+  for(t in 2:nocc){
+    gammaPrime[t] &lt;- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
+  for(i in 1:M){
+    phi.p[i,t] &lt;- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+    a[i,t] &lt;- (1-z[i,t])*a[i,t-1] #available for recruitment
+    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+  } #end t
+  }# end i
+```
+
+
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Detection Process
+
+``` r
+  ##----- DETECTION PROCESS -----##
+  for(t in 1:nocc){ #each year
+    p[t] ~ dbeta(1,1) 
+    for(i in 1:M){
+      y[i,t] ~ dbern(p[t]*z[i,t])
+  }#i
+  } #t
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+
+``` r
+  ### Derived parameters
+  for(t in 1:nocc){
+    N[t] &lt;- sum(z[1:M, t]) #realized abundance in time t
+    A[t] &lt;- sum(a[1:M, t]) #available for recruitment in time t
+  } #end t
+  cprob[1] &lt;- gamma[1] #expected recruitment probability 
+  qgamma[1] &lt;- 1 - gamma[1]
+  for(t in 2:nocc){
+    qgamma[t] &lt;- 1-gammaPrime[t] #not entering this time period
+    cprob[t] &lt;- gammaPrime[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] &lt;- A[t-1]-A[t] #how many actually got recruited
+    f[t] &lt;- B[t]/N[t] #realized per-capita recruitment
+  }
+  psi &lt;- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] &lt;- cprob[t]/psi #entry probability, given I entered at some point
+  }
+  Nsuper &lt;- M-A[nocc] #Superpopulation (ever alive)
+})
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+In a non-spatial model, we don't really care where the animals was captured, just that it *was* captured. That means we'll treat captures at sites 1, 2, or 3 the same. 
+
+
+``` r
+set.seed(341)
+nind &lt;- 100
+M &lt;- nind*3 #arbitrary, but big
+nocc &lt;- ncol(eurodip)
+y &lt;- as.matrix(eurodip[sample(1:nrow(eurodip), nind, replace = F),]) #get 100 random birds
+y[y&gt;0] &lt;- 1
+y &lt;- rbind(y, array(0, c(M-nind, nocc)))
+```
+
+
+```
+##     t1 t2 t3 t4 t5 t6 t7
+## 265  0  0  0  0  0  0  1
+## 84   0  0  1  1  0  0  0
+## 270  0  0  0  0  0  0  1
+## 141  0  0  0  1  1  0  0
+## 273  0  0  0  0  0  0  1
+## 93   0  0  1  1  1  0  0
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+We also need to prepare our `\(z\)` object and other initial values
+
+
+``` r
+z.init &lt;- y
+z.init[rowSums(z.init) &gt; 0,] &lt;- 1
+head(z.init)
+```
+
+```
+##     t1 t2 t3 t4 t5 t6 t7
+## 265  1  1  1  1  1  1  1
+## 84   1  1  1  1  1  1  1
+## 270  1  1  1  1  1  1  1
+## 141  1  1  1  1  1  1  1
+## 273  1  1  1  1  1  1  1
+## 93   1  1  1  1  1  1  1
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Nimble objects are relatively simple
+
+
+``` r
+nc &lt;- list(nocc = nocc, M = M)
+nd &lt;- list(y = y)
+ni &lt;- list(p = rbeta(nocc, 1, 1), gamma = rbeta(nocc, 1,1), z = z.init, phi = rbeta(1,1,1))
+params &lt;- c('gamma', 'phi', 'gammaPrime', 'p', 'N', 'A', 'B', 'f', 'b', 'Nsuper', 'psi')
+```
+
+Check model:
+
+
+``` r
+prepnim &lt;- nimbleModel(code = openCR2, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo()
+prepnim$calculate()
+```
+
+```
+## [1] -2242
+```
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Run the model!
+
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 75% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+library(parallel)
+library(coda)
+cl &lt;- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "openCR2", 'params'))
+dip1 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = openCR2, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 1000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+dip1 &lt;- as.mcmc.list(dip1)
+stopCluster(cl)
+```
+]
+
+
+
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Check convergence and make sure the super population is less than M
+
+
+``` r
+MCMCvis::MCMCtrace(dip1, params = c('phi', 'Nsuper'), pdf = F, Rhat = T, n.eff = T)
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-19-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+`\(\gamma\)`, the meaningless probability of no longer being unavailable and `\(\gamma'\)`, the per-capita version of this probability
+
+
+``` r
+gPs &lt;- MCMCvis::MCMCsummary(dip1, params = paste0('gammaPrime[', 2:7, ']'), ISB = F)
+gammas &lt;- MCMCvis::MCMCsummary(dip1, params = 'gamma')
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-21-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Dippers - Per capita restricted dynamic occupancy 
+
+Realized abundance and recruits:
+
+
+``` r
+Ns &lt;- MCMCvis::MCMCsummary(dip1, params = 'N')
+Bs &lt;- MCMCvis::MCMCsummary(dip1, params = paste0('B[', 2:nc$nocc, ']'), ISB = F)
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - Per capita restricted dynamic occupancy
+
+Detection probability and survival (last but not least!). Note that we get an estimate for p at time 1 and time 7, but these are not separately identifiable from `\(\gamma_1\)` or `\(\gamma_7\)`. 
+
+
+``` r
+(ps &lt;- MCMCvis::MCMCsummary(dip1, params = 'p'))
+```
+
+```
+##         mean      sd    2.5%     50%  97.5% Rhat n.eff
+## p[1] 0.08849 0.04976 0.02087 0.07826 0.2116 1.02  1023
+## p[2] 0.55592 0.16243 0.27688 0.55020 0.8753 1.07   202
+## p[3] 0.80632 0.13298 0.50377 0.82615 0.9925 1.01   328
+## p[4] 0.88923 0.09049 0.67155 0.91072 0.9977 1.02   451
+## p[5] 0.92134 0.06830 0.75064 0.93855 0.9979 1.01   697
+## p[6] 0.93184 0.05915 0.78353 0.94790 0.9982 1.01   679
+## p[7] 0.78898 0.12364 0.53334 0.79676 0.9896 1.00   464
+```
+
+Note that we get an estimate for p at time 1 and time 7, but these are not separately identifiable from `\(\gamma_1\)` and `\(\gamma_7\)` respectively. 
+
+
+---
+## Dippers - POPAN Style
+
+Next we'll fit this in the POPAN style. 
+
+.smaller[
+
+``` r
+popanCR &lt;- nimbleCode({
+  for (i in 1:M){
+    w[i] ~ dbern(psi)   # Draw latent inclusion
+    z[i,1] ~ dbern(nu[1])
+    a[i,1] &lt;- 1-z[i,1]
+    # Observation process
+    mu1[i] &lt;- p[1] * z[i,1] * w[i]
+    y[i,1] ~ dbern(mu1[i])
+    # Subsequent occasions
+    for (t in 2:nocc){
+       # State process
+       mu2[i,t] &lt;- phi * z[i,t-1] + nu[t] * prod(a[i,1:(t-1)])
+       z[i,t] ~ dbern(mu2[i,t])
+       a[i,t] &lt;- (1-z[i,t])*a[i,t-1] 
+       # Observation process
+       mu3[i,t] &lt;- z[i,t] * p[t] * w[i]
+       y[i,t] ~ dbern(mu3[i,t])
+    } #t
+ } #i
+```
+]
+
+
+  
+---
+## Dippers - POPAN Style
+
+Don't forget priors!
+
+
+``` r
+  psi ~ dbeta(1, 1)
+  phi ~ dbeta(1, 1)
+for(t in 1:nocc){
+  nu[t] ~ dbeta(1,1)
+  p[t] ~ dbeta(1, 1)
+}
+```
+
+---
+## Dippers - POPAN Style
+
+We'll also add in a few derived variables to match with the other models:
+
+.smaller[
+
+``` r
+    ### Derived parameters
+  for(t in 1:nocc){
+    N[t] &lt;- sum(z[1:M, t]* w[1:M]) #realized abundance in time t
+    A[t] &lt;- sum(a[1:M, t]*w[1:M]) #available for recruitment in time t AND real
+  } #end t
+  cprob[1] &lt;- nu[1] #expected recruitment probability 
+  qgamma[1] &lt;- 1 - nu[1]
+  for(t in 2:nocc){
+    qgamma[t] &lt;- 1-nu[t] #not entering this time period
+    cprob[t] &lt;- nu[t]*prod(qgamma[1:(t-1)]) #expected recruitment prob
+    B[t] &lt;- A[t-1]-A[t] #how many actually got recruited
+    f[t] &lt;- B[t]/N[t] #realized per-capita recruitment
+  }
+  ps &lt;- sum(cprob[1:nocc]) #overall inclusion probability of M
+  for(t in 1:nocc){
+    b[t] &lt;- cprob[t]/ps #entry probability, given I entered at some point
+  }
+  Nsuper1 &lt;- M-A[nocc] #Superpopulation (ever alive)
+  Nsuper2 &lt;- M*psi #ever real
+})
+```
+]
+---
+## Dippers - POPAN Style
+
+As before, we'll need to give the model our data in the form of y. We already have this object made, but I'm going to remake it with a higher M. 
+
+
+``` r
+M &lt;- 400
+nd2 &lt;- list(y = rbind(y, array(0, c(100, nocc))))
+```
+
+
+``` r
+nc2 &lt;- list(nocc = nocc, M = M)
+```
+
+We need to adjust our initial values and params
+
+
+``` r
+ni2 &lt;- list(p = rbeta(nocc, 1, 1), nu = rbeta(nocc, 1,1), 
+           z = rbind(z.init, array(0, c(100, nocc))),
+           phi = rbeta(1,1,1), psi = nind/M,
+           w = c(rep(1, nind), rep(0, M-nind)))
+params2 &lt;- c('nu', 'phi', 'p', 'N', 'A', 'B', 'f', 'b', 'Nsuper1','Nsuper2', 'psi')
+```
+
+---
+## Dippers - POPAN Style
+
+Let's check that our model elements are together 
+
+
+``` r
+prepnim &lt;- nimbleModel(code = popanCR, constants = nc2,
+                           data = nd2, inits = ni2, calculate = T)
+prepnim$initializeInfo()
+prepnim$calculate()
+```
+
+```
+## [1] -4420
+```
+
+---
+## Dippers - POPAN Style
+
+Run the model!
+
+.smaller[
+
+``` r
+library(parallel)
+library(coda)
+cl &lt;- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni2",  "nc2", 'nd2', "popanCR", 'params2'))
+dip2 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = popanCR, constants = nc2,
+                           data = nd2, inits = ni2, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params2, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 1000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+dip2 &lt;- as.mcmc.list(dip2)
+stopCluster(cl)
+```
+]
+
+
+
+---
+## Dippers - POPAN Style
+
+As before, check the model. 
+
+
+``` r
+MCMCvis::MCMCtrace(dip2, params = c('psi', "Nsuper2"), pdf = F, Rhat = T, n.eff = T)
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-35-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - POPAN Style
+
+Realized abundance and recruits:
+
+
+``` r
+Ns &lt;- MCMCvis::MCMCsummary(dip2, params = 'N')
+Bs &lt;- MCMCvis::MCMCsummary(dip2, params = paste0('B[', 2:nc$nocc, ']'), ISB = F)
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-37-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - POPAN Style
+
+Note that we get an estimate for p at time 1 and time 7, but these are not separately identifiable from `\(\nu_1\)` and `\(\nu_7\)` respectively. 
+
+
+``` r
+(ps &lt;- MCMCvis::MCMCsummary(dip2, params = 'p'))
+```
+
+```
+##        mean      sd    2.5%    50%  97.5% Rhat n.eff
+## p[1] 0.2552 0.24914 0.01899 0.1510 0.8998 1.08   107
+## p[2] 0.4391 0.16344 0.19499 0.4080 0.8314 1.07    95
+## p[3] 0.7427 0.15521 0.43580 0.7477 0.9888 1.02   161
+## p[4] 0.8755 0.09655 0.64588 0.8978 0.9956 1.00   434
+## p[5] 0.9211 0.06965 0.73988 0.9387 0.9974 1.01   641
+## p[6] 0.9198 0.07357 0.71770 0.9404 0.9975 1.00   377
+## p[7] 0.8264 0.10633 0.59483 0.8373 0.9906 1.02   533
+```
+
+---
+## Dippers - POPAN Style
+
+We can also look at `\(\nu\)`, the meaningless probability of no longer being unavailable and `\(f\)`, the realized per-capita recruitment (biologically meaningful)
+
+
+``` r
+fs &lt;- MCMCvis::MCMCsummary(dip2, params = paste0('f[', 2:7, ']'), ISB = F)
+nu &lt;- MCMCvis::MCMCsummary(dip2, params = 'nu')
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-40-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - HMM Style
+
+Finally, let's fit this data in a hidden markov model format. We're going to continue to ignore location for now (we'll worry about that in the homework). 
+
+The states we are going to worry about are:
+
+  + Pre-Alive (1)
+  
+  + Alive(2)
+  
+  + Dead (3)
+
+
+There is a built-in hidden markov model distribution in the `nimbleEcology` package that will do these calculations even faster than we can do by hand. 
+
+We will use the `dDHMMo` function which allows for both observation probability and transition probabilities (reproduction or sruvival) to vary with time.
+
+
+---
+## Dippers - HMM Style
+
+First step is to define the transition matrix. We have 3 states and 7 time periods. This should feel familiar. 
+
+
+``` r
+for(t in 1:nocc){
+  gamma[1,1,t] &lt;- 1-gam[t]  # Pr(pre alive t -&gt; pre alive t+1)
+  gamma[1,2,t] &lt;- gam[t]    # Pr(pre alive t -&gt; alive t+1)
+  gamma[1,3,t] &lt;- 0           # Pr(pre alive t -&gt; dead t+1)
+  gamma[2,1,t] &lt;- 0           # Pr(alive t -&gt; pre-alive t+1)
+  gamma[2,2,t] &lt;- phi           # Pr(alive t -&gt; alive t+1)
+  gamma[2,3,t] &lt;- 1-phi           # Pr(alive t -&gt; dead t+1)
+  gamma[3,1,t] &lt;- 0           # Pr(dead t -&gt; pre-alive t+1)
+  gamma[3,2,t] &lt;- 0           # Pr(dead t -&gt; alive t+1)
+  gamma[3,3,t] &lt;- 1           # Pr(dead t -&gt; dead t+1)
+```
+
+---
+## Dippers - HMM Style
+
+Next step is to define the observation matrix. We can only observe animals in 2 states (alive or not-seen) 
+
+
+``` r
+for(t in 1:nocc){
+  omega[1,1,t] &lt;- 0           # Pr(pre alive t and detected as alive)
+  omega[2,1,t] &lt;- p[t]        # Pr(alive t and detected as alive)
+  omega[3,1,t] &lt;- 0           # Pr(dead t and detected as alive)
+  omega[1,2,t] &lt;- 1           # Pr(pre alive t and not detected)
+  omega[2,2,t] &lt;- 1-p[t]         # Pr(alive t and not detected)
+  omega[3,2,t] &lt;- 1           # Pr(dead t and not detected)
+```
+
+
+---
+## Dippers - HMM Style
+
+Before we define priors, the final piece of information we need is a prior for an individual's state at the first time period. This is similar to our previous use of:
+
+
+``` r
+z[i, 1] ~ dbern(gamma[1])
+```
+
+All the delta's together must sum to 1
+
+
+``` r
+  delta[1] ~ dbeta(1,1) #initially in state pre-alive
+  delta[2] ~ dbeta(1,1) #initially in state alive
+  delta[3] &lt;- 1- (delta[1] + delta[2]) #initially dead
+```
+
+---
+## Dippers - HMM Style
+
+Full model (with priors)
+
+&lt;style type="text/css"&gt;
+.smallsmall .remark-code { 
+font-size: 45% !important;
+}
+&lt;/style&gt;
+
+.smallsmall[
+
+``` r
+dipHMM &lt;- nimbleCode({
+  
+  delta[1] ~ dbeta(1,1) #initially in state pre-alive
+  delta[2] ~ dbeta(1,1) #initially in state alive
+  delta[3] &lt;- 1- (delta[1] + delta[2]) #initially dead
+
+for(t in 1:nocc){
+  gamma[1,1,t] &lt;- 1-gam[t]  # Pr(pre alive t -&gt; pre alive t+1)
+  gamma[1,2,t] &lt;- gam[t]    # Pr(pre alive t -&gt; alive t+1)
+  gamma[1,3,t] &lt;- 0           # Pr(pre alive t -&gt; dead t+1)
+  gamma[2,1,t] &lt;- 0           # Pr(alive t -&gt; pre-alive t+1)
+  gamma[2,2,t] &lt;- phi         # Pr(alive t -&gt; alive t+1)
+  gamma[2,3,t] &lt;- 1-phi       # Pr(alive t -&gt; dead t+1)
+  gamma[3,1,t] &lt;- 0           # Pr(dead t -&gt; pre-alive t+1)
+  gamma[3,2,t] &lt;- 0           # Pr(dead t -&gt; alive t+1)
+  gamma[3,3,t] &lt;- 1           # Pr(dead t -&gt; dead t+1)
+  omega[1,1,t] &lt;- 0           # Pr(pre alive t and detected as alive)
+  omega[2,1,t] &lt;- p[t]        # Pr(alive t and detected as alive)
+  omega[3,1,t] &lt;- 0           # Pr(dead t and detected as alive)
+  omega[1,2,t] &lt;- 1           # Pr(pre alive t and not detected)
+  omega[2,2,t] &lt;- 1-p[t]         # Pr(alive t and not detected)
+  omega[3,2,t] &lt;- 1           # Pr(dead t and not detected)
+  p[t] ~ dbeta(1,1)
+  gam[t] ~ dbeta(1,1)
+} #end t
+  for(i in 1:M){
+    y[i,1:nocc] ~ dDHMMo(init =  delta[1:3],
+                         probObs = omega[1:3, 1:2, 1:nocc],
+                         probTrans = gamma[1:3, 1:3, 1:(nocc-1)],
+                         len = nocc,
+                         checkRowSums = 1)
+  } #end M
+  phi ~dbeta(1,1)
+})
+```
+]
+
+---
+## Dippers - HMM Style
+
+Make nimble objects and test model. Remember that this is a multistate model, so our y's need to be 1 or 2, not 1 or 0. 
+
+
+``` r
+newy &lt;- nd2$y
+newy[newy == 0] &lt;- 2
+nd3 &lt;- list(y = newy)
+ni3 &lt;- list(p = rbeta(nocc, 1,1),
+           gam = rbeta(nocc, 1, 1),
+           phi = rbeta(1,1,1),
+           delta = c(.5, .5, 0))
+nc3 &lt;- list(M = M, nocc = nocc)
+params3 &lt;- c('p', 'gam', 'phi', 'delta')
+```
+
+
+``` r
+prepnim &lt;- nimbleModel(code = dipHMM, constants = nc3,
+                           data = nd3, inits = ni3, calculate = T)
+prepnim$initializeInfo()
+prepnim$calculate()
+```
+
+```
+## [1] -732
+```
+
+---
+## Dippers - HMM Style
+
+Run the model!
+
+.smallsmall[
+
+``` r
+library(parallel)
+library(coda)
+cl &lt;- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni3",  "nc3", 'nd3', "dipHMM", 'params3'))
+dip3 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+library(nimbleEcology)
+prepnim &lt;- nimbleModel(code = dipHMM, constants = nc3,
+                           data = nd3, inits = ni3, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params3, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 8000, nburnin = 4000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+dip3 &lt;- as.mcmc.list(dip3)
+stopCluster(cl)
+```
+]
+
+
+
+---
+## Dippers - HMM Style
+
+Check convergence of some parameters:
+
+
+``` r
+MCMCvis::MCMCtrace(dip3, params = 'delta', pdf = F, Rhat = T, n.eff = T)
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-51-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - HMM Style
+
+Derived parameters get a little trickier. The trade off here is that extra speed means we removed the latent states that might be of interest! 
+
+
+Luckily we can still get several parameters of interest using some math tricks.
+
+For instance:
+
+`\(\Large  N_{observed} = N_t * p_t\)`
+
+Thus:
+
+`\(\Large   N_t = \frac{N_{observed}}{p_t}\)`
+
+
+``` r
+ps &lt;- MCMCsummary(dip3, params = 'p')
+LCI &lt;- colSums(nd2$y)/ps$`2.5%`
+UCI &lt;- colSums(nd2$y)/ps$`97.5%`
+Median &lt;- colSums(nd$y)/ps$`50%`
+```
+
+---
+## Dippers - HMM Style
+
+We can compare with our other models:
+
+
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-54-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - HMM Style
+
+Super population is also not too hard. We just need to add up the probability of starting in either state 1 or 2 (pre-alive or alive) and multiply that by our value of `\(M\)`. 
+
+
+``` r
+deltas &lt;-MCMCvis::MCMCsummary(dip3, 'delta')
+notdead &lt;- 1-deltas[3,c('2.5%', '50%', '97.5%')]
+```
+
+&lt;img src="20_JSSuper_files/figure-html/unnamed-chunk-56-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Dippers - HMM Style
+
+It is also possible to estimate the latent states and get out estimates for other parameters such as recruits, etc. 
+
+We will not review those here, as this requires using the Viterbi algorithm and can get a little tricky when you have many occasions.
+
+However, if you want a great resource on how to do this with Nimble and R, check out section 3.10 of the link below:
+
+https://oliviergimenez.github.io/banana-book/hmmcapturerecapture.html
 
 
     </textarea>

@@ -59,6 +59,7 @@
     <li><a class="dropdown-item" href="../articles/lectures/17_MultiState/17_Multistate.html">Lecture 17: Multistate Models</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/18_CT/18_CT.html">Lecture 18: Continuous-time CMR</a></li>
     <li><a class="dropdown-item" href="../articles/lectures/19_JS/19_openCMR.html">Lecture 19: Open Capture Mark Recapture Part 1</a></li>
+    <li><a class="dropdown-item" href="../articles/lectures/20_JSSuper/20_JSSuper.html">Lecture 20: Open Capture Mark Recapture Part 2</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -342,13 +343,15 @@ their previous location.</p>
 list is some data collected by Dr. Chamberlain et al from collared
 coyotes. The second is the matrix version of a raster containing
 information about the distance to roads (in meters). The EPSG code for
-this raster is 4326. Use this data to fit an RSF like we did above to
-this new dataset. Several steps will be required:</p>
+this raster is 26917. Use this data to fit an RSF like we did above to
+the 2019 coyote points. Several steps will be required:</p>
 <ul>
 <li>Make sure the points are in order by date for each individual</li>
-<li>Convert Latitude and Longitude to UTMs (EPSG 4326 aka UTM 17N)</li>
+<li>Convert Latitude and Longitude to UTMs (EPSG 26917 aka UTM 17N)</li>
 <li>Find the easting and northing values for each collar location based
 on the aspect of the roads tif</li>
+<li>Remove any points that don’t fall on the tif</li>
+<li>Fit the model</li>
 </ul>
 </li>
 <li><p>Using the deer collar data, fit a correlated random walk (see

@@ -180,7 +180,7 @@ knitr::include_graphics("figs/flow.png")
 ## Open C-R Models - Restricted Dynamic Occupancy
 #### Very similar to open occupancy models, except you can't come back from the dead
 $$\Large z_{i1} \sim Bernoulli(\psi)$$
-$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} z_{it})\gamma)$$
+$$\Large z_{i,t} \sim Bernoulli(z_{i,t-1} * \phi+(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma)$$
 
 
 $$\Large y_{it} \sim Binomial(z_{it}p, J)$$
@@ -195,7 +195,7 @@ $$\Large N_t = \sum_{i=1}^M z_{it}$$
 
 What does this mean in the equation? 
 
-$$\Large (1-\prod_{t= 1}^{t-1} z_{it})\gamma$$
+$$\Large (1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma$$
 
 In these models, $z_{it}$ = 0 means one of two things:
 
@@ -325,6 +325,7 @@ openCR1 <- nimbleCode({
   for(t in 1:nocc){
     gamma[t] ~ dbeta(1,1) #some probability of entry
   }
+   phi ~ dbeta(1,1)
   for(i in 1:M){
     z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
     a[i,1] <-  1-z[i,1] #available for recruitment
@@ -381,11 +382,11 @@ Derived Parameters
 
 Let $\Large A_{t}$ represent the sum of all the individuals available for recruitment in time $t$. Then instead of introducing recruitment via:
 
-$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma$$
+$$(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma$$
 
 We use:
 
-$$(1-\prod_{t= 1}^{t-1} z_{it})\gamma_t'$$
+$$(1-\prod_{t= 1}^{t-1} (1- z_{it}))\gamma_t'$$
 where 
 $$\gamma'_t = \frac{N_{t-1}}{A_{t-1}}\gamma$$
 Thus we are weighting the value of $\gamma$ by the number of individuals that are alive in the last time period and the total number still available to be recruited.
@@ -426,15 +427,17 @@ openCR2 <- nimbleCode({
   for(t in 1:nocc){
     gamma[t] ~ dbeta(1,1) #some probability of entry
   }
+   phi ~ dbeta(1,1)
   for(i in 1:M){
     z[i,1] ~ dbern(gamma[1]) #alive/real in time 1
     a[i,1] <-  1-z[i,1] #available for recruitment
-
+  } #end i
   for(t in 2:nocc){
     gammaPrime[t] <- N[t-1]*gamma[t-1]/A[t-1] #weight gamma by number alive in previous t
-    phi.p[i,t] <- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
-    a[i,t] <- (1-z[i,t])*a[i,t-1] #available for recruitment
-    z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
+    for(i in 1:M){
+      phi.p[i,t] <- phi*z[i,t-1] + a[i,t-1]*gammaPrime[t] #effective survival or recruitment 
+      a[i,t] <- (1-z[i,t])*a[i,t-1] #available for recruitment
+      z[i,t] ~ dbern(phi.p[i,t]) #survival/recruitment determine status
   } #end t
   }# end i
 ```
