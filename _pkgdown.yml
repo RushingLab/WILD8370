@@ -98,6 +98,8 @@ navbar:
           href: articles/Lab10_CJS.html
         - text: "Lab 11: Continuous-time CMR"
           href: articles/Lab11_Multistate.html
+        - text: "Lab 12: Joint Live-Dead Recovery Models"
+          href: articles/Lab12_JointLiveDead.html
     - icon: far fa-bookmark
       text: "References"
       menu:

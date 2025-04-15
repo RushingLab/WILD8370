@@ -1,0 +1,233 @@
+---
+title: "Lab12: Joint Live-Dead Recovery Models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Lab12_JointLiveDead}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+   warning = FALSE, message = FALSE,
+   fig.align = 'center', fig.retina = 2,
+  fig.height=8, fig.width=8,
+  echo = TRUE,
+  collapse = TRUE,
+  comment = "#>"
+)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+source(here::here("R/zzz.R"))
+```
+
+```{r setup, echo=FALSE}
+library(WILD8370)
+library(nimble)
+library(coda)
+library(mcmcOutput)
+library(MCMCvis)
+library(terra)
+```
+
+Today's lab will focus on joint live-dead recovery models. These can be written as a multi-state model or marginalized for faster analysis in a hidden markov model framework. 
+
+## Joint live-dead recovery models
+
+In the world of game-species, there is often a reward for hunters who report any tags or bands they find on their harvested prey. Not every animal that is tagged will be reported, either because hunters poach the animal or because the animal dies from some other method besides human-induced mortality. In the non-game world, these models are often used in situations where dead animals are sometimes found incidentally when surveying for live animals (such as finding a marked tortoise shell while surveying gopher tortoises).  
+
+The following graphic from the phidot.org MARK handbook does a great job of explaining the general idea. 
+
+```{r out.width = "75%"}
+knitr::include_graphics("Fates.png")
+```
+
+From this diagram, we can easily establish the likelihood of any capture/encounter history (again, stealing this from the MARK handbook). Below is the likelihood for a 2-occasion study. 
+
+```{r out.width = "75%"}
+knitr::include_graphics("Likelihoods.png")
+```
+
+## Example - Snow Goose Data
+
+Today's data comes from an 18-year data set on the lesser snow goose (*Anser caerulescens caerulescens*). Adult female geese were captured from 1997 to 2014, during their flightless phase in Nunavut, Canada. The citation for the paper containing this data can be found here:
+
+Weegman MD, Wilson S, Alisauskas RT, Kellett DK. Assessing bias in demographic estimates from joint live and dead encounter models. PeerJ. 2020 Jun 23;8:e9382. doi: 10.7717/peerj.9382. PMID: 32612891; PMCID: PMC7319022.
+
+
+
+
+
+```{r, eval = F, echo = T}
+#Joint encounter model with snow goose data
+sngo<-read.csv("Joint encounter model snow goose data.csv",header=FALSE)
+CH<-data.matrix(sngo)
+get.first<-function(x)min(which(x==1)) 
+f<-apply(CH,1,get.first) 
+
+# recode matrix; 1=alive in study area, 2=recover dead, 3=not seen or recovered
+# (recode so that 2=1, 3=2, 4=3 and 0=3)
+rCH <- CH  # Recoded CH
+rCH[rCH==0] <- 3
+
+sink("snow.je.txt")
+cat("
+model {
+#--------------Multistate Burnham---------------------------------------------
+# Parameters:
+# s: true survival probability
+# F: fidelity probability
+# r: recovery probability
+# p: recapture/resighting probability
+# -------------------------------------------------
+# States (S):
+# 1 alive in study area
+# 2 alive outside study area
+# 3 recently dead and recovered
+# 4 recently dead, but not recovered, or dead (absorbing)
+# Observations (O):
+# 1 seen alive
+# 2 recovered dead
+# 3 neither seen nor recovered
+# -------------------------------------------------
+for (t in 1:(n.ms.occasions-1)){ 
+   logit(s[t]) <- mu.s + eps.s[t]
+   logit(F[t]) <- mu.F + eps.F[t]
+   logit(r[t]) <- mu.r + eps.r[t]
+   logit(p[t]) <- mu.p + eps.p[t]
+	}
+mean.s~dunif(0.5,1)
+mu.s<-log(mean.s/(1-mean.s))
+mean.F~dunif(0.5,1)
+mu.F<-log(mean.F/(1-mean.F))
+mean.r~dunif(0,0.5)
+mu.r<-log(mean.r/(1-mean.r))
+mean.p~dunif(0,0.3)
+mu.p<-log(mean.p/(1-mean.p))
+
+sd.s~dunif(0,10)
+tau.s<-pow(sd.s,-2)
+sd.F~dunif(0,10)
+tau.F<-pow(sd.F,-2)
+sd.r~dunif(0,10)
+tau.r<-pow(sd.r,-2)
+sd.p~dunif(0,10)
+tau.p<-pow(sd.p,-2)
+
+# error terms - time effect
+for (t in 1:(n.ms.occasions-1)){
+	eps.s[t] ~ dnorm(0,tau.s)T(-10,10)
+	eps.F[t] ~ dnorm(0,tau.F)T(-10,10)
+	eps.r[t] ~ dnorm(0,tau.r)T(-10,10)
+	eps.p[t] ~ dnorm(0,tau.p)T(-10,10)
+}
+# define state and transition probabilities
+for (t in 1:(n.ms.occasions-1)){
+      ps[1,t,1] <- s[t]*F[t] # 1 to 1 is a marked individual recaptured in study area
+      ps[1,t,2] <- s[t]*(1-F[t])
+      ps[1,t,3] <- (1-s[t])*r[t]
+      ps[1,t,4] <- (1-s[t])*(1-r[t])
+      ps[2,t,1] <- 0
+      ps[2,t,2] <- s[t]
+      ps[2,t,3] <- (1-s[t])*r[t]
+      ps[2,t,4] <- (1-s[t])*(1-r[t])
+      ps[3,t,1] <- 0
+      ps[3,t,2] <- 0
+      ps[3,t,3] <- 0
+      ps[3,t,4] <- 1
+      ps[4,t,1] <- 0
+      ps[4,t,2] <- 0
+      ps[4,t,3] <- 0
+      ps[4,t,4] <- 1
+
+      # Define probabilities of O(t) given S(t)
+      po[1,t,1] <- p[t]
+      po[1,t,2] <- 0
+      po[1,t,3] <- 1-p[t]
+      po[2,t,1] <- 0
+      po[2,t,2] <- 0
+      po[2,t,3] <- 1
+      po[3,t,1] <- 0
+      po[3,t,2] <- 1
+      po[3,t,3] <- 0
+      po[4,t,1] <- 0
+      po[4,t,2] <- 0
+      po[4,t,3] <- 1
+      } #t
+
+# Likelihood 
+for (i in 1:nind){
+   # Define latent state at first capture
+   z[i,f[i]] <- y[i,f[i]]
+   for (t in (f[i]+1):n.ms.occasions){
+      # State process: draw S(t) given S(t-1)
+      z[i,t] ~ dcat(ps[z[i,t-1], t-1,])
+      # Observation process: draw O(t) given S(t)
+      y[i,t] ~ dcat(po[z[i,t], t-1,])
+      } #t
+   } #i
+}
+",fill = TRUE)
+sink()
+
+# Function from Kery and Schaub (2012):
+ld.init <- function(ch, f){
+   ch[ch==3] <- NA
+   v2 <- which(ch==2, arr.ind = T)
+   ch[v2] <- 3
+   for (i in 1:nrow(v2)){
+      ifelse(v2[i,2]!=ncol(ch), ch[v2[i,1], (v2[i,2]+1):ncol(ch)] <- 4, next)}
+   for (i in 1:nrow(ch)){
+      m <- max(which(ch[i,]==1))
+      ch[i,f[i]:m] <- 1
+      }
+   for (i in 1:nrow(v2)){
+      u1 <- min(which(ch[v2[i,1],]==1))
+      ch[v2[i],u1:(v2[i,2]-1)] <- 1
+      }
+   for (i in 1:nrow(ch)){
+      for (j in f[i]:ncol(ch)){
+         if(is.na(ch[i,j])==1) ch[i,j] <- 1
+         }
+      ch[i,f[i]] <- NA
+      }
+   return(ch)
+   }
+
+ch <- rCH
+ch[ch==3] <- NA
+z.known <- ld.init(rCH, f)
+z.known[is.na(ch)] <- NA
+for (i in 1:nrow(ch)){
+   z.known[i,f[i]] <- NA
+   }
+z <- ld.init(rCH, f)
+z[!is.na(ch)] <- NA
+
+# Bundle data
+jags.data <- list(y = rCH,f = f,n.ms.occasions = dim(rCH)[2],nind = dim(rCH)[1],z = z.known)
+
+# Initial values 
+inits <- function(){list(mean.s = 0.9,mean.F = 0.9,mean.p = 0.015,mean.r = 0.18,sd.s=1,sd.r=1,sd.F=1,sd.p=1,z = z)}  
+
+# Parameters monitored
+parameters <- c("s","F","r","p","mean.s","mean.F","mean.r","mean.p","sd.s","sd.F","sd.r","sd.p")
+
+# MCMC settings
+ni <- 80000
+nt <- 10
+nb <- 40000
+nc <- 3
+
+joint.encounter <- jags(jags.data, inits=inits, parallel = TRUE, parameters.to.save=parameters,  "snow.je.txt", n.thin=nt, n.chains=nc, n.burnin=nb, n.iter=ni)
+print(joint.encounter, digit = 3)
+```
+
+## Homework
+
+1. Using the data from the joint live-dead recovery model we ran above, run a hidden markov model (or multi-state if you prefer) that does *not* allow for dead recovery (if animals are recovered dead, treat them as unobserved in that time period). Graphically compare your estimates of $\phi$ and $p$ with those estimated in class. Does including the dead recoveries impact your results? 
+ 
+2. Using the dipper data we used in class, run a hidden markov model that accounts for location of capture in the state process. Instead of the 3 states we had in class (pre-alive, alive, dead), you should now have 5 states (pre-alive, alive at site 1, alive at site 2, alive at site 3, and dead). You should have 4 observation states (seen at site 1, seen at site 2, seen at site 3, and not seen). Keep phi constant between sites, but allow p to vary by site. Make a graph showing the estimated population at each site over time. 
+
+3.  On a 1-10 scale, with 1 being the worst week ever and 10 being the best, how would you rate this week's content? What lingering questions/confusion about the lecture or lab do you still have?
