@@ -51,182 +51,286 @@ knitr::include_graphics("Likelihoods.png")
 
 ## Example - Snow Goose Data
 
-Today's data comes from an 18-year data set on the lesser snow goose (*Anser caerulescens caerulescens*). Adult female geese were captured from 1997 to 2014, during their flightless phase in Nunavut, Canada. The citation for the paper containing this data can be found here:
+Today's data comes from an 18-year data set on the lesser snow goose (*Anser caerulescens caerulescens*). 18,493 adult female geese were captured from 1997 to 2014, during their flightless phase in Nunavut, Canada. The citation for the paper containing this data can be found here:
 
 Weegman MD, Wilson S, Alisauskas RT, Kellett DK. Assessing bias in demographic estimates from joint live and dead encounter models. PeerJ. 2020 Jun 23;8:e9382. doi: 10.7717/peerj.9382. PMID: 32612891; PMCID: PMC7319022.
 
 
+The geese could be observed in 1 of 3 states:
+
+1 = alive in the study area
+
+2 = recovered dead 
+
+3 = not seen
 
 
+For the sake of this lab, we will only be using a subset of the data from the first 10 years.
+
+```{r}
+library(WILD8370)
+#data(snowgeese)
+head(snowgeese)
+```
+
+## Model 
+
+We would like to code the model so that geese can be in 5 possible true states:
+
+1 = Pre-alive
+
+2 = alive in the study area 
+
+3 = alive and **permanently** emigrated
+
+4 = recently dead **and** recovered (notice this state inherently includes detection of the death)
+
+5 = recently dead, but not recovered, or dead for more than 1 time period (absorbing)
+
+We will treat $\phi$, $p$, and $gam$ as time-varying.  $\phi$ and $p$,will be modeled as logit-link with an intercept and a random effect of year. 
+
+### Transition Matrix
+
+We will build the model in sections, starting with the transition matrix. 
+
+```{r, echo =T, eval = F}
+for(t in 1:nocc){
+  gamma[1,1,t] <- 1-gam[t]            # Pr(pre alive t -> pre alive t+1)
+  gamma[1,2,t] <- gam[t]              # Pr(pre alive t -> alive and here t+1)
+  gamma[1,3,t] <- 0                   # Pr(pre alive t -> alive but gone t+1)
+  gamma[1,4,t] <- 0                   # Pr(pre alive t -> recent dead and recovered t+1)
+  gamma[1,5,t] <- 0                   # Pr(pre alive t -> absorbing dead t+1)
+  
+  gamma[2,1,t] <- 0                   # Pr(alive t -> pre-alive t+1)
+  gamma[2,2,t] <- phi[t]*f            # Pr(alive t -> alive and here t+1)
+  gamma[2,3,t] <- phi[t]*(1-f)        # Pr(alive t -> alive but gone t+1)
+  gamma[2,4,t] <- (1-phi[t])*r        # Pr(alive t -> recent dead and recovered t+1)
+  gamma[2,5,t] <- (1-phi[t])*(1-r)    # Pr(alive t -> absorbing dead t+1)
+  
+  gamma[3,1,t] <- 0                   # Pr(alive but gone t -> pre-alive t+1)
+  gamma[3,2,t] <- 0                   # Pr(alive but gone t -> alive and here t+1)
+  gamma[3,3,t] <- phi[t]              # Pr(alive but gone t -> alive but gone t+1)
+  gamma[3,4,t] <- (1-phi[t])*r        # Pr(alive but gone t -> recent dead and recovered t+1)
+  gamma[3,5,t] <- (1-phi[t])*(1-r)    # Pr(alive but gone t -> absorbing dead t+1)
+  
+  gamma[4,1,t] <- 0                   # Pr(Recently dead t -> pre-alive t+1)
+  gamma[4,2,t] <- 0                   # Pr(Recently dead t -> alive and here t+1)
+  gamma[4,3,t] <- 0                   # Pr(Recently dead t -> alive but gone t+1)
+  gamma[4,4,t] <- 0                   # Pr(Recently dead t -> recent dead and recovered t+1)
+  gamma[4,5,t] <- 1                   # Pr(Recently dead t -> absorbing dead t+1)
+  
+  gamma[5,1,t] <- 0                   # Pr(absorbing dead t -> pre-alive t+1)
+  gamma[5,2,t] <- 0                   # Pr(absorbing dead t -> alive and here t+1)
+  gamma[5,3,t] <- 0                   # Pr(absorbing dead t -> alive but gone t+1)
+  gamma[5,4,t] <- 0                   # Pr(absorbing dead t -> recent dead and recovered t+1)
+  gamma[5,5,t] <- 1                   # Pr(absorbing dead t -> absorbing dead t+1)
+  
+```
+
+
+### Observation Matrix
+
+Next let's make the observation matrix. This is a 5 X 3 matrix since we can only observe geese in 3 possible states (alive, dead, not observed). 
+
+```{r, echo = T, eval = F}
+  omega[1,1,t] <- 0           # Pr(pre alive t and detected as alive)
+  omega[2,1,t] <- p[t]        # Pr(alive and here t and detected as alive)
+  omega[3,1,t] <- 0           # Pr(alive and gone t and detected as alive)
+  omega[4,1,t] <- 0           # Pr(recent dead and recovered t and detected as alive)
+  omega[5,1,t] <- 0           # Pr(absorbing dead t and detected as alive)
+  
+  omega[1,2,t] <- 0           # Pr(pre alive t and recovered dead)
+  omega[2,2,t] <- 0           # Pr(alive and here t and recovered dead)
+  omega[3,2,t] <- 0           # Pr(alive and gone t and recovered dead)
+  omega[4,2,t] <- 1           # Pr(recent dead and recovered t and recovered dead)
+  omega[5,2,t] <- 0           # Pr(absorbing dead t and recovered dead)
+  
+  omega[1,3,t] <- 1           # Pr(pre alive t and not observed)
+  omega[2,3,t] <- 1-p[t]      # Pr(alive and here t and not observed)
+  omega[3,3,t] <- 1           # Pr(alive and gone t and not observed)
+  omega[4,3,t] <- 0           # Pr(recent dead and recovered t and not observed)
+  omega[5,3,t] <- 1           # Pr(absorbing dead t and not observed)
+  
+  
+```
+
+### Initial Matrix and Priors
+
+Let's get the initial probability of each state and then add in our priors. Rather than writing out a dbeta prior for each delta, I'm just going to use a dirichlet prior, which will ensure all the resulting probabilities sum to 1. The dirichlet can be thought of as a multinomial but for probabilities. 
 
 ```{r, eval = F, echo = T}
-#Joint encounter model with snow goose data
-sngo<-read.csv("Joint encounter model snow goose data.csv",header=FALSE)
-CH<-data.matrix(sngo)
-get.first<-function(x)min(which(x==1)) 
-f<-apply(CH,1,get.first) 
+  delta[1:5] ~ ddirch(alphas[1:5])
 
-# recode matrix; 1=alive in study area, 2=recover dead, 3=not seen or recovered
-# (recode so that 2=1, 3=2, 4=3 and 0=3)
-rCH <- CH  # Recoded CH
-rCH[rCH==0] <- 3
-
-sink("snow.je.txt")
-cat("
-model {
-#--------------Multistate Burnham---------------------------------------------
-# Parameters:
-# s: true survival probability
-# F: fidelity probability
-# r: recovery probability
-# p: recapture/resighting probability
-# -------------------------------------------------
-# States (S):
-# 1 alive in study area
-# 2 alive outside study area
-# 3 recently dead and recovered
-# 4 recently dead, but not recovered, or dead (absorbing)
-# Observations (O):
-# 1 seen alive
-# 2 recovered dead
-# 3 neither seen nor recovered
-# -------------------------------------------------
-for (t in 1:(n.ms.occasions-1)){ 
-   logit(s[t]) <- mu.s + eps.s[t]
-   logit(F[t]) <- mu.F + eps.F[t]
-   logit(r[t]) <- mu.r + eps.r[t]
-   logit(p[t]) <- mu.p + eps.p[t]
-	}
-mean.s~dunif(0.5,1)
-mu.s<-log(mean.s/(1-mean.s))
-mean.F~dunif(0.5,1)
-mu.F<-log(mean.F/(1-mean.F))
-mean.r~dunif(0,0.5)
-mu.r<-log(mean.r/(1-mean.r))
-mean.p~dunif(0,0.3)
-mu.p<-log(mean.p/(1-mean.p))
-
-sd.s~dunif(0,10)
-tau.s<-pow(sd.s,-2)
-sd.F~dunif(0,10)
-tau.F<-pow(sd.F,-2)
-sd.r~dunif(0,10)
-tau.r<-pow(sd.r,-2)
-sd.p~dunif(0,10)
-tau.p<-pow(sd.p,-2)
-
-# error terms - time effect
-for (t in 1:(n.ms.occasions-1)){
-	eps.s[t] ~ dnorm(0,tau.s)T(-10,10)
-	eps.F[t] ~ dnorm(0,tau.F)T(-10,10)
-	eps.r[t] ~ dnorm(0,tau.r)T(-10,10)
-	eps.p[t] ~ dnorm(0,tau.p)T(-10,10)
+for(t in 1:nocc){
+  logit(p[t]) <- mu.p + eps.p[t] #detection
+  logit(phi[t]) <- mu.phi + eps.phi[t] #survival
+  eps.p[t] ~ dnorm(0, sd = sd.p)
+  eps.phi[t] ~ dnorm(0, sd = sd.phi)
+  gam[t] ~ dbeta(1,1) #removal from augmented population
 }
-# define state and transition probabilities
-for (t in 1:(n.ms.occasions-1)){
-      ps[1,t,1] <- s[t]*F[t] # 1 to 1 is a marked individual recaptured in study area
-      ps[1,t,2] <- s[t]*(1-F[t])
-      ps[1,t,3] <- (1-s[t])*r[t]
-      ps[1,t,4] <- (1-s[t])*(1-r[t])
-      ps[2,t,1] <- 0
-      ps[2,t,2] <- s[t]
-      ps[2,t,3] <- (1-s[t])*r[t]
-      ps[2,t,4] <- (1-s[t])*(1-r[t])
-      ps[3,t,1] <- 0
-      ps[3,t,2] <- 0
-      ps[3,t,3] <- 0
-      ps[3,t,4] <- 1
-      ps[4,t,1] <- 0
-      ps[4,t,2] <- 0
-      ps[4,t,3] <- 0
-      ps[4,t,4] <- 1
 
-      # Define probabilities of O(t) given S(t)
-      po[1,t,1] <- p[t]
-      po[1,t,2] <- 0
-      po[1,t,3] <- 1-p[t]
-      po[2,t,1] <- 0
-      po[2,t,2] <- 0
-      po[2,t,3] <- 1
-      po[3,t,1] <- 0
-      po[3,t,2] <- 1
-      po[3,t,3] <- 0
-      po[4,t,1] <- 0
-      po[4,t,2] <- 0
-      po[4,t,3] <- 1
-      } #t
+r ~ dbeta(1, 1) #recovery probability
+f ~ dbeta(1, 1) #fidelity probability
+sd.phi ~ dexp(1)
+sd.p ~ dexp(1)
 
-# Likelihood 
-for (i in 1:nind){
-   # Define latent state at first capture
-   z[i,f[i]] <- y[i,f[i]]
-   for (t in (f[i]+1):n.ms.occasions){
-      # State process: draw S(t) given S(t-1)
-      z[i,t] ~ dcat(ps[z[i,t-1], t-1,])
-      # Observation process: draw O(t) given S(t)
-      y[i,t] ~ dcat(po[z[i,t], t-1,])
-      } #t
-   } #i
-}
-",fill = TRUE)
-sink()
+```
 
-# Function from Kery and Schaub (2012):
-ld.init <- function(ch, f){
-   ch[ch==3] <- NA
-   v2 <- which(ch==2, arr.ind = T)
-   ch[v2] <- 3
-   for (i in 1:nrow(v2)){
-      ifelse(v2[i,2]!=ncol(ch), ch[v2[i,1], (v2[i,2]+1):ncol(ch)] <- 4, next)}
-   for (i in 1:nrow(ch)){
-      m <- max(which(ch[i,]==1))
-      ch[i,f[i]:m] <- 1
-      }
-   for (i in 1:nrow(v2)){
-      u1 <- min(which(ch[v2[i,1],]==1))
-      ch[v2[i],u1:(v2[i,2]-1)] <- 1
-      }
-   for (i in 1:nrow(ch)){
-      for (j in f[i]:ncol(ch)){
-         if(is.na(ch[i,j])==1) ch[i,j] <- 1
-         }
-      ch[i,f[i]] <- NA
-      }
-   return(ch)
-   }
+### Full Model
 
-ch <- rCH
-ch[ch==3] <- NA
-z.known <- ld.init(rCH, f)
-z.known[is.na(ch)] <- NA
-for (i in 1:nrow(ch)){
-   z.known[i,f[i]] <- NA
-   }
-z <- ld.init(rCH, f)
-z[!is.na(ch)] <- NA
+```{r, echo =T, eval = T}
+livedeadHMM <- nimbleCode({
+for(t in 1:nocc){
+  gamma[1,1,t] <- 1-gam[t]            # Pr(pre alive t -> pre alive t+1)
+  gamma[1,2,t] <- gam[t]              # Pr(pre alive t -> alive and here t+1)
+  gamma[1,3,t] <- 0                   # Pr(pre alive t -> alive but gone t+1)
+  gamma[1,4,t] <- 0                   # Pr(pre alive t -> recent dead and recovered t+1)
+  gamma[1,5,t] <- 0                   # Pr(pre alive t -> absorbing dead t+1)
+  
+  gamma[2,1,t] <- 0                   # Pr(alive t -> pre-alive t+1)
+  gamma[2,2,t] <- phi[t]*f            # Pr(alive t -> alive and here t+1)
+  gamma[2,3,t] <- phi[t]*(1-f)        # Pr(alive t -> alive but gone t+1)
+  gamma[2,4,t] <- (1-phi[t])*r        # Pr(alive t -> recent dead and recovered t+1)
+  gamma[2,5,t] <- (1-phi[t])*(1-r)    # Pr(alive t -> absorbing dead t+1)
+  
+  gamma[3,1,t] <- 0                   # Pr(alive but gone t -> pre-alive t+1)
+  gamma[3,2,t] <- 0                   # Pr(alive but gone t -> alive and here t+1)
+  gamma[3,3,t] <- phi[t]              # Pr(alive but gone t -> alive but gone t+1)
+  gamma[3,4,t] <- (1-phi[t])*r        # Pr(alive but gone t -> recent dead and recovered t+1)
+  gamma[3,5,t] <- (1-phi[t])*(1-r)    # Pr(alive but gone t -> absorbing dead t+1)
+  
+  gamma[4,1,t] <- 0                   # Pr(Recently dead t -> pre-alive t+1)
+  gamma[4,2,t] <- 0                   # Pr(Recently dead t -> alive and here t+1)
+  gamma[4,3,t] <- 0                   # Pr(Recently dead t -> alive but gone t+1)
+  gamma[4,4,t] <- 0                   # Pr(Recently dead t -> recent dead and recovered t+1)
+  gamma[4,5,t] <- 1                   # Pr(Recently dead t -> absorbing dead t+1)
+  
+  gamma[5,1,t] <- 0                   # Pr(absorbing dead t -> pre-alive t+1)
+  gamma[5,2,t] <- 0                   # Pr(absorbing dead t -> alive and here t+1)
+  gamma[5,3,t] <- 0                   # Pr(absorbing dead t -> alive but gone t+1)
+  gamma[5,4,t] <- 0                   # Pr(absorbing dead t -> recent dead and recovered t+1)
+  gamma[5,5,t] <- 1                   # Pr(absorbing dead t -> absorbing dead t+1)
+  
+  omega[1,1,t] <- 0                   # Pr(pre alive t and detected as alive)
+  omega[2,1,t] <- p[t]                # Pr(alive and here t and detected as alive)
+  omega[3,1,t] <- 0                   # Pr(alive and gone t and detected as alive)
+  omega[4,1,t] <- 0                   # Pr(recent dead and recovered t and detected as alive)
+  omega[5,1,t] <- 0                   # Pr(absorbing dead t and detected as alive)
+  
+  omega[1,2,t] <- 0                   # Pr(pre alive t and recovered dead)
+  omega[2,2,t] <- 0                   # Pr(alive and here t and recovered dead)
+  omega[3,2,t] <- 0                   # Pr(alive and gone t and recovered dead)
+  omega[4,2,t] <- 1                   # Pr(recent dead and recovered t and recovered dead)
+  omega[5,2,t] <- 0                   # Pr(absorbing dead t and recovered dead)
+  
+  omega[1,3,t] <- 1                   # Pr(pre alive t and not observed)
+  omega[2,3,t] <- 1-p[t]              # Pr(alive and here t and not observed)
+  omega[3,3,t] <- 1                   # Pr(alive and gone t and not observed)
+  omega[4,3,t] <- 0                   # Pr(recent dead and recovered t and not observed)
+  omega[5,3,t] <- 1                   # Pr(absorbing dead t and not observed)
 
-# Bundle data
-jags.data <- list(y = rCH,f = f,n.ms.occasions = dim(rCH)[2],nind = dim(rCH)[1],z = z.known)
+  logit(p[t]) <- mu.p + eps.p[t] #detection
+  logit(phi[t]) <- mu.phi + eps.phi[t] #survival
+  eps.p[t] ~ dnorm(0, sd = sd.p)
+  eps.phi[t] ~ dnorm(0, sd = sd.phi)
+  gam[t] ~ dbeta(1,1) #removal from augmented population
+} #end t
 
-# Initial values 
-inits <- function(){list(mean.s = 0.9,mean.F = 0.9,mean.p = 0.015,mean.r = 0.18,sd.s=1,sd.r=1,sd.F=1,sd.p=1,z = z)}  
+delta[1:5] ~ ddirch(alphas[1:5])
+r ~ dbeta(1, 1) #recovery probability
+f ~ dbeta(1, 1) #fidelity probability
+sd.phi ~ dexp(1)
+sd.p ~ dexp(1)
+mu.p ~ dnorm(0, 1)
+mu.phi ~ dnorm(0, 1)
 
-# Parameters monitored
-parameters <- c("s","F","r","p","mean.s","mean.F","mean.r","mean.p","sd.s","sd.F","sd.r","sd.p")
+for(i in 1:M){
+    y[i,1:nocc] ~ dDHMMo(init =  delta[1:5],
+                         probObs = omega[1:5, 1:3, 1:nocc],
+                         probTrans = gamma[1:5, 1:5, 1:(nocc-1)],
+                         len = nocc,
+                         checkRowSums = 1)
+  } #end M
+})
+```  
 
-# MCMC settings
-ni <- 80000
-nt <- 10
-nb <- 40000
-nc <- 3
+## Analysis
 
-joint.encounter <- jags(jags.data, inits=inits, parallel = TRUE, parameters.to.save=parameters,  "snow.je.txt", n.thin=nt, n.chains=nc, n.burnin=nb, n.iter=ni)
-print(joint.encounter, digit = 3)
+Time to make some nimble objects. 
+
+```{r}
+M <- nrow(snowgeese)*2
+nocc <- ncol(snowgeese)
+y <- as.matrix(snowgeese)
+nind <- nrow(snowgeese)
+y <- rbind(y, array(3, c(M-nind, nocc))) 
+```
+
+```{r}
+nd <- list(y = y)
+nc <- list(M = M, nocc = nocc, alphas = rep(1, 5))
+ni <- list(eps.p = rep(0, nocc),
+           eps.phi = rep(0, nocc),
+           sd.phi = rexp(1),
+           sd.p = rexp(1),
+           mu.p = rnorm(1),
+           mu.phi = rnorm(1),
+           r = rbeta(1,1,1),
+           f = rbeta(1,1,1),
+           gam = rbeta(nocc, 1,1),
+           delta = rdirch(1, rep(1, 5))
+)
+  
+params <- c('mu.p', 'eps.p', 'sd.p', 'mu.phi', 'eps.phi', 'sd.phi', 'gam',  'delta', 'r', 'f', 'phi', 'p')
+```
+
+Check that the model is correctly setup. 
+
+```{r, echo = T, warning = F}
+prepnim <- nimbleModel(code = livedeadHMM, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo()
+prepnim$calculate()
+```
+
+This step may take several minutes (it's a big model!)
+
+```{r, echo = T, eval = F}
+library(parallel)
+library(coda)
+cl <- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "livedeadHMM", 'params'))
+geese <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+library(nimbleEcology)
+prepnim <- nimbleModel(code = livedeadHMM, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 1000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+geese <- as.mcmc.list(geese)
+stopCluster(cl)
+```
+
+## Output
+
+Time to inspect the chains
+
+```{r}
+MCMCvis::MCMCtrace(geese, pdf = F, Rhat = T, n.eff = T)
 ```
 
 ## Homework
 
-1. Using the data from the joint live-dead recovery model we ran above, run a hidden markov model (or multi-state if you prefer) that does *not* allow for dead recovery (if animals are recovered dead, treat them as unobserved in that time period). Graphically compare your estimates of $\phi$ and $p$ with those estimated in class. Does including the dead recoveries impact your results? 
+1. Using the data from the joint live-dead recovery model we ran above, run a hidden markov model that does *not* allow for dead recovery. In the data, if animals are recovered dead, treat them as unobserved in that time period. Graphically compare your estimates of $\phi$ and $N$ with those estimated in the lab above. How does including the dead recoveries impact your results? 
  
 2. Using the dipper data we used in class, run a hidden markov model that accounts for location of capture in the state process. Instead of the 3 states we had in class (pre-alive, alive, dead), you should now have 5 states (pre-alive, alive at site 1, alive at site 2, alive at site 3, and dead). You should have 4 observation states (seen at site 1, seen at site 2, seen at site 3, and not seen). Keep phi constant between sites, but allow p to vary by site. Make a graph showing the estimated population at each site over time. 
 

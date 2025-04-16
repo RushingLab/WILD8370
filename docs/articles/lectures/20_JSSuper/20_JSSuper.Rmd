@@ -311,7 +311,7 @@ Detection Process
 ---
 ## Dippers - Per capita restricted dynamic occupancy 
 
-In a non-spatial model, we don't really care where the animals was captured, just that it *was* captured. That means we'll treat captures at sites 1, 2, or 3 the same. 
+In a non-spatial model, we don't really care where the animals was captured, just that it *was* captured. That means we'll treat captures at sites 1, 2, or 3 the same. Reminder that we're just using 100 random birds for the sake of this lecture, though in a real study you would analyze your entire dataset. 
 
 ```{r, echo = T}
 set.seed(341)
