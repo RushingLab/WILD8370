@@ -28,7 +28,7 @@ library(nimble)
 library(coda)
 library(mcmcOutput)
 library(MCMCvis)
-library(terra)
+library(nimbleEcology)
 ```
 
 Today's lab will focus on joint live-dead recovery models. These can be written as a multi-state model or marginalized for faster analysis in a hidden markov model framework. 
@@ -69,7 +69,7 @@ For the sake of this lab, we will only be using a subset of the data from the fi
 
 ```{r}
 library(WILD8370)
-#data(snowgeese)
+data(snowgeese)
 head(snowgeese)
 ```
 
@@ -287,6 +287,7 @@ params <- c('mu.p', 'eps.p', 'sd.p', 'mu.phi', 'eps.phi', 'sd.phi', 'gam',  'del
 Check that the model is correctly setup. 
 
 ```{r, echo = T, warning = F}
+library(nimbleEcology)
 prepnim <- nimbleModel(code = livedeadHMM, constants = nc,
                            data = nd, inits = ni, calculate = T)
 prepnim$initializeInfo()
@@ -324,9 +325,68 @@ stopCluster(cl)
 
 Time to inspect the chains
 
-```{r}
-MCMCvis::MCMCtrace(geese, pdf = F, Rhat = T, n.eff = T)
+```{r, echo = F}
+geese <- readRDS('geese1.rds')
 ```
+
+(You would inspect all of them in a a real analysis)
+
+```{r}
+MCMCvis::MCMCtrace(geese, params = 'delta',  pdf = F, Rhat = T, n.eff = T)
+```
+
+Let's check the population estimate over time. Remember that:
+
+$\Large   N_t = \frac{N_{observed}}{p_t}$
+
+```{r, echo = T}
+ps <- MCMCsummary(geese, params = 'p')
+seenalive <- colSums(snowgeese == 1)
+LCI <- seenalive/ps$`2.5%`
+UCI <- seenalive/ps$`97.5%`
+Median <- seenalive/ps$`50%`
+
+gg_ab <- data.frame(Median = Median,
+                    LCI = LCI,
+                    UCI = UCI,
+                    Time = 1:nocc)
+
+ggplot(gg_ab, aes(x = Time, y= Median))+
+  geom_pointrange(aes(ymin = LCI,ymax = UCI))+
+  geom_line()+
+  theme_bw()+
+  theme(axis.text= element_text(size = 20), axis.title = element_text(size = 20))+
+  xlab("Year")+
+  ylab("Abundance")
+```
+
+We can also evaluate how p and $\phi$ changed over time:
+
+```{r, echo = T}
+phis <- MCMCsummary(geese, params = 'phi')
+gg_ps <- data.frame(Median = c(ps$`50%`, phis$`50%`),
+                    LCI = c(ps$`2.5%`, phis$`2.5%`),
+                    UCI = c(ps$`97.5%`, phis$`97.5%`),
+                    Time = rep(1:nocc, 2),
+                    Estimate = rep(c('Detection probability', 'Survival'), each = nocc))
+
+ggplot(gg_ps, aes(x = Time, y= Median, col = Estimate, group = Estimate))+
+  geom_pointrange(aes(ymin = LCI,ymax = UCI), position = position_dodge(width = .25))+
+  geom_line()+
+  theme_bw()+
+  theme(axis.text= element_text(size = 20), axis.title = element_text(size = 20))+
+  xlab("Year")+
+  ylab("Probability")
+```
+
+Finally, we can learn about fidelity and recovery probabilities. 
+
+```{r}
+MCMCvis::MCMCsummary(geese, params = c('f', 'r'))
+```
+
+
+You'll notice that many of these estimates have wide CIs - these models are very data hungry!
 
 ## Homework
 

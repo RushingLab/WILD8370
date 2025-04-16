@@ -77,6 +77,7 @@
     <li><a class="dropdown-item" href="../articles/Lab9_SCR.html">Lab 9: Spatial Capture Recapture</a></li>
     <li><a class="dropdown-item" href="../articles/Lab10_CJS.html">Lab 10: CJS</a></li>
     <li><a class="dropdown-item" href="../articles/Lab11_Multistate.html">Lab 11: Continuous-time CMR</a></li>
+    <li><a class="dropdown-item" href="../articles/Lab12_JointLiveDead.html">Lab 12: Joint Live-Dead Recovery Models</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -431,7 +432,7 @@ like with one chain:</p>
 <span><span class="va">Cmodel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/compileNimble.html" class="external-link">compileNimble</a></span><span class="op">(</span><span class="va">prepnim</span><span class="op">)</span> <span class="co">#compiling the model itself in C++;</span></span>
 <span><span class="va">Compnim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/compileNimble.html" class="external-link">compileNimble</a></span><span class="op">(</span><span class="va">nimMCMC</span>, project <span class="op">=</span> <span class="va">prepnim</span><span class="op">)</span> <span class="co"># compile the samplers next</span></span>
 <span><span class="va">Compnim</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>niter <span class="op">=</span> <span class="va">nI</span>, nburnin <span class="op">=</span> <span class="va">nB</span>, thin <span class="op">=</span> <span class="va">nT</span><span class="op">)</span></span>
-<span><span class="va">falcon_res</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu">as.mcmc</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Compnim</span><span class="op">$</span><span class="va">mvSamples</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">falcon_res</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/coda/man/mcmc.html" class="external-link">as.mcmc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Compnim</span><span class="op">$</span><span class="va">mvSamples</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>View a portion of the results (printing all of the
 <code>lambda</code> values takes up too much room):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
