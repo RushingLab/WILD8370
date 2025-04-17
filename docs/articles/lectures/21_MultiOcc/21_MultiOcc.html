@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 21</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 21
+]
+.subtitle[
+## Bonus Lecture - Multispecies Occupancy
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+## Readings
+
+&gt; 
+
+
+&gt; Devarajan, K., Morelli, T.L. and Tenan, S. (2020), Multi-species occupancy models: review, roadmap, and recommendations. Ecography, 43: 1612-1624. https://doi.org/10.1111/ecog.04957
+
+&gt; 
+
+---
+## Multi-Species Occupancy Models
+
+Like single species occupancy models, MSOMs are built on the encounter histories of species across sites in a region during repeated visits
+
+
+Based on the concept that a community is an ensemble of species occurring at a site and a metacommunity is the collection of such communities
+
+
+Typically used to estimate species richness at both the community and metacommunity level
+
+
+---
+## Conceptual Framework from Guillera-Arroita et al 2019
+
+&lt;img src="figs/c1.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Conceptual Framework from Guillera-Arroita et al 2019
+
+&lt;img src="figs/c2.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Conceptual Framework from Guillera-Arroita et al 2019
+
+&lt;img src="figs/c3.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Assumptions and their reprocussions
+
+
+#### Geographic and demographic closure  
+
+
+#### Independence
+
+
+#### Accurate identification
+
+
+#### Ecological similarity in species
+
+
+---
+## Assumptions and their reprocussions
+
+#### Geographic and demographic closure  
+
+  +  Sites represent closed populations; No births, deaths, colonization or extinction during the surveys
+  
+  
+        +   Violations usually inflate species richness 
+  
+---
+## Assumptions and their reprocussions
+
+#### Independence
+
+  + Detection and occupancy probability at site A is independent of detection and occupancy at site B 
+  
+  + Frequently violated when there is oversampling or clustered sampling 
+  
+  + Spatial correlations usually not a problem
+  
+  + Luckily, violations can be tested for statistically! 
+  
+    
+      + Violations lead to overestimate of precision of estimates 
+      
+  
+---
+## Assumptions and their reprocussions
+
+#### Accurate identification
+
+  + We assume observers can correctly separate species from one another 
+  
+  + Easily violated during any auditory surveys (frogs, insects, birds, etc.)
+
+  
+    + Fluctuations in detectability or observer error can significantly impact and bias occupancy estimates
+    
+    + False positives result in an overestimation of species richness
+    
+    + Can partially address by modeling false positives if misidentification and 
+      detection probabilities are caused by different processes
+    
+    
+---
+## Assumptions and their reprocussions
+
+#### Ecological similarity in species
+
+  + Assume that species in the community are similar, resulting in species-specific random effects that are drawn from the same distribution
+
+
+    + Violating this assumption leads to prediction errors (just straight up wrong answers)
+    
+    
+---
+## Basic Mathematical Structure
+
+`\(x_i\)` that is 1 for real specie and 0 for fake species with probability `\(\omega\)`:
+
+`$$x_i \sim Bernoulli(\omega)$$`
+
+Occupancy status of each species `\(i\)` at each site `\(j\)`:
+
+`$$z_{i,j} \sim Bernoulli(x_i \psi_i)$$`
+
+`$$logit(\psi_{i,j}) \sim Normal(\mu_{\psi}, \sigma^2_{\psi})$$`
+
+`$$y_{i,j} \sim Binomial(z_{i,j}p_i, K)$$`
+
+`\(p_i\)` is a species-specific random effect:
+
+`$$logit(p_i) \sim Normal(\mu_{p}, \sigma_{p}^2)$$`
+
+---
+## Basic Mathematical Structure
+
+Richness at each site:
+
+`$$\Large R_j = \sum_{i=1}^M z_{i,j}$$`
+
+Richness overall:
+
+`$$\Large R = \sum_{i=1}^M x_{i}$$`
+
+
+**Note: Even with model assumptions perfectly met, estimation of the total number of species can be poor if many species are missed (&gt;15%)**
+
+
+---
+## False Positives 
+
+
+&lt;img src="figs/FPs.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+False positives are easier to deal with when we only have one species because we don't have to identify who the false detection 'belongs to'. 
+
+Without extra data, you cannot reliably model false positives in a multi-species framework. 
+
+Table stolen from: 
+
+Miller, D.A., Nichols, J.D., McClintock, B.T., Grant, E.H.C., Bailey, L.L. and Weir, L.A. (2011), Improving occupancy estimation when two types of observational error occur: non-detection and species misidentification. Ecology, 92: 1422-1428. https://doi.org/10.1890/10-1396.1
+
+---
+## Multispecies Occupancy in Nimble
+
+
+``` r
+nimbleCode({
+   # Superpopulation process
+   for (k in 1:M){
+     w[k] ~ dbern(omega) # Community membership indicator
+   }
+   
+   # Ecological model for latent occurrence z (process model)
+   for (k in 1:M){
+    # Priors to describe heterogeneity among species in community
+     logit(psi[k]) &lt;- lpsi[k] #present/absent prob
+     lpsi[k] ~ dnorm(mu.lpsi, sd = sd.lpsi) #present/absent on wrong scale
+     lp[k] ~ dnorm(mu.lp, sd = sd.lp) #detection on wrong scale
+     for (i in 1:nsite) {
+       z[i,k] ~ dbern(w[k] * psi[k]) #gotta be real to be present
+     }
+   }
+```
+
+---
+## Multispecies Occupancy in Nimble
+
+
+``` r
+   # Observation model for observed detection frequencies
+   for (k in 1:M){
+     logit(p[k]) &lt;- lp[k]
+     for (i in 1:nsite) {
+       y[i,k] ~ dbin(z[i,k] * p[k], ntrials[i])
+     }
+   }
+   
+   # Hyperpriors to describe full community
+   omega ~ dunif(0,1) # For data augmentation (probability of community membership)
+   mu.lpsi ~ dnorm(0,sd = 30) # Community mean of occupancy (logit)
+   mu.lp ~ dnorm(0,sd = 30) # Community mean of detection (logit)
+   sd.lpsi ~ dunif(0,5) # Species heterogeneity in logit(psi)
+   sd.lp ~ dunif(0,5) # Species heterogeneity in logit(p)
+```
+
+---
+## Multispecies Occupancy in Nimble
+
+
+``` r
+   # Derived quantities
+   for (k in 1:M){
+     Socc.fs[k] &lt;- sum(z[1:nsite,k]) # Number of occupied sites among the sampled ones
+     speciesP[k]&lt;-(Socc.fs[k]&gt;0)*1
+   }
+   
+   Nsmall&lt;-sum(speciesP[1:M]) #total species present
+   for (i in 1:nsite) {
+     Nsite[i] &lt;- sum(z[i,1:M]) # Number of occurring species at each site
+   }
+   Ntotal &lt;- sum(w[1:M]) # Total metacommunity size
+})
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
