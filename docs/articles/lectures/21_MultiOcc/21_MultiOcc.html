@@ -198,8 +198,8 @@ nimbleCode({
    for (k in 1:M){
     # Priors to describe heterogeneity among species in community
      logit(psi[k]) &lt;- lpsi[k] #present/absent prob
-     lpsi[k] ~ dnorm(mu.lpsi, sd = sd.lpsi) #present/absent on wrong scale
-     lp[k] ~ dnorm(mu.lp, sd = sd.lp) #detection on wrong scale
+     lpsi[k] ~ dnorm(mu.lpsi, sd = sd.lpsi) #present/absent on normal scale
+     lp[k] ~ dnorm(mu.lp, sd = sd.lp) #detection on normal scale
      for (i in 1:nsite) {
        z[i,k] ~ dbern(w[k] * psi[k]) #gotta be real to be present
      }
@@ -220,11 +220,11 @@ nimbleCode({
    }
    
    # Hyperpriors to describe full community
-   omega ~ dunif(0,1) # For data augmentation (probability of community membership)
-   mu.lpsi ~ dnorm(0,sd = 30) # Community mean of occupancy (logit)
-   mu.lp ~ dnorm(0,sd = 30) # Community mean of detection (logit)
-   sd.lpsi ~ dunif(0,5) # Species heterogeneity in logit(psi)
-   sd.lp ~ dunif(0,5) # Species heterogeneity in logit(p)
+   omega ~ dbeta(1, 1) # For data augmentation (probability of community membership)
+   mu.lpsi ~ dnorm(0,sd = 10) # Community mean of occupancy (logit)
+   mu.lp ~ dnorm(0,sd = 10) # Community mean of detection (logit)
+   sd.lpsi ~ dexp(1) # Species heterogeneity in logit(psi)
+   sd.lp ~ dexp(1) # Species heterogeneity in logit(p)
 ```
 
 ---
@@ -245,6 +245,306 @@ nimbleCode({
    Ntotal &lt;- sum(w[1:M]) # Total metacommunity size
 })
 ```
+
+---
+## Example - Blantant Self Promotion 
+
+&lt;img src="figs/me.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Southern Appalachian Birds
+
+This study was conducted across an elevation gradient and 10 years. The original study also used abundance. We'll just analyze occupancy in 2018.
+
+&lt;img src="figs/map.jpeg" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Southern Appalachian Birds
+
+The data for this example are located in the WILD8370 package, or you can find them online where the paper is published.
+
+Each column is a species, and each row is a point count location. There are 110 locations, with 45 total species detected. Each site was surveyed 4 times. 
+
+
+``` r
+library(WILD8370)
+#data("Coweeta_birds")
+load("~/Desktop/U_Georgia/WILD8370/data/Coweeta_birds.rda")
+str(Coweeta_birds)
+```
+
+```
+## List of 2
+##  $ obs : num [1:110, 1:4, 1:45] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ temp: num [1:110] 1.06 0.933 0.735 0.828 0.922 ...
+```
+
+---
+## Example - Southern Appalachian Birds
+
+First we need to convert our data into occupancy from abundance. 
+
+``` r
+Coweeta_birds$obs[Coweeta_birds$obs &gt;0] &lt;- 1
+```
+
+Let's look at raw occupancy to get an idea of our data set. First, how many species did we see per site?
+
+
+``` r
+rowSums(apply(Coweeta_birds$obs, c(1, 3), function(x) any(x &gt; 0)))
+```
+
+```
+##   [1] 12  8 10  4  4 11  5  1  9  6  2  2  2  7 10 11  5  4  6  2  8  5 10  7 10
+##  [26] 11  4  1  7 12  9 14 11  2  5 11  9  1  7 11  4  8  7  4  4  7  6  6  5  9
+##  [51]  9  9  8  3  5 10  6 10  7  7  6  9  4  9  6  8 11  7  3  6  5  6  4  5 10
+##  [76]  9  8  9  7  4  6  6  2  8  7 14 10 11  8  7  5  9  8 10 10  6  4  5  9  4
+## [101]  7  7  7  5  5  3  9  5  6  7
+```
+
+---
+## Example - Southern Appalachian Birds
+
+
+How many sites did we see each species at? (The 0s are because some of these species were seen in other years, just not 2018).
+
+
+``` r
+colSums(apply(Coweeta_birds$obs, c(1, 3), function(x) any(x &gt; 0)))
+```
+
+```
+##  [1]  2 57 55 20  5 52 23 15  3 29  3  8  2  3  5  0 25 15  0  0  4 36  2  4  3
+## [26] 26 79  1 14 16  1 30  1  0 45 51  0 37 33  4 11  3 32  1  0
+```
+
+---
+## Example - Southern Appalachian Birds
+
+Now we need to setup our data for the model. Let's add an additional 30 species that we could have missed. 
+
+
+``` r
+M &lt;- dim(Coweeta_birds$obs)[3] + 30
+nsites &lt;- nrow(Coweeta_birds$obs)
+y &lt;- apply(Coweeta_birds$obs, c(1,3), sum)
+ynew &lt;- cbind(y, array(0, c(nsites, 30)))
+nd &lt;- list(y = ynew)
+str(ynew)
+```
+
+```
+##  num [1:110, 1:75] 0 0 0 0 0 0 0 0 0 0 ...
+```
+
+``` r
+ynew[1:2, 1:10]
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+## [1,]    0    3    3    0    3    1    1    0    0     0
+## [2,]    0    4    0    0    0    0    2    0    0     0
+```
+
+---
+## Example - Southern Appalachian Birds
+
+We'll use the model we saw before, but let occupancy change with temperature, since temperature and elevation are strongly correlated at this location (top of the mountain is cold, bottom of the mountain is warm).
+
+Note: This is *NOT* a good model.
+
+
+``` r
+nimbleCode({
+   # Superpopulation process
+   for (k in 1:M){
+     w[k] ~ dbern(omega) # Community membership indicator
+   }
+   
+   # Ecological model for latent occurrence z (process model)
+   for (k in 1:M){
+    # Priors to describe heterogeneity among species in community
+     lp[k] ~ dnorm(mu.lp, sd = sd.lp) #detection on normal scale
+     for (i in 1:nsite) {
+       logit(psi[i,k]) &lt;- mu.lpsi + psi.t[k]*temp[i] #present/absent prob
+       z[i,k] ~ dbern(w[k] * psi[i, k]) #gotta be real to be present
+     }
+   }
+```
+
+---
+## Example - Southern Appalachian Birds
+&lt;style type="text/css"&gt;
+.smallsmall .remark-code { 
+font-size: 45% !important;
+}
+&lt;/style&gt;
+
+.smallsmall[
+
+``` r
+birdmod &lt;- nimbleCode({
+   # Superpopulation process
+   for (k in 1:M){
+     w[k] ~ dbern(omega) # Community membership indicator
+   }
+   
+   # Ecological model for latent occurrence z (process model)
+   for (k in 1:M){
+    # Priors to describe heterogeneity among species in community
+     lp[k] ~ dnorm(mu.lp, sd = sd.lp) #detection on normal scale
+     psi.t[k] ~ dnorm(0, sd = sd.psi.t)
+     for (i in 1:nsite) {
+       logit(psi[i,k]) &lt;- mu.lpsi + psi.t[k]*temp[i] #present/absent prob
+       z[i,k] ~ dbern(w[k] * psi[i, k]) #gotta be real to be present
+     }
+  
+     logit(p[k]) &lt;- lp[k]
+     for (i in 1:nsite) {
+       y[i,k] ~ dbin(z[i,k] * p[k], ntrials[i])
+     }
+   }
+   
+   # Hyperpriors to describe full community
+   omega ~ dbeta(1,1) # For data augmentation (probability of community membership)
+   mu.lpsi ~ dnorm(0,sd = 10) # Community mean of occupancy (logit)
+   mu.lp ~ dnorm(0,sd = 10) # Community mean of detection (logit)
+   sd.lp ~ dexp(1) # Species heterogeneity in logit(p)
+   sd.psi.t ~ dexp(1)
+
+   for (k in 1:M){
+     Socc.fs[k] &lt;- sum(z[1:nsite,k]) # Number of occupied sites 
+     speciesP[k] &lt;- (Socc.fs[k]&gt;0)*1
+   }
+   
+   Nsmall&lt;-sum(speciesP[1:M]) #total species present
+   for (i in 1:nsite) {
+     Nsite[i] &lt;- sum(z[i,1:M]) # Number of occurring species at each site
+   }
+   Ntotal &lt;- sum(w[1:M]) # Total metacommunity size
+})
+```
+]
+
+---
+## Example - Southern Appalachian Birds
+
+Most of the annoyance of this model will be initial values. Temperature is already scaled, woot woot!
+
+
+``` r
+nseen &lt;- 45
+nc &lt;- list(nsite = nsites, M = M, temp = Coweeta_birds$temp, ntrials = rep(4, nsites))
+ni &lt;- list(w = c(rep(1, nseen), rep(0, 30)), #start only ones we saw as real
+           lp = rep(.25, M), #plogis(.25) = 56% detection
+           mu.lp = 0.25, 
+           sd.lp = 1,
+           sd.psi.t = 1,
+           mu.lpsi = 0.25, #50% average chance of occupancy
+           psi.t = rep(0, M), #start with no effect of temperature
+           omega = nseen/M,
+           z = cbind(array(1, c(nsites, nseen)), 
+                     array(0, c(nsites, M-nseen)))
+)
+params &lt;- c('Ntotal', 'Nsite', 'Nsmall', 'omega', 'w', 'lp', 
+            'mu.lp', 'sd.lp', 'mu.lpsi', 'psi.t', 'sd.psi.t', 'Socc.fs')
+```
+
+---
+## Example - Southern Appalachian Birds
+
+Check model
+
+
+``` r
+prepnim &lt;- nimbleModel(code = birdmod, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo()
+prepnim$calculate()
+```
+
+```
+## [1] -18131
+```
+
+---
+## Example - Southern Appalachian Birds
+
+Run the model
+
+
+``` r
+birds.out &lt;- nimbleMCMC(code = birdmod,
+                     data = nd,
+                     constants = nc,
+                     inits = ni,
+                     monitors = params,
+                     thin = 1,
+                     niter = 10000,
+                     nburnin = 4000,
+                     nchains = 3,
+                     samplesAsCodaMCMC = TRUE
+                      )
+```
+
+
+---
+## Example - Southern Appalachian Birds
+
+Let's check convergence 
+
+
+``` r
+MCMCvis::MCMCtrace(birds.out, params = c('Nsmall', 'omega', 'Ntotal'), pdf = F, Rhat = T, n.eff = T)
+```
+
+&lt;img src="21_MultiOcc_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Southern Appalachian Birds
+
+
+``` r
+ps &lt;- MCMCvis::MCMCsummary(birds.out, params = 'lp')
+gg_p &lt;- data.frame(median = plogis(ps$`50%`),
+                   LCI = plogis(ps$`2.5%`),
+                   UCI = plogis(ps$`97.5%`),
+                   species = 1:M)
+```
+
+&lt;img src="21_MultiOcc_files/figure-html/unnamed-chunk-24-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Example - Southern Appalachian Birds
+
+
+``` r
+psis &lt;- MCMCvis::MCMCsummary(birds.out, params = c('mu.lpsi', 'psi.t'))
+tseq &lt;- seq(-2, 2, by = .1)
+mean_psi &lt;- array(NA, c(M, length(tseq)))
+for(k in 1:M){
+  mean_psi[k,] &lt;- plogis(psis$`50%`[1] + tseq*psis$`50%`[k+1])
+}
+```
+&lt;img src="21_MultiOcc_files/figure-html/unnamed-chunk-26-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## Conclusions
+
+  + Multispecies occupancy has the potential to be very powerful but can also easily go wrong
+
+
+  + Not very useful if you have poor detection or rare species 
+  
+  
+  + Need to consider how large `\(M\)` can realistically be 
+  
+  
+  + Dr. Gaya doesn't like these models, so these slides are biased 
+  
+  
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
