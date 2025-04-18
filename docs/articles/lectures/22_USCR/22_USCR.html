@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 22</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="   Spring 2025" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="FANR8370.css" type="text/css" />
+    <link rel="stylesheet" href="FANR8370-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 22
+]
+.subtitle[
+## Bonus Lecture - Unmarked Spatial Recapture
+]
+.author[
+### <br/><br/><br/>Spring 2025
+]
+
+---
+
+
+
+## Readings
+
+&gt; Chandler, Richard B., and J. Andrew Royle. “Spatially explicit models for inference about density in unmarked or partially marked populations." The Annals of Applied Statistics 7, no. 2 (2013): 936–54. http://www.jstor.org/stable/23566419.
+
+&gt; Augustine, B. C., J. A. Royle, S. M. Murphy, R. B. Chandler, J. J. Cox, and M. J. Kelly. 2019. Spatial capture–recapture for categorically marked populations with an application to genetic capture–recapture. Ecosphere 10(4):e02627. 10.1002/ecs2.2627
+
+&gt; Chandler, R. B., D. A. Crawford, E. P. Garrison, K. V. Miller, and M. J. Cherry. 2022. Modeling abundance, distribution, movement, and space use with camera and telemetry data. Ecology 103(10): e3583. 10.1002/ecy.3583
+
+&gt; Catherine Sun, Joanna M. Burgar, Jason T. Fisher, A. Cole Burton,
+A cautionary tale comparing spatial count and partial identity models for estimating densities of threatened and unmarked populations. Global Ecology and Conservation. Volume 38, 2022. e02268. https://doi.org/10.1016/j.gecco.2022.e02268.
+
+---
+## Spatial Capture Recapture 
+
+ - Goal is to estimate the density of a population across some pre-determined region 
+ 
+ 
+ - Typically done by setting out an array of detectors and identifying all captured individuals with unique IDs 
+ 
+ 
+ - Statistical process hinges on the concept that animals with activity centers farther from traps will be harder to detect than those nearby 
+ 
+ 
+---
+## Spatial Capture Recapture 
+
+Basic SCR:
+
+`$$\Lambda = \int_{\mathcal{S}} \lambda(s)$$`
+
+
+`$$\large \mathbf{s_{i}} \sim Uniform(s_{min}, s_{max})$$`
+
+`$$\Large z_{i} \sim Bernoulli(\frac{\Lambda}{M})$$`
+
+`$$\large p_{ij} = g_0*e^{(-\|s_i - x_j\|^2/(2\sigma^2))}$$`
+
+`$$\large y_{ij} \sim Binomial(z_i*p_{ij}, K)$$`
+
+`$$\Large N = \sum^M_{i=1} z_i$$`
+
+---
+## Capture Probability 
+
+In classical SCR we think of detection probability as a function of distance between the activity center and our trap, defined with a half-normal:
+
+`$$\large p_{ij} = g_0*e^{(-\|s_i - x_j\|^2/(2\sigma^2))}$$`
+
+&lt;br/&gt;
+
+This tells us the probability of trap `\(j\)` detecting individual `\(i\)` specifically. This is great when we have marked data.
+ 
+&lt;br/&gt;
+
+For unmarked SCR, however, we would rather know the probability that trap `\(j\)` detects *ANY* individual. 
+
+&lt;br/&gt;
+
+That is, what is `\(P(At Least One)\)` for a binomial ?
+
+
+---
+## Binomial and Poisson
+
+Turns out the binomial and the Poisson distribution are connected! 
+
+
+In fact, the Poisson distribution is actually a limiting case of a Binomial distribution when the number of trials, `\(n\)`, gets very large and `\(p\)`, the probability of success, is small. 
+
+
+This is excellent news, because we know:
+
+`$$\Large P(Pois(\lambda) = 0) = e^{-\lambda}$$`
+
+Which means the probability of drawing a non-0 number from a poisson is just:
+
+`$$\Large  P(At Least One) = 1-e^{-\lambda}$$`
+
+
+---
+## Binomial and Poisson
+
+Okay, so now we know about the Poisson but how does that help with us with the binomial? 
+
+
+Remember if:
+
+`$$\Large N \sim Pois(\lambda)$$`
+
+Then 
+
+`$$\Large E(N) = \lambda$$` 
+
+
+And if:
+
+
+`$$\Large N \sim Binomial(n, p)$$`
+
+Then 
+
+
+`$$\Large E(N) = n*p$$` 
+
+---
+## Binomial and Poisson
+
+Thus we can approximate the probability that a trap detects at least one individual with
+
+`$$\Large  P(At Least One) = 1-e^{-np}$$`
+
+&lt;br/&gt;
+
+In practice, this means we need to calculate:
+
+`$$\Large 1 - e^{-(\sum_{i = 1}^M p_{i,j}*z_i)}$$`
+
+---
+## Unmarked SCR Model
+
+`$$\Lambda = \int_{\mathcal{S}} \lambda(s)$$`
+
+
+`$$\large \mathbf{s_{i}} \sim Uniform(s_{min}, s_{max})$$`
+
+`$$\Large z_{i} \sim Bernoulli(\frac{\Lambda}{M})$$`
+
+`$$\large p_{ij} = g_0*e^{(-\|s_i - x_j\|^2/(2\sigma^2))}$$`
+
+`$$\large y_{j} \sim Binomial(1 - e^{-(\sum_{i = 1}^M p_{i,j}*z_i)}, K)$$`
+
+`$$\Large N = \sum^M_{i=1} z_i$$`
+
+---
+## What is an occasion?
+
+We are back to working in discrete time, which means we need to define occasions. 
+
+
+In physical capture/tagging studies, this is usually defined by the trapping process. 
+
+
+For cameras or ARUs, this gets trickier. 
+
+
+There are no clear answers here. Just try to make an informed decision based on your species. 
+
+
+- insert shrugging emoji here - 
+
+
+---
+## In Nimble - Homogenous Version
+
+
+``` r
+uscr &lt;- nimbleCode({
+g0 ~ dbeta(1, 1)       ## Baseline capture probability
+sigma ~ dexp(1)  ## Scale parameter of encounter function
+psi ~ dbeta(1, 1)  ## Data augmentation parameter
+for(i in 1:M) {
+  s[i,1] ~ dunif(xlim[1], xlim[2]) ## x-coord of activity center
+  s[i,2] ~ dunif(ylim[1], ylim[2]) ## y-coord of activity center
+  z[i] ~ dbern(psi)                ## Is individual real?
+  for(j in 1:J) {
+    dist[i,j] &lt;- sqrt((s[i,1]-x[j,1])^2 + (s[i,2]-x[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sigma^2))
+  }
+} #end M
+  for(j in 1:J) {
+    y[j] ~ dbinom(p = 1-exp(-(sum(z[1:M]*p[1:M,j]))), size = ntrials) ## Model per trap
+  }
+EN &lt;- M*psi  ## Expected value of N
+N &lt;- sum(z[1:M])  ## Realized value of N
+})
+```
+
+---
+## Simulation
+
+Let's simulate some data to prove to ourselves that this works. 
+
+
+&lt;style type="text/css"&gt;
+.smaller .remark-code { 
+font-size: 65% !important;
+}
+&lt;/style&gt;
+
+.smaller[
+
+``` r
+set.seed(35)
+N &lt;- 55
+max &lt;- 20
+min &lt;- 0
+g0 &lt;-  .75
+sig &lt;- 1
+x &lt;- seq(3, 17, length.out = 14) #14 x 14
+traps &lt;- expand.grid(x,x) #camera traps
+ntrials &lt;- 14 #2 weeks
+ntraps &lt;- nrow(traps)
+s &lt;- matrix(runif(N*2, min = min, max = max), ncol = 2)
+dist &lt;- p  &lt;- array(NA, c(N, ntraps))
+seen &lt;- array(NA, c(N, ntraps, ntrials))
+for(j in 1:ntraps) {
+  for(i in 1:N){
+    dist[i,j] &lt;- sqrt((s[i,1]-traps[j,1])^2 + (s[i,2]-traps[j,2])^2)
+    p[i,j] &lt;- g0*exp(-dist[i,j]^2/(2*sig^2))
+    for(k in 1:ntrials){
+    seen[i,j,k] &lt;- rbinom(1, 1, p[i,j]) ## actual captures
+    }
+  }
+}
+```
+]
+
+---
+## Simulation
+
+Our data:
+
+
+``` r
+plot(s, pch = 19, ylim = c(min, max), xlim = c(min, max))
+points(traps, cex = 1, pch = 4, col = 'red')
+```
+
+&lt;img src="22_USCR_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+## Simulation
+
+Since we don't know which individual is which, we will turn our 'captures' of each individual into a sum indicating how many days (of 14) each trap saw at least one animal.
+
+
+``` r
+pertrap &lt;- apply(seen, MARGIN = c(2,3), FUN = function(x)sum(x))
+binary &lt;- (pertrap &gt; 1)*1
+y2 &lt;- rowSums(binary)
+y2
+```
+
+```
+##   [1]  0  0  2  5  1  2  2  3  1  1  2  0  1  0  0  4 10 11  8  8  4  3  0  0  0
+##  [26]  0  0  1  0  3  9 10 11 10  8  1  0  0  0  0  0  0  0  0  4  7  9  8  3  0
+##  [51]  0  1  0  0  0  0  0  0  0  2  8  2  1  0  0  0  0  0  1  1  0  0  0  2  3
+##  [76]  0  1  2  1  1  3  1  0  2  0  0  1  0  0  1  0  0  2  0  5  5  4 10  0  0
+## [101]  0  0  0  1  0  0  0  3  8  8 12 11  0  0  0  0  0  0  0  0  1  1  7  6 12
+## [126]  8  0  0  1  1  2  1  0  1  0  0  1  3  7  5  0  0  0  0  0  2  1  0  0  1
+## [151]  0  1  2  0  0  0  0  1  1  3  6  3  2  3  1  2  2  1  0  0  1  1  0  2  4
+## [176]  2  1  3  1  7  3  1  0  0  0  4  6  2  0  2  5  7  5  2  2  0
+```
+
+---
+## Simulation
+
+Great, now we can send our information to nimble
+
+
+``` r
+M &lt;- N*2 #for convenience
+nd &lt;- list(y = y2)
+nc &lt;- list(M = M, J = ntraps, ntrials = ntrials, 
+           xlim = c(min, max), ylim = c(min, max),
+           x = traps)
+s.init &lt;- rbind(s, s)
+ni &lt;- list(g0 = runif(1), 
+           sigma = sig,
+           psi = N/M,
+           s = s.init,
+           z = c(rep(1, N), rep(0, M-N)))
+params &lt;- c('EN', 'N', 'psi', 'g0', 'sigma')
+```
+
+---
+## Simulation
+
+
+``` r
+prepnim &lt;- nimbleModel(code = uscr, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+```
+
+```
+## [1] -1152
+```
+
+---
+## Simulation
+
+
+``` r
+library(parallel)
+cl &lt;- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("ni",  "nc", 'nd', "uscr", 'params'))
+uscr1 &lt;- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim &lt;- nimbleModel(code = uscr, constants = nc,
+                           data = nd, inits = ni, calculate = T)
+prepnim$initializeInfo() #will tell you what is or isn't initialized
+prepnim$calculate() #if this is NA or -Inf you know it's gone wrong
+mcmcnim &lt;- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC &lt;- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel &lt;- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim &lt;- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 5000, nburnin = 3000, thin = 1)
+res &lt;- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+uscr1 &lt;- as.mcmc.list(uscr1)
+stopCluster(cl)
+```
+
+
+
+---
+## Simulation
+
+
+
+``` r
+MCMCvis::MCMCtrace(uscr1, params = c('g0', 'sigma'), pdf = F)
+```
+
+&lt;img src="22_USCR_files/figure-html/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+---
+## General Notes
+
+
+- As with marked spatial capture recapture, the ratio of trap spacing to `\(\sigma\)` can strongly influence your results
+
+
+- Even a small amount of prior information about `\(g0\)` or `\(\sigma\)` makes a big difference 
+
+
+- `\(g0\)` and `\(\sigma\)` are always going to co-vary (not truly independent)
+
+
+---
+## Add in Marked Individuals
+
+In lab we will discuss how to combine camera data with collar data to ensure accurate unmarked SCR estimates
+
+
+&lt;img src="figs/chandler.png" width="55%" style="display: block; margin: auto;" /&gt;
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9",
+  "slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

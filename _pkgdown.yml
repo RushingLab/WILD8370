@@ -72,6 +72,8 @@ navbar:
           href: articles/lectures/20_JSSuper/20_JSSuper.html
         - text: "Lecture 21: Multispecies Occupancy"
           href: articles/lectures/21_MultiOcc/21_MultiOcc.html
+        - text: "Lecture 22: Unmarked SCR"
+          href: articles/lectures/22_USCR/22_USCR.html
           
     - text: "Labs"
       icon: fas fa-laptop-code
