@@ -161,6 +161,8 @@ markedNimble <- nimbleCode({
 Their model was fancier than what we're going to fit, so we'll only use the 29th fortnight of their data (it has the most detection data).
 
 ```{r}
+data('scr2stage')
+
 telemetry.deer2 <- telemetry.deer[,,,29] #first fortnight 
 nTelemLocs2 <- nTelemLocs[, 29]
 keepers <- which(nTelemLocs2 >0)
