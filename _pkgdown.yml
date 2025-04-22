@@ -104,6 +104,8 @@ navbar:
           href: articles/Lab11_Multistate.html
         - text: "Lab 12: Joint Live-Dead Recovery Models"
           href: articles/Lab12_JointLiveDead.html
+        - text: "Lab 13: Two Stage SCR"
+          href: articles/Lab13_2StageSCR.html
     - icon: far fa-bookmark
       text: "References"
       menu:

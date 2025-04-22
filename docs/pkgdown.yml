@@ -9,6 +9,7 @@ articles:
   Lab10_CJS: Lab10_CJS.html
   Lab11_Multistate: Lab11_Multistate.html
   Lab12_JointLiveDead: Lab12_JointLiveDead.html
+  Lab13_2StageSCR: Lab13_2StageSCR.html
   Lab2_simulation: Lab2_simulation.html
   Lab3_BasicMCMC: Lab3_BasicMCMC.html
   Lab4_glms: Lab4_glms.html
@@ -23,7 +24,7 @@ articles:
   RMarkdown: RMarkdown.html
   schedule: schedule.html
   syllabus: syllabus.html
-last_built: 2025-04-18T20:38Z
+last_built: 2025-04-22T13:11Z
 urls:
   reference: http://rushinglab.github.io/WILD8370/reference
   article: http://rushinglab.github.io/WILD8370/articles

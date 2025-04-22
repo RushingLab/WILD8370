@@ -163,13 +163,13 @@ Their model was fancier than what we're going to fit, so we'll only use the 29th
 ```{r}
 data('scr2stage')
 
-telemetry.deer2 <- telemetry.deer[,,,29] #first fortnight 
-nTelemLocs2 <- nTelemLocs[, 29]
+telemetry.deer2 <- scr2stage$telemetry.deer[,,,29] #first fortnight 
+nTelemLocs2 <- scr2stage$nTelemLocs[, 29]
 keepers <- which(nTelemLocs2 >0)
 telemetry.deer2 <- telemetry.deer2[keepers,,] #only keep ones with data
 nTelemLocs2 <- nTelemLocs2[keepers]
-traps <- x
-traphist <- histories4D[keepers,,,29]
+traps <- scr2stage$x
+traphist <- scr2stage$histories4D[keepers,,,29]
 ```
 
 Let's do a quick plot so we know what's happening:
@@ -192,7 +192,7 @@ ylim = range(traps[,2])+c(-1000,1000)
 
 # number of secondary sampling occasions (1 fortnight)
 K <- 14
-operational <- oper3D[,,29]
+operational <- scr2stage$oper3D[,,29]
 ```
 
 ```{r}
@@ -341,8 +341,101 @@ densityNimble <- nimbleCode({
 
 ## Grab Some Data for Part 2
 
-We now also need our unmarked counts of the number of days each camera saw at least one deer. 
+We now also need our unmarked counts of the number of days each camera saw at least one deer. As we can see, despite being out for 2 weeks, there were many sites with relatively few detections.
+
+```{r}
+nsum <- apply(scr2stage$n3D, c(1,3), sum)
+nsum <- nsum[,29]
+nsum
+```
+
+```{r}
+Area <- (xlim[2]-xlim[1])*(ylim[2]-ylim[1])/1e6 ## sq-km
+M <- 350 #lots of deer!
+```
+
+Nimble objects for part 2
+```{r}
+constants <- list(M=M, K = rowSums(operational), 
+                  J=nrow(traps),
+                  xlim = xlim, ylim = ylim, 
+                  Area = Area, x = traps)
+data <- list(nsum = nsum, 
+             prior_means = xbar, prior_vcov = xvar)
+
+log_sig_lam0.init <- rep(NA, 2)
+log_sig_lam0.init[1] <- log(.1)
+log_sig_lam0.init[2] <- log(800)
+
+M.x <- runif(M, xlim[1], xlim[2])
+M.y <- runif(M, ylim[1], ylim[2])
+
+si <- array(NA, c(M, 2))
+for(i in 1:M){
+  si[i, 1] <- M.x[i]
+  si[i, 2] <- M.y[i]
+}
 
 
+inits <- list(s = si, z = rep(1,M),
+              log_sig_lam0 = log_sig_lam0.init,
+              psi = 1) 
 
 
+params <- c("sigma", "lam0", "psi", 
+            "N", "D")
+```
+
+Check model:
+```{r}
+mod.nimble2 <- nimbleModel(code = densityNimble,
+                          constants = constants,
+                          data = data,
+                          inits = inits)
+
+# Did everything initialize correctly?
+mod.nimble2$calculate()
+```
+## Run Stage 2
+
+This part takes a little bit longer, but still isn't too bad in terms of time. Maybe 10 minutes? 
+
+```{r, echo = T, eval = F}
+library(parallel)
+cl <- makeCluster(3) #each chain will be run separately 
+clusterExport(cl = cl, varlist = c("inits",  "constants", 'data', "densityNimble", 'params'))
+stage2 <- clusterEvalQ(cl = cl,{
+library(nimble) #reload packages for each core
+library(coda)
+prepnim <- nimbleModel(code = densityNimble,
+                          constants = constants,
+                          data = data,
+                          inits = inits, calculate = T)
+mcmcnim <- configureMCMC(prepnim, monitors = params, print = T)
+nimMCMC <- buildMCMC(mcmcnim) #actually build the code for those samplers
+Cmodel <- compileNimble(prepnim) #compiling the model itself in C++;
+Compnim <- compileNimble(nimMCMC, project = prepnim) # compile the samplers next
+Compnim$run(niter = 100000, nburnin = 75000, thin = 1)
+res <- (as.mcmc(as.matrix(Compnim$mvSamples)))
+return(res)
+}) #this will take awhile and not produce any progress bar
+stage2 <- as.mcmc.list(stage2)
+stopCluster(cl)
+```
+
+```{r, echo = F, eval = T}
+stage2 <- readRDS('stage2.rds')
+```
+
+Make sure psi is reasonable and other outputs seem to have mixed.
+
+
+```{r}
+MCMCvis::MCMCtrace(stage2, pdf = F, Rhat = T, n.eff = T)
+```
+
+The estimated density (per square kilometer) for female deer at this location is:
+
+```{r}
+MCMCsummary(stage2, 'D', Rhat = F, n.eff = F)
+```
